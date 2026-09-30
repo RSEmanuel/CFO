@@ -11,6 +11,7 @@ import { join } from "node:path";
  * nada del servidor de Postgres.
  */
 const SERVER_NAME = "cfo";
+const DOCKER_CONTAINER = "cfo-postgres";
 const START_TIMEOUT_MS = 60_000;
 const READY_TIMEOUT_MS = 30_000;
 const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
@@ -128,6 +129,18 @@ async function main(): Promise<void> {
     return;
   }
 
+  // Si el Postgres de Docker existe (migración 2026-09: la base local vive en
+  // el contenedor "cfo-postgres"), se levanta sin tocar `prisma dev`.
+  try {
+    execSync(`docker start ${DOCKER_CONTAINER}`, { stdio: "ignore", timeout: START_TIMEOUT_MS });
+    if (await waitUntilReady(target)) {
+      console.log(`Base local lista en el puerto ${target.port} (Docker: ${DOCKER_CONTAINER}).`);
+      return;
+    }
+  } catch {
+    // Docker no está instalado o el contenedor no existe: se sigue con prisma dev.
+  }
+
   console.log(`Levantando la base local "${SERVER_NAME}" en el puerto ${target.port}...`);
 
   // El servidor con nombre conserva sus puertos y sus datos entre reinicios.
@@ -147,8 +160,8 @@ async function main(): Promise<void> {
 
   if (!(await waitUntilReady(target))) {
     throw new Error(
-      `La base local no respondió en el puerto ${target.port}. Revisa con "npx prisma dev ls" ` +
-        `y arráncala con "npm run db:start".`,
+      `La base local no respondió en el puerto ${target.port}. Si usas Docker: "docker start ${DOCKER_CONTAINER}". ` +
+        `Si usas prisma dev: revisa con "npx prisma dev ls" y arráncala con "npm run db:start".`,
     );
   }
   console.log(`Base local lista en el puerto ${target.port}.`);

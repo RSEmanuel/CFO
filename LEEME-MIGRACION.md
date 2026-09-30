@@ -74,6 +74,28 @@ Abre http://localhost:3000 y verifica que aparezcan tus tenants, balanzas y auxi
 - **"Lock file is already being held"**: borra `~/Library/Application Support/prisma-dev-nodejs/Data/durable-streams/cfo/server.lock.lock` y vuelve a `npm run db:start` (el `predev` ya lo intenta solo).
 - **Base vacía tras el import**: asegúrate de haber corrido `npx prisma migrate deploy` ANTES de `npm run db:import`.
 
+## Plan B: Postgres en Docker (recomendado si `prisma dev` da problemas)
+
+En Windows la base local ahora corre así (contenedor `cfo-postgres`). En la Mac también puedes:
+
+```bash
+brew install docker colima   # o instala Docker Desktop para Mac
+colima start                 # (solo si usas colima)
+docker run -d --name cfo-postgres --restart unless-stopped \
+  -e POSTGRES_PASSWORD=postgres -p 54329:5432 postgres:16
+docker exec cfo-postgres psql -U postgres -c "CREATE DATABASE shadow;"
+```
+
+Y en `.env` apunta a Docker:
+
+```
+DATABASE_URL="postgres://postgres:postgres@localhost:54329/postgres?sslmode=disable"
+DIRECT_URL="postgres://postgres:postgres@localhost:54329/postgres?sslmode=disable"
+SHADOW_DATABASE_URL="postgres://postgres:postgres@localhost:54329/shadow?sslmode=disable"
+```
+
+Después: `npx prisma migrate deploy` + `npm run db:import` igual que siempre. El `predev` (`npm run dev`) levanta el contenedor solo si Docker está corriendo.
+
 ## Re-exportar en el futuro
 
 Para generar un respaldo nuevo en cualquier máquina:
