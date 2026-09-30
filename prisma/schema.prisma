@@ -1,0 +1,434 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  ADMIN
+  CFO_PARTNER
+  CLIENT_VIEWER
+}
+
+enum CategoriaMaestra {
+  Activo
+  Pasivo
+  Patrimonio
+  Ingreso
+  COGS
+  OpEx
+}
+
+enum EstatusPago {
+  Pagado
+  Pendiente
+  Cancelado
+}
+
+enum ClasificacionGasto {
+  Fijo
+  Variable
+}
+
+enum TipoInversion {
+  OpEx
+  CapEx
+}
+
+enum IngestProfileOrigin {
+  BUILTIN
+  TENANT
+}
+
+enum IngestAuditStatus {
+  DETECTED
+  VALIDATED
+  COMMITTED
+  REJECTED
+}
+
+enum FlujoDireccion {
+  ingreso
+  egreso
+}
+
+model Tenant {
+  id        String   @id @default(cuid())
+  name      String
+  rfc       String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  users                 User[]
+  balanzasPnL           BalanzaPnL[]
+  auxiliaresVentas      AuxiliarVentas[]
+  auxiliaresEgresos     AuxiliarEgresos[]
+  tesoreriaFlujos       TesoreriaFlujo[]
+  tesoreriaFlujoDetalles TesoreriaFlujoDetalle[]
+  auxiliarMovimientos   AuxiliarMovimiento[]
+  auxiliarCuentaResumenes AuxiliarCuentaResumen[]
+  polizas               Poliza[]
+  polizaMovimientos     PolizaMovimiento[]
+  ingestMappingProfiles IngestMappingProfile[]
+  ingestBatches         IngestBatch[]
+  ingestFileAudits      IngestFileAudit[]
+  budgetAssumptions     BudgetAssumption[]
+
+  @@index([rfc])
+  @@map("tenants")
+}
+
+model User {
+  id         String   @id @default(cuid())
+  email      String   @unique
+  cognitoSub String   @unique
+  role       UserRole
+  tenantId   String
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  ingestBatches    IngestBatch[]
+  ingestFileAudits IngestFileAudit[]
+
+  @@index([tenantId])
+  @@index([email])
+  @@index([cognitoSub])
+  @@map("users")
+}
+
+model BalanzaPnL {
+  id                       String           @id @default(cuid())
+  tenantId                 String
+  idCuenta                 String
+  nombreCuenta             String
+  categoriaMaestra         CategoriaMaestra
+  saldoInicial             Decimal          @db.Decimal(18, 2)
+  debe                     Decimal          @db.Decimal(18, 2)
+  haber                    Decimal          @db.Decimal(18, 2)
+  saldoFinal               Decimal          @db.Decimal(18, 2)
+  montoPresupuestado       Decimal          @db.Decimal(18, 2)
+  depreciacionAmortizacion Boolean          @default(false)
+  periodo                  Int
+  anio                     Int
+  createdAt                DateTime         @default(now())
+  updatedAt                DateTime         @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio, periodo, idCuenta])
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@index([tenantId, categoriaMaestra])
+  @@map("balanzas_pnl")
+}
+
+model AuxiliarVentas {
+  id               String      @id @default(cuid())
+  tenantId         String
+  idCliente        String
+  nombreCliente    String
+  folioFactura     String
+  fechaEmision     DateTime    @db.Date
+  fechaVencimiento DateTime    @db.Date
+  montoSubtotal    Decimal     @db.Decimal(18, 2)
+  iva              Decimal     @db.Decimal(18, 2)
+  montoCobrado     Decimal     @db.Decimal(18, 2)
+  estatusPago      EstatusPago
+  lineaNegocio     String
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, folioFactura])
+  @@index([tenantId])
+  @@index([tenantId, idCliente])
+  @@index([tenantId, fechaEmision])
+  @@index([tenantId, estatusPago])
+  @@map("auxiliares_ventas")
+}
+
+model AuxiliarEgresos {
+  id                 String             @id @default(cuid())
+  tenantId           String
+  idProveedor        String
+  nombreProveedor    String
+  folioDocumento     String
+  fechaEmision       DateTime           @db.Date
+  fechaVencimiento   DateTime           @db.Date
+  montoSubtotal      Decimal            @db.Decimal(18, 2)
+  centroDeCostos     String
+  clasificacionGasto ClasificacionGasto
+  tipoInversion      TipoInversion
+  estatusPago        EstatusPago
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, folioDocumento])
+  @@index([tenantId])
+  @@index([tenantId, idProveedor])
+  @@index([tenantId, fechaEmision])
+  @@index([tenantId, clasificacionGasto, tipoInversion])
+  @@map("auxiliares_egresos")
+}
+
+model TesoreriaFlujo {
+  id                  String   @id @default(cuid())
+  tenantId            String
+  idBancoCaja         String
+  saldoInicialPeriodo Decimal  @db.Decimal(18, 2)
+  entradasOperativas  Decimal  @db.Decimal(18, 2)
+  salidasOperativas   Decimal  @db.Decimal(18, 2)
+  salidasCapex        Decimal  @db.Decimal(18, 2)
+  servicioDeuda       Decimal  @db.Decimal(18, 2)
+  saldoFinalPeriodo   Decimal  @db.Decimal(18, 2)
+  periodo             Int
+  anio                Int
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio, periodo, idBancoCaja])
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@map("tesoreria_flujos")
+}
+
+model TesoreriaFlujoDetalle {
+  id           String          @id @default(cuid())
+  tenantId     String
+  anio         Int
+  periodo      Int
+  idBancoCaja  String
+  direccion    FlujoDireccion
+  categoriaKey String
+  labelOrigen  String
+  monto        Decimal         @db.Decimal(18, 2)
+  esTraspaso   Boolean         @default(false)
+  orden        Int
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio, periodo, idBancoCaja, direccion, categoriaKey])
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@map("tesoreria_flujo_detalle")
+}
+
+model AuxiliarMovimiento {
+  id           String   @id @default(cuid())
+  tenantId     String
+  anio         Int
+  periodo      Int
+  moneda       String
+  idCuenta     String
+  nombreCuenta String
+  fecha        DateTime @db.Date
+  tipoPoliza   String
+  numeroPoliza String
+  concepto     String
+  referencia   String
+  cargos       Decimal  @db.Decimal(18, 2)
+  abonos       Decimal  @db.Decimal(18, 2)
+  saldo        Decimal  @db.Decimal(18, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@index([tenantId, idCuenta, fecha])
+  @@map("auxiliar_movimientos")
+}
+
+model Poliza {
+  id               String   @id @default(cuid())
+  tenantId         String
+  anio             Int
+  periodo          Int
+  tipo             String
+  numero           Int
+  fecha            DateTime @db.Date
+  concepto         String
+  totalCargos      Decimal  @db.Decimal(18, 2)
+  totalAbonos      Decimal  @db.Decimal(18, 2)
+  cuadrada         Boolean  @default(true)
+  movimientosCount Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio, periodo, tipo, numero])
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@map("polizas")
+}
+
+model PolizaMovimiento {
+  id               String   @id @default(cuid())
+  tenantId         String
+  anio             Int
+  periodo          Int
+  tipoPoliza       String
+  numeroPoliza     Int
+  numeroMovimiento Int
+  codigoCuenta     String
+  nombreCuenta     String
+  referencia       String
+  concepto         String
+  cargo            Decimal  @db.Decimal(18, 2)
+  abono            Decimal  @db.Decimal(18, 2)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId])
+  @@index([tenantId, anio, periodo])
+  @@index([tenantId, anio, periodo, tipoPoliza, numeroPoliza])
+  @@index([tenantId, codigoCuenta])
+  @@map("poliza_movimientos")
+}
+
+model AuxiliarCuentaResumen {
+  id           String   @id @default(cuid())
+  tenantId     String
+  anio         Int
+  periodo      Int
+  moneda       String
+  idCuenta     String
+  nombreCuenta String
+  saldoInicial Decimal  @db.Decimal(18, 2)
+  cargos       Decimal  @db.Decimal(18, 2)
+  abonos       Decimal  @db.Decimal(18, 2)
+  saldoFinal   Decimal  @db.Decimal(18, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio, periodo, moneda, idCuenta])
+  @@index([tenantId, anio, periodo])
+  @@map("auxiliar_cuenta_resumen")
+}
+
+model BudgetAssumption {
+  id                   String   @id @default(cuid())
+  tenantId             String
+  anio                 Int
+  salesGrowthPct       Decimal  @db.Decimal(6, 3)
+  inflationPct         Decimal  @db.Decimal(6, 3)
+  headcount            Int
+  headcountCostMonthly Decimal  @db.Decimal(14, 2)
+  debtInterestMonthly  Decimal  @db.Decimal(14, 2)
+  depreciationMonthly  Decimal  @db.Decimal(14, 2)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, anio])
+  @@index([tenantId])
+  @@map("budget_assumptions")
+}
+
+model IngestMappingProfile {
+  id                         String              @id @default(cuid())
+  tenantId                   String?
+  origin                     IngestProfileOrigin
+  profileKey                 String
+  version                    Int
+  isActive                   Boolean             @default(true)
+  name                       String
+  sourceSystem               String
+  documentType               String
+  headerRow                  Int
+  sheetMatch                 String?
+  columnMap                  Json
+  enumMap                    Json
+  accountPrefixRules         Json?
+  accountRoles               Json?
+  matcherConfig              Json
+  flujoConfig                Json?
+  fingerprintHash            String
+  partidaDobleMode           String              @default("full")
+  bridgeTesoreriaFromBalanza Boolean             @default(false)
+  createdAt                  DateTime            @default(now())
+  updatedAt                  DateTime            @updatedAt
+
+  tenant     Tenant?           @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  fileAudits IngestFileAudit[]
+
+  @@index([tenantId])
+  @@index([origin, sourceSystem, documentType, isActive])
+  @@index([profileKey, version])
+  @@map("ingest_mapping_profiles")
+}
+
+model IngestBatch {
+  id          String            @id @default(cuid())
+  detectionId String            @unique
+  tenantId    String
+  userId      String
+  status      IngestAuditStatus
+  periodo     Int?
+  anio        Int?
+  fileCount   Int
+  counts      Json?
+  issues      Json?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  tenant Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user   User              @relation(fields: [userId], references: [id], onDelete: Restrict)
+  files  IngestFileAudit[]
+
+  @@index([tenantId, createdAt])
+  @@index([tenantId, status])
+  @@map("ingest_batches")
+}
+
+model IngestFileAudit {
+  id             String            @id @default(cuid())
+  batchId        String
+  tenantId       String
+  userId         String
+  sha256         String
+  originalName   String
+  profileId      String?
+  profileKey     String?
+  profileVersion Int?
+  periodo        Int?
+  anio           Int?
+  rowsRead       Int               @default(0)
+  rowsAccepted   Int               @default(0)
+  rowsRejected   Int               @default(0)
+  warnings       Json?
+  errors         Json?
+  status         IngestAuditStatus
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  batch   IngestBatch           @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  tenant  Tenant                @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  user    User                  @relation(fields: [userId], references: [id], onDelete: Restrict)
+  profile IngestMappingProfile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+
+  @@unique([batchId, sha256])
+  @@index([tenantId, createdAt])
+  @@index([tenantId, sha256])
+  @@index([tenantId, status])
+  @@map("ingest_file_audits")
+}

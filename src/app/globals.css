@@ -1,0 +1,137 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Canvas / content #ffffff */
+    --background: 0 0% 100%;
+    /* Ink #22201d */
+    --foreground: 36 8% 12%;
+    /* Paper #ffffff */
+    --card: 0 0% 100%;
+    --card-foreground: 36 8% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 8% 12%;
+    /* Ember #ff692d CTA */
+    --primary: 17 100% 59%;
+    --primary-foreground: 0 0% 100%;
+    /* Chrome #f4f4f5 (zinc-100) */
+    --chrome: 240 5% 96%;
+    --secondary: 240 5% 96%;
+    --secondary-foreground: 36 8% 12%;
+    --muted: 240 5% 96%;
+    /* Graphite #777573 */
+    --muted-foreground: 24 2% 46%;
+    --accent: 240 5% 96%;
+    --accent-foreground: 17 100% 59%;
+    --destructive: 343 80% 35%;
+    --destructive-foreground: 0 0% 100%;
+    /* Stone #dcd9d6 — card hairlines on white */
+    --border: 24 8% 85%;
+    --input: 24 8% 85%;
+    --ring: 17 100% 59%;
+    --brand-clay: 17 100% 59%;
+    /* Ember hover #e85d27 */
+    --brand-clay-hover: 17 81% 53%;
+    /* Chrome hairline #e4e4e7 */
+    --beige-deep: 240 5% 90%;
+    --favorable: 124 17% 37%;
+    --desfavorable: 343 80% 35%;
+    --metric-margins-bg: 100 20% 93%;
+    --metric-margins-fg: 124 17% 37%;
+    --metric-return-bg: 220 17% 94%;
+    --metric-return-fg: 218 20% 35%;
+    --metric-efficiency-bg: 40 57% 93%;
+    --metric-efficiency-fg: 37 45% 47%;
+    --metric-solvency-bg: 15 58% 94%;
+    --metric-solvency-fg: 11 43% 42%;
+    --metric-management-bg: 300 16% 94%;
+    --metric-management-fg: 299 14% 42%;
+    --radius: 0.75rem;
+    --shadow-card: 0 1px 2px rgba(34, 32, 29, 0.05);
+    --shadow-md: 0 4px 12px rgba(34, 32, 29, 0.08);
+    --app-header-h: 4.25rem;
+  }
+
+  html[class~="dark"] {
+    /* Content canvas — lighter than chrome so header ≠ main */
+    --background: 30 8% 12%;
+    --foreground: 36 14% 94%;
+    --card: 30 8% 16%;
+    --card-foreground: 36 14% 94%;
+    --popover: 30 8% 16%;
+    --popover-foreground: 36 14% 94%;
+    --primary: 17 100% 59%;
+    --primary-foreground: 0 0% 100%;
+    --chrome: 30 10% 6%;
+    --secondary: 30 10% 6%;
+    --secondary-foreground: 36 14% 94%;
+    --muted: 30 10% 6%;
+    --muted-foreground: 24 8% 68%;
+    --accent: 30 10% 6%;
+    --accent-foreground: 17 100% 68%;
+    --destructive: 343 70% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 8% 22%;
+    --input: 30 8% 22%;
+    --ring: 17 100% 59%;
+    --brand-clay: 17 100% 59%;
+    --brand-clay-hover: 17 81% 62%;
+    --beige-deep: 30 8% 18%;
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.28);
+    --shadow-md: 0 8px 20px rgba(0, 0, 0, 0.32);
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased tracking-[-0.01em];
+  }
+}
+
+@layer utilities {
+  .financial-nums {
+    font-family: var(--font-sans), Arial, sans-serif;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+}
+
+@layer components {
+  .metrics-page {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1680px;
+  }
+
+  .metrics-filter-bar {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(140px, 1fr));
+    gap: 0.75rem;
+    overflow-x: auto;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    background: hsl(var(--card) / 0.94);
+    padding: 1rem;
+    box-shadow: var(--shadow-card);
+  }
+
+  @media (max-width: 1279px) {
+    .metrics-filter-bar {
+      grid-template-columns: repeat(3, minmax(170px, 1fr));
+    }
+  }
+
+  @media (max-width: 639px) {
+    .metrics-filter-bar {
+      display: flex;
+      padding: 0.875rem;
+    }
+
+    .metrics-filter-bar > label {
+      min-width: 170px;
+    }
+  }
+}

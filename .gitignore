@@ -1,0 +1,19 @@
+node_modules
+.next
+Data_ejemplo
+.env
+.env.local
+src/generated
+dist
+*.log
+.DS_Store
+
+# Artefactos de build / IDE
+tsconfig.tsbuildinfo
+.cursor/
+.tmp-sankey-recover/
+dashboard-check.png
+canvas.json
+
+# Respaldos de base de datos (van en Drive, no en git)
+backup-*.sql

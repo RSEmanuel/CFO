@@ -1,0 +1,35 @@
+# RULES FOR CURSOR AI - MONTHLY-LIKE VIRTUAL CFO PLATFORM
+
+[PROJECT OVERVIEW]
+Building an enterprise-grade Virtual CFO Dashboard inspired by Monthly.app using Python (Streamlit + Plotly + Pandas).
+Ingests General Ledger / Balanza de Comprobación and Auxiliaries (CONTPAQi or Master Template).
+
+[UI/UX DESIGN SYSTEM (MONARCH EDITORIAL-FINTECH ON CFO SHELL)]
+- Product shell (not a marketing landing): Sidebar + header + filter bar + cards + charts.
+- Canvas: Linen (#efecea) with Paper (#fff) surfaces, Ink (#22201d) type, Graphite (#777573) mute, Stone (#dcd9d6) hairline borders.
+- Single UI accent: Ember (#ff692d / `--brand-clay`, `--primary`, `--ring`). Ember hover #e85d27. Do not add a second accent or wash Ember into body/fills.
+- Typography: Inter (`--font-sans`, body/nav/labels/tables/buttons, tracking −0.01em) + Fraunces (`--font-serif` only on section/card titles, tracking-tight; page titles ~−0.04em). Financial numbers: Inter + `.financial-nums`, never Fraunces.
+- Controls: pill buttons/tags (9999px); cards 12px; inputs/selects 8px; near-invisible shadows (`--shadow-card: 0 1px 2px rgba(34,32,29,0.05)`).
+- Category / semantic palettes are PRESERVED (not Ember):
+  * Márgenes / Liquidez: Soft Mint Green (#E8F8F5 / #2ECC71)
+  * Retorno: Soft Lavender / Indigo (#EEF2FF / #6366F1)
+  * Eficiencia: Soft Gold / Amber (#FEF9C3 / #F59E0B)
+  * Solvencia: Soft Coral / Red (#FEE2E2 / #EF4444)
+  * Gestión: Soft Purple (#F3E8FF / #A855F7)
+  * Deltas: `favorable` / `desfavorable` (green / crimson), never orange.
+- Layout: Sidebar navigation (Dashboards, Metrics, Screeners, Data Center).
+- Top Filter Bar: Temporalidad (Mes/Q/Año), Periodo (ej. May-2026), Comparable (YoY / MoM), Divisa (MXN/USD), Unidades (K, M, B), Análisis ($, %).
+- Category Tabs: Destacados, Márgenes, Retorno, Eficiencia, Liquidez, Solvencia, Gestión, Valuación.
+- Metric Cards: Soft background colors, clean category badges, large metric numbers, delta variation pills (+15.2%, -5.7%).
+
+[50-METRIC CATALOG ARCHITECTURE]
+1. MÁRGENES (#1-#8): Gross, EBITDA, Net, NOPAT, Operating, OCF, FCF Margins, Effective Tax Rate.
+2. RETORNO (#9-#15): ROIC, ROCE, ROE, ROA, GMROI, RONIC, Cash ROIC.
+3. EFICIENCIA (#16-#24): Asset/Receivables/Inventory/Payables/IC Turnovers, NWC/CapEx/SG&A/D&A sobre Revenue.
+4. LIQUIDEZ (#25-#33): Current, Quick, Cash Ratios, Cash Runway, Cash Efficiency, CCC, DSO, DPO, DIO.
+5. SOLVENCIA (#34-#41): Interest Coverage, Net Debt/EBITDA, Financial Leverage, Liability Ratio, Debt Ratio, Cost of Debt, Operating Leverage, Debt/Revenue.
+6. GESTIÓN (#42-#50): Key Score, Value Driver, Revenue Growth, EBITDA Growth, WACC, Cost of Equity, Economic Spread, Shareholder Margin, Dividend Payout.
+
+[DATAFRAME CONTRACT]
+`df_balanza`: [codigo_cuenta, nombre_cuenta, categoria_maestra, saldo_inicial, cargos, abonos, saldo_final, periodo, ano]
+`df_ventas`: [fecha, codigo_cuenta, nombre_cuenta, concepto, referencia, cargos, abonos, monto_neto, cliente, mes, ano]
