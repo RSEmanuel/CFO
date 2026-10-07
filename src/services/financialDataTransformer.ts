@@ -125,6 +125,11 @@ function breakdownTotal(breakdown: Record<string, number>): number {
   return round2(Object.values(breakdown).reduce((sum, value) => sum + value, 0));
 }
 
+/** Total mensual que dibuja la serie de la categoría: la suma de sus cuentas en ese mes. */
+export function monthlySeriesTotal(row: MonthlyFinancials, category: ResultadosCategoryName): number {
+  return breakdownTotal(categoryBreakdown(row, category));
+}
+
 function chartPoint(
   label: string,
   rows: MonthlyFinancials[],
@@ -255,7 +260,7 @@ export function buildStackedSeries(
     }),
     seriesKeys: keys,
     headlineLabel: periodLabel(current.periodo),
-    headlineTotal: breakdownTotal(categoryBreakdown(current, category)),
+    headlineTotal: monthlySeriesTotal(current, category),
     comparableLabel: comparableRow ? periodLabel(comparableRow.periodo) : null,
     comparableTotal: comparableRow ? categoryTotal(comparableRow, category) : null,
   };

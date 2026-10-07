@@ -60,3 +60,49 @@ export function CategoryTemporalKpiCard({
     </article>
   );
 }
+
+/** Tarjeta «Acumulado del año»: enero al mes seleccionado, con el mismo rango del año anterior. */
+export function YearToDateKpiCard({
+  category,
+  periodLabel,
+  value,
+  deltaPct,
+  priorLabel,
+  missingNote,
+}: {
+  category: ResultadosCategoryName;
+  periodLabel: string;
+  value: number | null;
+  deltaPct: number | null;
+  priorLabel: string;
+  missingNote: string | null;
+}) {
+  const { t } = useLocale();
+  return (
+    <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
+      <p className="font-sans text-base font-bold text-foreground">{t("resultados.yearToDate")}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{periodLabel}</p>
+      <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
+        {value == null ? "N/A" : KPI_FORMATTER.format(value)}
+      </p>
+      {deltaPct == null ? null : (
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span
+            className={cn(
+              "financial-nums inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
+              deltaIsFavorable(category, deltaPct)
+                ? "bg-category-margins text-favorable"
+                : "bg-category-solvency text-desfavorable",
+            )}
+          >
+            {formatDelta(deltaPct)}
+          </span>
+          <span className="text-[11px] text-muted-foreground">
+            {t("resultados.yearToDateVsPrior", { range: priorLabel })}
+          </span>
+        </div>
+      )}
+      {missingNote ? <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{missingNote}</p> : null}
+    </article>
+  );
+}

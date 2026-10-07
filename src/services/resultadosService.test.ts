@@ -13,6 +13,7 @@ import {
   type MonthlyFinancials,
 } from "@/services/financialDataTransformer";
 import { formatAxisTick } from "@/services/money";
+import { calculateYearToDate } from "@/services/resultadosKpis";
 import { verticalPct } from "@/services/posicionFinanciera";
 
 describe("resultados desde BalanzaPnL", () => {
@@ -187,6 +188,27 @@ describe("serie de ingreso total", () => {
     assert.equal(quarter.headlineTotal, quarter.chartData[0]?.total);
     assert.equal(year.chartData.find((point) => point.month === "2026")?.total, 600);
     assert.equal(year.headlineTotal, 600);
+  });
+
+  it("el acumulado del año suma los mismos totales mensuales que dibuja la serie", () => {
+    const month = buildStackedSeries(rows, { ...baseFilters, temporalidad: "month" }, "Ingreso");
+    const ytd = calculateYearToDate(rows, "Ingreso", "2026-02");
+    const fromChart = month.chartData
+      .filter((point) => point.month === "Ene-26" || point.month === "Feb-26")
+      .reduce((sum, point) => sum + Number(point.total ?? 0), 0);
+    assert.equal(ytd.value, 600);
+    assert.equal(ytd.value, fromChart);
+  });
+
+  it("Año dibuja un punto por año con el mismo total", () => {
+    const year = buildStackedSeries(rows, { ...baseFilters, temporalidad: "year" }, "Ingreso");
+    assert.deepEqual(
+      year.chartData.map((point) => [point.month, point.total]),
+      [
+        ["2025", 150],
+        ["2026", 600],
+      ],
+    );
   });
 
   it("conserva seriesKeys apilables para Costo y Gasto", () => {

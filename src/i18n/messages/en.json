@@ -39,7 +39,8 @@
       "ADMIN": "Admin",
       "CFO_PARTNER": "CFO partner",
       "CLIENT_VIEWER": "Client viewer"
-    }
+    },
+    "and": "and"
   },
   "nav": {
     "results": "Results",
@@ -261,7 +262,8 @@
       "emptyClients": "The auxiliary ledger has no client charges (105/1105) in this period.",
       "emptyClientsNoAuxiliar": "No auxiliary ledger for this period. Upload CONTPAQi reports 06/07 in Ingesta.",
       "emptyLines": "The trial balance has no revenue movement in this period.",
-      "loadError": "Could not load the Top 5"
+      "loadError": "Could not load the Top 5",
+      "pieWindow": "Selected month"
     },
     "opex": {
       "title": "Operating Expense (OPEX)",
@@ -500,7 +502,14 @@
           "funcionariosEmpleados": "Officers and employees"
         }
       }
-    }
+    },
+    "yearToDate": "Year to date",
+    "yearToDateVsPrior": "vs. {range}",
+    "yearToDateIncomplete": "Data missing for {months}; the sum only includes loaded months. Upload that trial balance in Ingest to complete it.",
+    "chartByMonth": "By month",
+    "chartByYear": "By year",
+    "chartViewLabel": "View revenue by month or by year",
+    "partialYearsNote": "Years without all 12 months: {years}. They look lower; to compare years, use the Year to date card."
   },
   "widgets": {
     "customize": "Customize view",

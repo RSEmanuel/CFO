@@ -16,6 +16,7 @@ import {
   toTop5StackedPoints,
   top5ActiveMonthRows,
   type Top5ChartSeries,
+  type Top5LegendRow,
   type Top5StackedPoint,
 } from "@/services/resultadosTop5";
 import { Users } from "lucide-react";
@@ -24,7 +25,10 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
+  Cell,
   LabelList,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -139,6 +143,55 @@ function TotalStackLabel(props: LabelGeom) {
   );
 }
 
+type PieLabelGeom = {
+  cx?: number;
+  cy?: number;
+  midAngle?: number;
+  outerRadius?: number | string;
+  payload?: Top5LegendRow;
+};
+
+const RADIAN = Math.PI / 180;
+
+/** % del mes junto a cada rebanada; el nombre y el monto viven en la lista de abajo. */
+function SlicePctLabel({ cx, cy, midAngle, outerRadius, payload }: PieLabelGeom) {
+  if (cx == null || cy == null || midAngle == null || outerRadius == null || !payload || payload.pct < 3) {
+    return null;
+  }
+  const radius = Number(outerRadius) + 16;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text
+      x={x}
+      y={y}
+      fill={CHART_AXIS.tick}
+      textAnchor={x > cx ? "start" : "end"}
+      dominantBaseline="central"
+      fontSize={11}
+      fontWeight={600}
+      className="financial-nums"
+    >
+      {`${payload.pct.toFixed(1)}%`}
+    </text>
+  );
+}
+
+function Top5PieTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: Top5LegendRow }> }) {
+  const row = active ? payload?.[0]?.payload : undefined;
+  if (!row) {
+    return null;
+  }
+  return (
+    <div className="min-w-[180px] px-3 py-2 text-xs" style={TOOLTIP_STYLE}>
+      <p className="mb-1 font-medium text-foreground">{row.label}</p>
+      <p className="financial-nums text-sm font-semibold text-foreground">
+        {formatMxn(row.monto)} · {row.pct.toFixed(1)}%
+      </p>
+    </div>
+  );
+}
+
 function Top5Card({
   title,
   insightText,
@@ -149,6 +202,7 @@ function Top5Card({
   emptyMessage,
   methodNote,
   favoriteId,
+  variant = "bars",
 }: {
   title: string;
   insightText?: string;
@@ -159,6 +213,8 @@ function Top5Card({
   emptyMessage: string;
   methodNote: string;
   favoriteId?: string;
+  /** "pie": el mes seleccionado como pastel (top 5 + resto). "bars": 12 meses apilados. */
+  variant?: "bars" | "pie";
 }) {
   const { t } = useLocale();
   const narrow = useNarrowScreen();
@@ -196,6 +252,7 @@ function Top5Card({
   }
 
   const { rows, periodTotal } = top5ActiveMonthRows(series, restLabel);
+  const pieRows = rows.filter((row) => row.monto > 0.005);
   const lastLabel = series.months[series.months.length - 1]?.label ?? "";
 
   return (
@@ -213,73 +270,104 @@ function Top5Card({
         </div>
       </div>
       <p className="mb-4 text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-        {t("resultados.top5.seriesWindow")} · {lastLabel} · {formatMxn(periodTotal)}
+        {t(variant === "pie" ? "resultados.top5.pieWindow" : "resultados.top5.seriesWindow")} · {lastLabel} ·{" "}
+        {formatMxn(periodTotal)}
       </p>
 
-      <div className="h-[360px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} barCategoryGap="25%" margin={{ top: 36, right: 16, left: 8, bottom: 8 }}>
-            <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
-            <XAxis
-              dataKey="mes"
-              interval={narrow ? "preserveStartEnd" : 0}
-              minTickGap={narrow ? 12 : 5}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-              axisLine={{ stroke: CHART_AXIS.stroke }}
-              tickLine={false}
-            />
-            <YAxis
-              width={64}
-              domain={[0, yMax > 0 ? yMax * 1.22 : 1]}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: number) => formatAxisTick(value, units)}
-            />
-            <Tooltip
-              cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
-              content={
-                <Top5Tooltip
-                  restLabel={restLabel}
-                  entidades={series.entidades}
-                  includeResto={Boolean(series.resto)}
-                  colors={colors}
-                />
-              }
-            />
-            {stackedKeys.map((key, index) => {
-              const fill = colors.get(key) ?? seriesColor(index, key);
-              const isLast = key === lastBarKey;
-              return (
-                <Bar
-                  key={key}
-                  dataKey={key}
-                  name={key === OTROS_KEY ? restLabel : series.entidades.find((actor) => actor.key === key)?.label}
-                  stackId={TOP5_STACK_ID}
-                  fill={fill}
-                  radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
-                  isAnimationActive={false}
-                >
-                  {narrow ? null : (
-                    <LabelList
-                      position="top"
-                      offset={8}
-                      valueAccessor={(entry) => {
-                        const point = entry.payload as Top5StackedPoint | undefined;
-                        if (!point || stackTopKey(point, stackedKeys) !== key) {
-                          return "";
-                        }
-                        return totalMesLabel(point.totalMes);
-                      }}
-                      content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
-                    />
-                  )}
-                </Bar>
-              );
-            })}
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+      {variant === "pie" ? (
+        <div className="h-[300px] w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ top: 16, right: 48, bottom: 16, left: 48 }}>
+              <Tooltip content={<Top5PieTooltip />} />
+              <Pie
+                data={pieRows}
+                dataKey="monto"
+                nameKey="label"
+                cx="50%"
+                cy="50%"
+                innerRadius="48%"
+                outerRadius="78%"
+                paddingAngle={2}
+                minAngle={3}
+                stroke={CHART.card}
+                strokeWidth={2}
+                label={narrow ? false : (props: PieLabelGeom) => <SlicePctLabel {...props} />}
+                labelLine={false}
+                isAnimationActive={false}
+              >
+                {pieRows.map((row, index) => (
+                  <Cell key={row.key} fill={colors.get(row.key) ?? seriesColor(index, row.key)} />
+                ))}
+              </Pie>
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="h-[360px] w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={data} barCategoryGap="25%" margin={{ top: 36, right: 16, left: 8, bottom: 8 }}>
+              <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
+              <XAxis
+                dataKey="mes"
+                interval={narrow ? "preserveStartEnd" : 0}
+                minTickGap={narrow ? 12 : 5}
+                tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                axisLine={{ stroke: CHART_AXIS.stroke }}
+                tickLine={false}
+              />
+              <YAxis
+                width={64}
+                domain={[0, yMax > 0 ? yMax * 1.22 : 1]}
+                tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                axisLine={false}
+                tickLine={false}
+                tickFormatter={(value: number) => formatAxisTick(value, units)}
+              />
+              <Tooltip
+                cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
+                content={
+                  <Top5Tooltip
+                    restLabel={restLabel}
+                    entidades={series.entidades}
+                    includeResto={Boolean(series.resto)}
+                    colors={colors}
+                  />
+                }
+              />
+              {stackedKeys.map((key, index) => {
+                const fill = colors.get(key) ?? seriesColor(index, key);
+                const isLast = key === lastBarKey;
+                return (
+                  <Bar
+                    key={key}
+                    dataKey={key}
+                    name={key === OTROS_KEY ? restLabel : series.entidades.find((actor) => actor.key === key)?.label}
+                    stackId={TOP5_STACK_ID}
+                    fill={fill}
+                    radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                    isAnimationActive={false}
+                  >
+                    {narrow ? null : (
+                      <LabelList
+                        position="top"
+                        offset={8}
+                        valueAccessor={(entry) => {
+                          const point = entry.payload as Top5StackedPoint | undefined;
+                          if (!point || stackTopKey(point, stackedKeys) !== key) {
+                            return "";
+                          }
+                          return totalMesLabel(point.totalMes);
+                        }}
+                        content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
+                      />
+                    )}
+                  </Bar>
+                );
+              })}
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
 
       <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{methodNote}</p>
       {showRestoNote ? (
@@ -358,6 +446,7 @@ export function ResultadosTop5Charts({ periodo, units }: ResultadosTop5ChartsPro
         }
         methodNote={t("resultados.top5.shareNoteClients")}
         favoriteId="chart-top5-clientes"
+        variant="pie"
       />
       <Top5Card
         title={t("resultados.top5.linesTitle")}
@@ -419,6 +508,7 @@ export function ResultadosTop5Card({
       }
       methodNote={t("resultados.top5.shareNoteClients")}
       favoriteId="chart-top5-clientes"
+      variant="pie"
     />
   ) : (
     <Top5Card

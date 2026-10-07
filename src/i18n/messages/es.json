@@ -39,7 +39,8 @@
       "ADMIN": "Admin",
       "CFO_PARTNER": "CFO partner",
       "CLIENT_VIEWER": "Client viewer"
-    }
+    },
+    "and": "y"
   },
   "nav": {
     "results": "Resultados",
@@ -261,7 +262,8 @@
       "emptyClients": "El auxiliar no tiene cargos de clientes (105/1105) en este periodo.",
       "emptyClientsNoAuxiliar": "No hay auxiliar de cuentas para este periodo. Sube los reportes 06/07 de CONTPAQi en Ingesta.",
       "emptyLines": "La balanza no tiene movimiento de ingreso en este periodo.",
-      "loadError": "No se pudo cargar el Top 5"
+      "loadError": "No se pudo cargar el Top 5",
+      "pieWindow": "Mes seleccionado"
     },
     "opex": {
       "title": "Gasto Operativo (OPEX)",
@@ -500,7 +502,14 @@
           "funcionariosEmpleados": "Funcionarios y empleados"
         }
       }
-    }
+    },
+    "yearToDate": "Acumulado del año",
+    "yearToDateVsPrior": "vs. {range}",
+    "yearToDateIncomplete": "Faltan datos de {months}; la suma solo trae los meses cargados. Sube esa balanza en Ingesta para completarla.",
+    "chartByMonth": "Por mes",
+    "chartByYear": "Por año",
+    "chartViewLabel": "Ver el ingreso por mes o por año",
+    "partialYearsNote": "Años sin los 12 meses: {years}. Se ven más bajos; para comparar años, usa la tarjeta Acumulado del año."
   },
   "widgets": {
     "customize": "Personalizar vista",

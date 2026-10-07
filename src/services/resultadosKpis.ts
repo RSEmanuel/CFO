@@ -2,6 +2,7 @@ import { dateLocale, type Locale } from "@/i18n/config";
 import { monthLabelKey } from "@/i18n/format";
 import {
   categoryTotal,
+  monthlySeriesTotal,
   type MonthlyFinancials,
   type ResultadosCategoryName,
 } from "@/services/financialDataTransformer";
@@ -210,4 +211,90 @@ export function calculateTopKPIs(
   ];
 
   return { currentMonthValue, cards };
+}
+
+export type YearToDate = {
+  /** Suma de enero al mes seleccionado con los meses que sí tienen datos; null si no hay ninguno. */
+  value: number | null;
+  /** Meses de enero al mes seleccionado, en formato YYYY-MM. */
+  periodos: string[];
+  /** Meses del rango sin datos. Si hay alguno, el acumulado está incompleto. */
+  missing: string[];
+  /** Mismo rango del año anterior; solo si el actual y el anterior están completos. */
+  priorValue: number | null;
+  deltaPct: number | null;
+};
+
+function yearToDatePeriodos(periodo: string): string[] {
+  const { year, month } = parsePeriodo(periodo);
+  return Array.from({ length: month }, (_, index) => `${year}-${String(index + 1).padStart(2, "0")}`);
+}
+
+function sumSeries(
+  data: MonthlyFinancials[],
+  category: ResultadosCategoryName,
+  periodos: string[],
+): { total: number | null; missing: string[] } {
+  const byPeriodo = new Map(data.map((row) => [row.periodo, row]));
+  let total = 0;
+  let found = 0;
+  const missing: string[] = [];
+  for (const periodo of periodos) {
+    const row = byPeriodo.get(periodo);
+    if (!row) {
+      missing.push(periodo);
+      continue;
+    }
+    total += monthlySeriesTotal(row, category);
+    found += 1;
+  }
+  return { total: found > 0 ? Math.round(total * 100) / 100 : null, missing };
+}
+
+/**
+ * Acumulado del año: de enero al mes seleccionado, inclusive, con el mismo total
+ * mensual que dibuja la serie. No rellena meses faltantes: los reporta en `missing`.
+ */
+export function calculateYearToDate(
+  data: MonthlyFinancials[],
+  category: ResultadosCategoryName,
+  selectedPeriod: string,
+): YearToDate {
+  const periodos = yearToDatePeriodos(selectedPeriod);
+  const current = sumSeries(data, category, periodos);
+  const prior = sumSeries(data, category, periodos.map((periodo) => shiftPeriodo(periodo, -12)));
+  const priorValue = current.missing.length === 0 && prior.missing.length === 0 ? prior.total : null;
+  return {
+    value: current.total,
+    periodos,
+    missing: current.missing,
+    priorValue,
+    deltaPct: priorValue == null ? null : deltaVsCurrent(current.total, priorValue),
+  };
+}
+
+/** Etiquetas del acumulado: «Enero–julio 2026» y el mismo rango del año anterior. */
+export function yearToDateLabels(
+  periodo: string,
+  t: Translate,
+  locale: Locale,
+): { current: string; prior: string } {
+  const { year, month } = parsePeriodo(periodo);
+  const start = `${year}-01`;
+  const label = (from: string, to: string) =>
+    month === 1 ? singleMonthLabel(to, t, locale) : rangeLabel(from, to, t, locale);
+  return {
+    current: label(start, periodo),
+    prior: label(shiftPeriodo(start, -12), shiftPeriodo(periodo, -12)),
+  };
+}
+
+/** Lista de meses faltantes en texto: «marzo y abril 2026». */
+export function missingMonthsLabel(periodos: string[], t: Translate, locale: Locale): string {
+  const names = periodos.map((periodo) => monthPhrase(periodo, t, locale, true));
+  if (names.length === 0) return "";
+  const year = names[names.length - 1]?.year;
+  const list = names.map((item) => item.name);
+  const joined = list.length === 1 ? list[0] : `${list.slice(0, -1).join(", ")} ${t("common.and")} ${list.at(-1)}`;
+  return `${joined} ${year}`;
 }

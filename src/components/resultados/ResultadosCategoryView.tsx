@@ -2,9 +2,9 @@
 
 import { HERO_CHART_COLORS, HeroBarChart } from "@/components/charts/HeroBarChart";
 import { HeroLineChart } from "@/components/charts/HeroLineChart";
-import { IncomeBreakdownPie } from "@/components/charts/IncomeBreakdownPie";
+import { IncomeBreakdownBars } from "@/components/charts/IncomeBreakdownBars";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
-import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
+import { CategoryTemporalKpiCard, YearToDateKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
 import { CogsAnalisisCard } from "@/components/resultados/CogsAnalisisCard";
 import { GastoOpexView } from "@/components/resultados/GastoOpexView";
 import { IngresoMonitor } from "@/components/resultados/IngresoMonitor";
@@ -12,22 +12,21 @@ import { ResultadosTop5Charts } from "@/components/resultados/ResultadosTop5Char
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
 import { formatAxisTick, formatMxn } from "@/services/money";
-import { buildIncomeBreakdown } from "@/services/financialDataTransformer";
+import { buildIncomeBreakdown, buildStackedSeries } from "@/services/financialDataTransformer";
 import type { MonthlyFinancials, ResultadosCategoryName } from "@/services/financialDataTransformer";
-import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
+import {
+  calculateTopKPIs,
+  calculateYearToDate,
+  categoryTemporalCards,
+  missingMonthsLabel,
+  yearToDateLabels,
+} from "@/services/resultadosKpis";
 import type { BudgetProjectionPayload } from "@/services/budgetProjectionService";
-import { LineChart as LineChartIcon, PieChart as PieChartIcon } from "lucide-react";
-import { useMemo } from "react";
+import { cn } from "@/lib/utils";
+import { BarChartHorizontal, LineChart as LineChartIcon } from "lucide-react";
+import { Fragment, useMemo, useState } from "react";
 
 export type { ResultadosCategoryName };
-
-const KPI_FORMATTER = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  notation: "compact",
-  compactDisplay: "short",
-  maximumFractionDigits: 2,
-});
 
 function StackedCategoryChart({
   data,
@@ -96,6 +95,9 @@ export function CategorySeriesCard({
   headlineTotal,
   comparableLabel,
   comparableTotal,
+  yearlyChartData,
+  yearlySelectedLabel,
+  partialYearsNote,
 }: {
   category: "Ingreso" | "Costo";
   units: "k" | "m" | "b";
@@ -107,10 +109,17 @@ export function CategorySeriesCard({
   headlineTotal: number | null;
   comparableLabel: string | null;
   comparableTotal: number | null;
+  /** Serie anual de Temporalidad = Año. Si viene, el Ingreso mensual ofrece «Por mes / Por año». */
+  yearlyChartData?: Array<Record<string, string | number | null>>;
+  yearlySelectedLabel?: string;
+  partialYearsNote?: string | null;
 }) {
   const { t } = useLocale();
+  const [chartView, setChartView] = useState<"month" | "year">("month");
+  const canToggleYear = category === "Ingreso" && temporalidad === "month" && Boolean(yearlyChartData?.length);
+  const showYearly = canToggleYear && chartView === "year";
   const tempoLabel =
-    temporalidad === "year"
+    temporalidad === "year" || showYearly
       ? t("resultados.annual")
       : temporalidad === "quarter"
         ? t("resultados.quarterly")
@@ -145,12 +154,46 @@ export function CategorySeriesCard({
         ) : null}
       </div>
 
-      <div className="h-[380px] w-full min-w-0 overflow-visible lg:h-[420px] lg:w-[70%]">
-        {category === "Ingreso" ? (
-          <IncomeTotalChart data={chartData} series={seriesKeys} units={units} selectedLabel={headlineLabel} />
-        ) : (
-          <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
-        )}
+      <div className="flex w-full min-w-0 flex-col lg:w-[70%]">
+        {canToggleYear ? (
+          <div
+            role="group"
+            aria-label={t("resultados.chartViewLabel")}
+            className="inline-flex h-10 items-center self-end rounded-control border border-input bg-card p-0.5"
+          >
+            {(["month", "year"] as const).map((view) => (
+              <button
+                key={view}
+                type="button"
+                onClick={() => setChartView(view)}
+                aria-pressed={chartView === view}
+                className={cn(
+                  "h-9 rounded-control px-3 text-sm font-medium transition-colors",
+                  chartView === view
+                    ? "bg-secondary text-clay shadow-sm"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                )}
+              >
+                {t(view === "month" ? "resultados.chartByMonth" : "resultados.chartByYear")}
+              </button>
+            ))}
+          </div>
+        ) : null}
+        <div className="h-[380px] w-full min-w-0 overflow-visible lg:h-[420px]">
+          {category === "Ingreso" ? (
+            <IncomeTotalChart
+              data={showYearly && yearlyChartData ? yearlyChartData : chartData}
+              series={seriesKeys}
+              units={units}
+              selectedLabel={showYearly ? (yearlySelectedLabel ?? headlineLabel) : headlineLabel}
+            />
+          ) : (
+            <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
+          )}
+        </div>
+        {showYearly && partialYearsNote ? (
+          <p className="mt-2 text-xs leading-snug text-muted-foreground">{partialYearsNote}</p>
+        ) : null}
       </div>
     </section>
   );
@@ -193,7 +236,7 @@ export function IncomeBreakdownCard({
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex items-center gap-2">
         <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-          <PieChartIcon className="h-4 w-4" />
+          <BarChartHorizontal className="h-4 w-4" />
         </span>
         <div className="min-w-0 flex-1">
           <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.incomeBreakdown")}</h2>
@@ -203,15 +246,11 @@ export function IncomeBreakdownCard({
         </div>
         <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoDesglose} label={t("resultados.incomeBreakdown")} />
       </div>
-      <div className="h-[400px] w-full min-w-0">
-        <IncomeBreakdownPie
-          data={incomeBreakdown}
-          valueFormatter={formatMxn}
-          centerValueFormatter={(value) => KPI_FORMATTER.format(value)}
-          totalLabel={t("resultados.incomeBreakdownCenter")}
-          chartKey={`${periodo}-${temporalidad}-${units}`}
-        />
-      </div>
+      <IncomeBreakdownBars
+        data={incomeBreakdown}
+        valueFormatter={formatMxn}
+        totalLabel={t("resultados.incomeBreakdownCenter")}
+      />
     </section>
   );
 }
@@ -256,6 +295,40 @@ export function ResultadosCategoryView({
     () => categoryTemporalCards(kpis, periodo, category, t, locale),
     [kpis, periodo, category, t, locale],
   );
+  const yearToDate = useMemo(() => {
+    if (category !== "Ingreso" || !periodo) return null;
+    const ytd = calculateYearToDate(rows, category, periodo);
+    const labels = yearToDateLabels(periodo, t, locale);
+    return {
+      ...ytd,
+      ...labels,
+      missingNote: ytd.missing.length
+        ? t("resultados.yearToDateIncomplete", { months: missingMonthsLabel(ytd.missing, t, locale) })
+        : null,
+    };
+  }, [rows, category, periodo, t, locale]);
+  const yearly = useMemo(() => {
+    if (category !== "Ingreso" || temporalidad !== "month") return null;
+    // Mismo camino que Temporalidad = Año en el filtro global.
+    const series = buildStackedSeries(
+      rows,
+      { temporalidad: "year", periodo, comparable, currency: "mxn", units, analysis: "amount" },
+      "Ingreso",
+    );
+    const monthsByYear = new Map<string, number>();
+    for (const row of rows) {
+      const year = row.periodo.slice(0, 4);
+      monthsByYear.set(year, (monthsByYear.get(year) ?? 0) + 1);
+    }
+    const partial = [...monthsByYear.entries()].filter(([, count]) => count < 12).map(([year]) => year);
+    const years =
+      partial.length > 1 ? `${partial.slice(0, -1).join(", ")} ${t("common.and")} ${partial.at(-1)}` : partial[0];
+    return {
+      chartData: series.chartData,
+      selectedLabel: series.headlineLabel,
+      partialYearsNote: years ? t("resultados.partialYearsNote", { years }) : null,
+    };
+  }, [rows, category, temporalidad, periodo, comparable, units, t]);
   if (category === "Gasto") {
     return (
       <GastoOpexView
@@ -269,9 +342,26 @@ export function ResultadosCategoryView({
   }
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-        {temporalCards.map((card) => (
-          <CategoryTemporalKpiCard key={card.key} card={card} category={category} />
+      <div
+        className={cn(
+          "grid grid-cols-1 gap-4 sm:grid-cols-2",
+          yearToDate ? "lg:grid-cols-3 xl:grid-cols-6" : "xl:grid-cols-5",
+        )}
+      >
+        {temporalCards.map((card, index) => (
+          <Fragment key={card.key}>
+            <CategoryTemporalKpiCard card={card} category={category} />
+            {index === 0 && yearToDate ? (
+              <YearToDateKpiCard
+                category={category}
+                periodLabel={yearToDate.current}
+                value={yearToDate.value}
+                deltaPct={yearToDate.deltaPct}
+                priorLabel={yearToDate.prior}
+                missingNote={yearToDate.missingNote}
+              />
+            ) : null}
+          </Fragment>
         ))}
       </div>
 
@@ -286,6 +376,9 @@ export function ResultadosCategoryView({
         headlineTotal={headlineTotal}
         comparableLabel={comparableLabel}
         comparableTotal={comparableTotal}
+        yearlyChartData={yearly?.chartData}
+        yearlySelectedLabel={yearly?.selectedLabel}
+        partialYearsNote={yearly?.partialYearsNote}
       />
 
       {category === "Ingreso" ? (
