@@ -5,6 +5,7 @@ import { MetricCard } from "@/components/metric-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { arr, fmtMoney, fmtPct } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 function BudgetTable({
   title,
@@ -24,7 +25,7 @@ function BudgetTable({
         {loading ? (
           <div className="h-32 animate-pulse rounded-lg bg-muted" />
         ) : (
-          <div className="overflow-x-auto">
+          <TableScroll>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b text-left text-muted-foreground">
@@ -46,7 +47,7 @@ function BudgetTable({
               </tbody>
             </table>
             {rows.length === 0 ? <p className="py-6 text-sm text-muted-foreground">Sin datos en el corte.</p> : null}
-          </div>
+          </TableScroll>
         )}
       </CardContent>
     </Card>

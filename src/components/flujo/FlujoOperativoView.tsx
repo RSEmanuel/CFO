@@ -289,7 +289,7 @@ export function FlujoOperativoView({ periodo, units }: { periodo: string; units:
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           label={t("flujo.operativo.inflows")}
           value={formatMxn(data.totales.entradas)}
@@ -374,7 +374,7 @@ export function FlujoResumenKpis({ periodo }: { periodo: string }) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <KpiCard
         label={t("flujo.operativo.inflows")}
         value={formatMxn(data.totales.entradas)}

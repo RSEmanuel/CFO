@@ -27,7 +27,7 @@ export function InfoDialog({
           type="button"
           aria-label={ariaLabel}
           className={cn(
-            "rounded-full p-1 text-muted-foreground/70 transition hover:bg-card/80 hover:text-foreground",
+            "touch-hit rounded-full p-1 text-muted-foreground/70 transition hover:bg-card/80 hover:text-foreground",
             triggerClassName,
           )}
         >

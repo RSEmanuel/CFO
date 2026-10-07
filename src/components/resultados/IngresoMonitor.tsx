@@ -11,6 +11,7 @@ import type { IngresoTablaRow } from "@/services/ingresoCalidad";
 import { formatCompactAxis, formatMxn } from "@/services/money";
 import { ArrowDown, ArrowUp, Gauge, ReceiptText } from "lucide-react";
 import { useState } from "react";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type IngresoMonitorPart = "calidad" | "pacing" | "tabla";
 
@@ -62,11 +63,11 @@ function ImpactBar({
   negative?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-[minmax(10rem,1.2fr)_minmax(10rem,2fr)_minmax(7rem,auto)] items-center gap-3">
+    <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1.5 sm:grid-cols-[minmax(10rem,1.2fr)_minmax(10rem,2fr)_minmax(7rem,auto)] sm:gap-3">
       <p className="truncate text-sm text-foreground" title={label}>
         {label}
       </p>
-      <div className="h-3 overflow-hidden rounded-full bg-muted">
+      <div className="order-last col-span-2 h-3 overflow-hidden rounded-full bg-muted sm:order-none sm:col-span-1">
         <div
           className="h-full rounded-full"
           style={{ width: `${Math.min(100, Math.max(0, widthPct))}%`, backgroundColor: color }}
@@ -128,7 +129,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
       <div className={cn("grid grid-cols-1 gap-4", show("calidad") && show("pacing") && "lg:grid-cols-2")}>
         {show("calidad") ? (
         <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <div className="mb-4 flex items-start justify-between gap-3">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
                 <ReceiptText className="h-4 w-4" />
@@ -262,7 +263,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
         {tabla.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">{t("resultados.ingreso.tablaEmpty")}</p>
         ) : (
-          <div className="mt-4 overflow-x-auto">
+          <TableScroll className="mt-4">
             <table className="w-full min-w-[640px] text-sm">
               <thead>
                 <tr className="text-left text-[11.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
@@ -306,7 +307,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         )}
       </section>
       ) : null}

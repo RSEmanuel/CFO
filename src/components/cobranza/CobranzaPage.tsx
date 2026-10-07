@@ -31,6 +31,7 @@ import {
 } from "@/services/tableExport";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type AntiguedadLado = "cxc" | "cxp";
 type CobranzaTab = "cartera" | "antiguedad" | "concentracion";
@@ -107,7 +108,7 @@ export function CobranzaPage() {
       <Tabs value={tab} onValueChange={(value) => setTab(value as CobranzaTab)}>
         <div>
           <p className="mb-2 text-lg font-bold tracking-tight text-clay">{t("nav.collections")}</p>
-          <TabsList className="flex h-auto flex-wrap justify-start gap-2 border-0 bg-transparent p-0">
+          <TabsList className="flex h-auto flex-nowrap justify-start gap-2 overflow-x-auto border-0 bg-transparent p-0 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {COBRANZA_TABS.map((item) => (
               <TabsTrigger
                 key={item.value}
@@ -213,7 +214,7 @@ export function CobranzaPage() {
             </p>
             <ExportMenu onDownload={exportAntiguedad} />
           </div>
-          <div className="mt-2 overflow-x-auto">
+          <TableScroll className="mt-2">
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
@@ -234,7 +235,7 @@ export function CobranzaPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableScroll>
         </section>
       ) : null}
 
@@ -244,7 +245,7 @@ export function CobranzaPage() {
           <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.balancesByClient")}</h2>
           <ExportMenu onDownload={exportClientes} />
         </div>
-        <div className="overflow-x-auto">
+        <TableScroll>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
@@ -265,7 +266,7 @@ export function CobranzaPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       </section>
       ) : null}
       </div>

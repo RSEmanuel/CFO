@@ -24,6 +24,7 @@ import {
   type PresupuestoRubroKey,
 } from "@/services/resultadosPresupuesto";
 import { useMemo, useState } from "react";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 const LOWER_IS_BETTER = new Set<PresupuestoRubroKey>(["costo", "gasto"]);
 
@@ -232,7 +233,7 @@ export function ResultadosPresupuestoView({
               </div>
             </div>
 
-            <div className="mt-6 overflow-x-auto">
+            <TableScroll className="mt-6">
               <table className="w-full min-w-[860px] text-sm">
                 <thead>
                   <tr className="border-b border-beige-deep text-left text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
@@ -282,7 +283,7 @@ export function ResultadosPresupuestoView({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           </>
         )}
 
@@ -309,7 +310,7 @@ export function ResultadosPresupuestoView({
                 ))}
               </div>
             </div>
-            <div className="mt-3 overflow-x-auto">
+            <TableScroll className="mt-3">
               <table className="w-full min-w-[720px] text-sm">
                 <thead>
                   <tr className="border-b border-beige-deep text-left text-[11px] uppercase tracking-[0.08em] text-muted-foreground">
@@ -340,7 +341,7 @@ export function ResultadosPresupuestoView({
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableScroll>
           </div>
         )}
 

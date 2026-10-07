@@ -22,6 +22,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNarrowScreen } from "@/hooks/use-narrow-screen";
 
 type TendenciaIngresosCostosChartProps = {
   rows: MonthlyFinancials[];
@@ -272,6 +273,7 @@ export function TendenciaIngresosCostosChart({
   insightText,
 }: TendenciaIngresosCostosChartProps) {
   const { t } = useLocale();
+  const narrow = useNarrowScreen();
   const data = useMemo(
     () =>
       trailingMonthlyRows(rows, endPeriod, TREND_WINDOW_MONTHS).map((row) => ({
@@ -322,7 +324,8 @@ export function TendenciaIngresosCostosChart({
             <CartesianGrid vertical={false} stroke={CHART_AXIS.stroke} strokeDasharray="3 3" />
             <XAxis
               dataKey="label"
-              interval={0}
+              interval={narrow ? "preserveStartEnd" : 0}
+              minTickGap={narrow ? 12 : 5}
               tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
               axisLine={{ stroke: CHART_AXIS.stroke }}
               tickLine={false}
@@ -350,14 +353,16 @@ export function TendenciaIngresosCostosChart({
               activeDot={{ r: 6, fill: "var(--cifra-brand-contrast)", stroke: INGRESO_LINE, strokeWidth: 2 }}
               isAnimationActive={false}
             >
-              <LabelList
-                dataKey="ingreso"
-                position="top"
-                offset={10}
-                content={
-                  <TrendPointLabel color={INGRESO_LABEL} visible={incomeVisible} layouts={labelLayouts.ingreso} />
-                }
-              />
+              {narrow ? null : (
+                <LabelList
+                  dataKey="ingreso"
+                  position="top"
+                  offset={10}
+                  content={
+                    <TrendPointLabel color={INGRESO_LABEL} visible={incomeVisible} layouts={labelLayouts.ingreso} />
+                  }
+                />
+              )}
             </Line>
             <Line
               type="monotone"
@@ -369,14 +374,16 @@ export function TendenciaIngresosCostosChart({
               activeDot={{ r: 6, fill: "var(--cifra-brand-contrast)", stroke: COSTO_LINE, strokeWidth: 2 }}
               isAnimationActive={false}
             >
-              <LabelList
-                dataKey="costo"
-                position="bottom"
-                offset={10}
-                content={
-                  <TrendPointLabel color={COSTO_LABEL} visible={costVisible} layouts={labelLayouts.costo} />
-                }
-              />
+              {narrow ? null : (
+                <LabelList
+                  dataKey="costo"
+                  position="bottom"
+                  offset={10}
+                  content={
+                    <TrendPointLabel color={COSTO_LABEL} visible={costVisible} layouts={labelLayouts.costo} />
+                  }
+                />
+              )}
             </Line>
           </LineChart>
         </ResponsiveContainer>

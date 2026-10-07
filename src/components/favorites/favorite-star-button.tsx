@@ -33,7 +33,7 @@ export function FavoriteStarButton({
       aria-pressed={active}
       title={active ? t("favorites.remove", { label: translatedLabel }) : t("favorites.add", { label: translatedLabel })}
       className={cn(
-        "shrink-0 rounded-full p-1 transition-all",
+        "touch-hit shrink-0 rounded-full p-1 transition-all",
         active
           ? "text-amber-400"
           : "text-muted-foreground/40 hover:scale-110 hover:text-amber-400",

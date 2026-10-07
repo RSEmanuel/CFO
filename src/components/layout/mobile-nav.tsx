@@ -24,7 +24,7 @@ export function MobileNav() {
     <div className="flex items-center gap-2 border-b border-beige-deep bg-chrome px-3 py-2 lg:hidden">
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <Button variant="outline" size="icon" aria-label={t("common.openMenu")}>
+          <Button variant="outline" size="icon" className="h-11 w-11" aria-label={t("common.openMenu")}>
             <Menu className="h-4 w-4" />
           </Button>
         </SheetTrigger>
@@ -45,7 +45,7 @@ export function MobileNav() {
                   href={item.href}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "flex items-center gap-2 rounded-control border-l-2 px-3 py-2 text-sm font-medium",
+                    "flex min-h-11 items-center gap-3 rounded-control border-l-2 px-3 py-2.5 text-sm font-medium",
                     active
                       ? "border-clay bg-card text-foreground"
                       : "border-transparent text-muted-foreground hover:bg-card/70 hover:text-foreground",
@@ -62,7 +62,7 @@ export function MobileNav() {
           <Button
             type="button"
             variant="outline"
-            className="mt-4 w-full justify-start gap-2"
+            className="mt-4 h-11 w-full justify-start gap-2"
             onClick={() => {
               setOpen(false);
               logout();

@@ -19,6 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNarrowScreen } from "@/hooks/use-narrow-screen";
 
 /**
  * EBITDA vs EBIT — barras agrupadas TTM (tab Estado Operativo, arriba de la
@@ -86,6 +87,7 @@ export function EbitdaEbitTtmChart({
   /** Qué es el EBITDA de la serie. Si se omite, usa resultados.operativo.ttm.help. */
   insightText?: string;
 }) {
+  const narrow = useNarrowScreen();
   const { t } = useLocale();
 
   const data: ChartRow[] = ttm.map((point) => ({
@@ -110,7 +112,8 @@ export function EbitdaEbitTtmChart({
             <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
             <XAxis
               dataKey="mesLabel"
-              interval={0}
+              interval={narrow ? "preserveStartEnd" : 0}
+              minTickGap={narrow ? 12 : 5}
               tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
               axisLine={{ stroke: CHART_AXIS.stroke }}
               tickLine={false}

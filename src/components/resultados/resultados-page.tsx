@@ -182,7 +182,7 @@ export function ResultadosPage() {
       >
         <div className="sticky top-0 z-20 -mx-4 -mt-4 bg-background px-4 pt-4 md:-mx-6 md:-mt-6 md:px-6 md:pt-6">
           <p className="mb-2 text-lg font-bold tracking-tight text-clay">{t("nav.results")}</p>
-          <TabsList className="flex h-auto flex-wrap justify-start gap-2 border-0 bg-transparent p-0">
+          <TabsList className="flex h-auto flex-nowrap justify-start gap-2 overflow-x-auto border-0 bg-transparent p-0 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {RESULTADOS_TABS.map((item) => (
               <TabsTrigger
                 key={item.value}

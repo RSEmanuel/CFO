@@ -18,6 +18,7 @@ import {
 import { formatMxn } from "@/services/money";
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronDown, ChevronRight, Search } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type SortKey =
   | "accountNumber"
@@ -360,7 +361,7 @@ function CarteraTable({
           </p>
         </div>
       </div>
-      <div className="overflow-x-auto">
+      <TableScroll>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
@@ -374,7 +375,7 @@ function CarteraTable({
                     type="button"
                     onClick={() => toggleSort(column.key)}
                     className={cn(
-                      "inline-flex items-center gap-1 uppercase tracking-[0.1em] transition-colors hover:text-foreground",
+                      "touch-hit-y inline-flex items-center gap-1 uppercase tracking-[0.1em] transition-colors hover:text-foreground",
                       column.numeric && "flex-row-reverse",
                     )}
                   >
@@ -407,7 +408,7 @@ function CarteraTable({
                         aria-label={t("cobranza.cartera.toggleDetalle", {
                           name: row.entityName,
                         })}
-                        className="flex h-6 w-6 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                        className="touch-hit flex h-6 w-6 items-center justify-center rounded-control text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                       >
                         {expanded ? (
                           <ChevronDown className="h-4 w-4" />
@@ -452,7 +453,7 @@ function CarteraTable({
             ) : null}
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </div>
   );
 }
@@ -494,7 +495,7 @@ export function CobranzaCarteraSection() {
                   type="button"
                   onClick={() => setMoneda(option)}
                   className={cn(
-                    "rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
+                    "touch-hit-y rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
                     moneda === option && "bg-card text-clay shadow-sm",
                   )}
                 >

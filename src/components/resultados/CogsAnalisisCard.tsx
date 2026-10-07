@@ -11,6 +11,7 @@ import { formatMxn } from "@/services/money";
 import { PackageSearch } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type DisplayMode = "pct" | "mxn" | "ambos";
 
@@ -227,7 +228,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
           </ResponsiveContainer>
         </div>
 
-        <div className="overflow-x-auto">
+        <TableScroll>
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
@@ -255,7 +256,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
               })}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       </div>
     </section>
   );

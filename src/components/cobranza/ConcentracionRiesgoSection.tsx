@@ -35,6 +35,7 @@ import {
   YAxis,
 } from "recharts";
 import { toast } from "sonner";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 const ESPRESSO = "var(--cifra-ink)";
 
@@ -296,7 +297,7 @@ export function ConcentracionRiesgoSection() {
               type="button"
               onClick={() => setTipo(option)}
               className={cn(
-                "rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
+                "touch-hit-y rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
                 tipo === option && "bg-card text-clay shadow-sm",
               )}
             >
@@ -314,7 +315,7 @@ export function ConcentracionRiesgoSection() {
                 type="button"
                 onClick={() => setMoneda(option)}
                 className={cn(
-                  "rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
+                  "touch-hit-y rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
                   moneda === option && "bg-card text-clay shadow-sm",
                 )}
               >
@@ -362,7 +363,7 @@ export function ConcentracionRiesgoSection() {
             <ExportMenu onDownload={exportTabla} />
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <TableScroll>
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
@@ -432,7 +433,7 @@ export function ConcentracionRiesgoSection() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
         <p className="mt-4 text-[11.5px] leading-relaxed text-muted-foreground">
           <span className="align-super text-[10px]">*</span> {t("cobranza.concentracion.baseSaldoPendiente")}.{" "}
           {t("cobranza.concentracion.metodologia")}

@@ -133,7 +133,7 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
+      <CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
         <div>
           <CardTitle>{t("flujo.efectivo.mapaTitle")}</CardTitle>
           <CardDescription>{t("flujo.efectivo.mapaHelp")}</CardDescription>

@@ -30,6 +30,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNarrowScreen } from "@/hooks/use-narrow-screen";
 
 type ResultadosTop5ChartsProps = {
   periodo: string;
@@ -160,6 +161,7 @@ function Top5Card({
   favoriteId?: string;
 }) {
   const { t } = useLocale();
+  const narrow = useNarrowScreen();
   const data = useMemo(() => toTop5StackedPoints(series), [series]);
   const stackedKeys = useMemo(() => {
     const keys = series.entidades.map((actor) => actor.key);
@@ -220,7 +222,8 @@ function Top5Card({
             <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
             <XAxis
               dataKey="mes"
-              interval={0}
+              interval={narrow ? "preserveStartEnd" : 0}
+              minTickGap={narrow ? 12 : 5}
               tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
               axisLine={{ stroke: CHART_AXIS.stroke }}
               tickLine={false}
@@ -257,18 +260,20 @@ function Top5Card({
                   radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
                   isAnimationActive={false}
                 >
+                  {narrow ? null : (
                     <LabelList
-                    position="top"
-                    offset={8}
-                    valueAccessor={(entry) => {
-                      const point = entry.payload as Top5StackedPoint | undefined;
-                      if (!point || stackTopKey(point, stackedKeys) !== key) {
-                        return "";
-                      }
-                      return totalMesLabel(point.totalMes);
-                    }}
-                    content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
-                  />
+                      position="top"
+                      offset={8}
+                      valueAccessor={(entry) => {
+                        const point = entry.payload as Top5StackedPoint | undefined;
+                        if (!point || stackTopKey(point, stackedKeys) !== key) {
+                          return "";
+                        }
+                        return totalMesLabel(point.totalMes);
+                      }}
+                      content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
+                    />
+                  )}
                 </Bar>
               );
             })}

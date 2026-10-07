@@ -12,6 +12,7 @@ import { parseIngresoPeriodo } from "@/services/ingresoMix";
 import { formatMxn } from "@/services/money";
 import { FileText } from "lucide-react";
 import { useState } from "react";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type DisplayMode = "pct" | "mxn" | "ambos";
 
@@ -156,7 +157,7 @@ export function EstadoOperativoCard({ periodo }: EstadoOperativoCardProps) {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <TableScroll>
           <table className="w-full min-w-[640px] text-sm">
             <thead>
               <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
@@ -198,7 +199,7 @@ export function EstadoOperativoCard({ periodo }: EstadoOperativoCardProps) {
               })}
             </tbody>
           </table>
-        </div>
+        </TableScroll>
       </section>
 
       <PolizasAuditSheet target={auditTarget} onClose={() => setAuditTarget(null)} />

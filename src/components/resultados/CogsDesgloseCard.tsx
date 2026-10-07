@@ -8,6 +8,7 @@ import type { CogsRubroKey } from "@/services/cogsDesglose";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { PackageSearch } from "lucide-react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 const COGS_LINE_PALETTE = [
   "var(--cifra-ink)",
@@ -115,7 +116,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 overflow-x-auto border-t border-border/60 pt-3">
+      <TableScroll className="mt-4 border-t border-border/60 pt-3">
         <table className="w-full text-sm">
           <thead>
             <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
@@ -158,7 +159,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
             </tr>
           </tbody>
         </table>
-      </div>
+      </TableScroll>
     </section>
   );
 }

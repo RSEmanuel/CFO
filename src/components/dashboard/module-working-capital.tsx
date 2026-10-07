@@ -5,6 +5,7 @@ import { MetricCard } from "@/components/metric-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { arr, fmtDays, fmtMoney } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 export function ModuleWorkingCapital({ pack, loading }: { pack: ModulePack | null; loading: boolean }) {
   const wc = pack?.capitalTrabajo;
@@ -45,7 +46,7 @@ export function ModuleWorkingCapital({ pack, loading }: { pack: ModulePack | nul
           {loading ? (
             <div className="h-40 animate-pulse rounded-lg bg-muted" />
           ) : (
-            <div className="overflow-x-auto">
+            <TableScroll>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-muted-foreground">
@@ -65,7 +66,7 @@ export function ModuleWorkingCapital({ pack, loading }: { pack: ModulePack | nul
                 </tbody>
               </table>
               {vendors.length === 0 ? <p className="py-6 text-sm text-muted-foreground">Sin proveedores en el corte.</p> : null}
-            </div>
+            </TableScroll>
           )}
         </CardContent>
       </Card>

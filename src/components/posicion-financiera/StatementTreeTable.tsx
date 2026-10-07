@@ -25,6 +25,7 @@ import {
 } from "@/services/posicionFinanciera";
 import { ChevronDown, Download, Info, RefreshCw } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
+import { TableScroll } from "@/components/ui/table-scroll";
 
 type NumberMode = "money" | "ratio";
 
@@ -207,7 +208,7 @@ export function StatementTreeTable({
             {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
             <Tooltip>
               <TooltipTrigger asChild>
-                <button type="button" className="text-muted-foreground hover:text-clay" aria-label={t("posicionFinanciera.information")}>
+                <button type="button" className="touch-hit text-muted-foreground hover:text-clay" aria-label={t("posicionFinanciera.information")}>
                   <Info className="h-4 w-4" />
                 </button>
               </TooltipTrigger>
@@ -238,7 +239,7 @@ export function StatementTreeTable({
         </div>
 
         <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
-          <button type="button" className="font-medium text-clay hover:text-clay-hover" onClick={toggleExpandAll}>
+          <button type="button" className="touch-hit-y font-medium text-clay hover:text-clay-hover" onClick={toggleExpandAll}>
             {allExpanded ? t("posicionFinanciera.collapseAll") : t("posicionFinanciera.expandAll")}
           </button>
           {showEmptyToggle ? (
@@ -265,7 +266,7 @@ export function StatementTreeTable({
           ) : null}
         </div>
 
-        <div className="mt-4 overflow-x-auto">
+        <TableScroll className="mt-4">
           {loading ? (
             <div className="space-y-2">
               {Array.from({ length: 8 }).map((_, index) => (
@@ -318,7 +319,7 @@ export function StatementTreeTable({
                               type="button"
                               aria-label={isOpen ? t("posicionFinanciera.collapse") : t("posicionFinanciera.expand")}
                               onClick={() => toggleExpand(row.node.id)}
-                              className="inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-beige-deep text-[11px] leading-none text-muted-foreground"
+                              className="touch-hit inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-[2px] border border-beige-deep text-[11px] leading-none text-muted-foreground"
                             >
                               {isOpen ? "−" : "+"}
                             </button>
@@ -411,7 +412,7 @@ export function StatementTreeTable({
               </tbody>
             </table>
           )}
-        </div>
+        </TableScroll>
       </section>
     </TooltipProvider>
   );

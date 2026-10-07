@@ -167,12 +167,32 @@
 
   @media (max-width: 639px) {
     .metrics-filter-bar {
-      display: flex;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      overflow-x: visible;
       padding: 0.875rem;
     }
+  }
 
-    .metrics-filter-bar > label {
-      min-width: 170px;
+  /* En pantallas táctiles, los botones de ícono pequeños reciben un área de toque
+     invisible más grande sin cambiar cómo se ven. */
+  @media (pointer: coarse) {
+    .touch-hit,
+    .touch-hit-y {
+      position: relative;
+    }
+
+    .touch-hit::after,
+    .touch-hit-y::after {
+      content: "";
+      position: absolute;
+    }
+
+    .touch-hit::after {
+      inset: -10px;
+    }
+
+    .touch-hit-y::after {
+      inset: -10px 0;
     }
   }
 }

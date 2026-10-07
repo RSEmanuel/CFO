@@ -11,6 +11,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useNarrowScreen } from "@/hooks/use-narrow-screen";
 
 export type HeroLineDatum = Record<string, string | number | null>;
 
@@ -271,6 +272,7 @@ export function HeroLineChart({
 }: HeroLineChartProps) {
   const seriesValues = seriesNumbers(data, totalKey);
   const labelOffsets = pointLabelOffsets(seriesValues);
+  const narrow = useNarrowScreen();
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -283,6 +285,7 @@ export function HeroLineChart({
         <XAxis
           dataKey={xKey}
           interval="preserveStartEnd"
+          minTickGap={narrow ? 16 : 5}
           tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
           axisLine={{ stroke: CHART_AXIS.stroke }}
           tickLine={false}
@@ -318,18 +321,20 @@ export function HeroLineChart({
           dot={<IncomeDot xKey={xKey} selectedXValue={selectedXValue} />}
           activeDot={{ r: 6, fill: CHART.clay, stroke: CHART.card, strokeWidth: 2 }}
         >
-          <LabelList
-            dataKey={totalKey}
-            position="top"
-            offset={12}
-            content={
-              <IncomePointLabel
-                seriesValues={seriesValues}
-                labelOffsets={labelOffsets}
-                formatValue={valueLabelFormatter}
-              />
-            }
-          />
+          {narrow ? null : (
+            <LabelList
+              dataKey={totalKey}
+              position="top"
+              offset={12}
+              content={
+                <IncomePointLabel
+                  seriesValues={seriesValues}
+                  labelOffsets={labelOffsets}
+                  formatValue={valueLabelFormatter}
+                />
+              }
+            />
+          )}
         </Line>
       </LineChart>
     </ResponsiveContainer>
