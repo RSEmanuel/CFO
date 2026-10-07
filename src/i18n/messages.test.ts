@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale } from "./config";
 import { collectKeys, createT, MESSAGES } from "./translate";
-import { SANKEY_IDS, generateSankeyData } from "../services/resultadosSankey";
 
 describe("i18n catalogs", () => {
   it("es and en share the same keys", () => {
@@ -68,18 +67,8 @@ describe("i18n catalogs", () => {
       "flujo.operativo.categories.otrosSalidas",
       "resultados.sankeyError",
       "errors.prismaClientStale",
-      "resultados.waterfallTitle",
-      "resultados.waterfallHelp",
-      "resultados.waterfallError",
-      "resultados.step.income",
-      "resultados.step.costs",
-      "resultados.step.grossProfit",
-      "resultados.step.expenses",
-      "resultados.step.operatingResult",
-      "resultados.step.da",
-      "resultados.waterfallLegend.increase",
-      "resultados.waterfallLegend.decrease",
-      "resultados.waterfallLegend.total",
+      "posicionFinanciera.waterfall.steps.financieros",
+      "posicionFinanciera.waterfall.steps.impuestos",
       "flujo.efectivo.tab",
       "flujo.efectivo.mapaTitle",
       "flujo.efectivo.mapaHelp",
@@ -143,25 +132,3 @@ describe("i18n catalogs", () => {
   });
 });
 
-describe("translated financial chrome keeps stable ids", () => {
-  it("Sankey hubs keep stable ids and amounts across locales", () => {
-    const graph = generateSankeyData({
-      ingreso_total: 1_000,
-      costo_total: 200,
-      gasto_total: 300,
-      ebitda: 500,
-      depreciacion_amortizacion: 0,
-      micro_categorias: {},
-      desglose_ingreso: { "Cuenta ingreso": 1_000 },
-      desglose_costo: { "Cuenta costo": 200 },
-      desglose_gasto: { "Cuenta gasto": 300 },
-    });
-    const es = createT("es");
-    const en = createT("en");
-    const income = graph.nodes.find((node) => node.name === SANKEY_IDS.income);
-    assert.ok(income);
-    assert.equal(income.value, 1_000);
-    assert.notEqual(es(income.labelKey ?? ""), en(income.labelKey ?? ""));
-    assert.ok(graph.nodes.some((node) => node.name === "Cuenta ingreso"));
-  });
-});

@@ -1,3 +1,5 @@
+import { dateLocale, type Locale } from "@/i18n/config";
+import { monthLabelKey } from "@/i18n/format";
 import {
   categoryTotal,
   type MonthlyFinancials,
@@ -16,6 +18,34 @@ export type KpiCard = {
 export type TopKpis = {
   currentMonthValue: number | null;
   cards: KpiCard[];
+};
+
+/** Orden de las temporalidades, sin presupuesto. El mes seleccionado va primero. */
+const TEMPORAL_KPI_ORDER = ["mesAnterior", "promedio3M", "anoAnterior", "trimAnterior"] as const;
+
+export type CategoryTemporalKey = "mesActual" | (typeof TEMPORAL_KPI_ORDER)[number];
+
+export type CategoryTemporalCard = {
+  key: CategoryTemporalKey;
+  titleKey: string;
+  value: number | null;
+  deltaPct: number | null;
+  periodLabel: string;
+};
+
+type Translate = (key: string) => string;
+
+const TEMPORAL_TITLE_KEY: Record<(typeof TEMPORAL_KPI_ORDER)[number], string> = {
+  mesAnterior: "resultados.previousMonth",
+  promedio3M: "resultados.average3m",
+  anoAnterior: "resultados.previousYear",
+  trimAnterior: "resultados.previousQuarter",
+};
+
+const MONTH_TITLE_KEY: Record<ResultadosCategoryName, string> = {
+  Ingreso: "resultados.monthIncome",
+  Costo: "resultados.monthCost",
+  Gasto: "resultados.monthExpense",
 };
 
 function parsePeriodo(periodo: string): { year: number; month: number } {
@@ -47,6 +77,71 @@ function deltaVsCurrent(current: number | null, kpi: number | null): number | nu
     return null;
   }
   return (current - kpi) / Math.abs(kpi);
+}
+
+function monthPhrase(periodo: string, t: Translate, locale: Locale, lower: boolean): { name: string; year: number } {
+  const { year, month } = parsePeriodo(periodo);
+  const raw = t(monthLabelKey(month - 1));
+  return { name: lower ? raw.toLocaleLowerCase(dateLocale(locale)) : raw, year };
+}
+
+function singleMonthLabel(periodo: string, t: Translate, locale: Locale): string {
+  const { name, year } = monthPhrase(periodo, t, locale, false);
+  return `${name} ${year}`;
+}
+
+function rangeLabel(start: string, end: string, t: Translate, locale: Locale): string {
+  const from = monthPhrase(start, t, locale, false);
+  const to = monthPhrase(end, t, locale, true);
+  if (from.year === to.year) {
+    return `${from.name}–${to.name} ${to.year}`;
+  }
+  return `${from.name} ${from.year}–${to.name} ${to.year}`;
+}
+
+export function temporalPeriodLabels(
+  periodo: string,
+  t: Translate,
+  locale: Locale,
+): Record<CategoryTemporalKey, string> {
+  const priorQuarter = previousQuarterMonths(periodo);
+  return {
+    mesActual: singleMonthLabel(periodo, t, locale),
+    mesAnterior: singleMonthLabel(shiftPeriodo(periodo, -1), t, locale),
+    promedio3M: rangeLabel(shiftPeriodo(periodo, -2), periodo, t, locale),
+    anoAnterior: singleMonthLabel(shiftPeriodo(periodo, -12), t, locale),
+    trimAnterior: priorQuarter ? rangeLabel(priorQuarter[0], priorQuarter[2], t, locale) : "",
+  };
+}
+
+export function categoryTemporalCards(
+  kpis: TopKpis,
+  periodo: string,
+  category: ResultadosCategoryName,
+  t: Translate,
+  locale: Locale,
+): CategoryTemporalCard[] {
+  const labels = temporalPeriodLabels(periodo, t, locale);
+  const byKey = new Map(kpis.cards.map((card) => [card.key, card]));
+  return [
+    {
+      key: "mesActual",
+      titleKey: MONTH_TITLE_KEY[category],
+      value: kpis.currentMonthValue,
+      deltaPct: null,
+      periodLabel: labels.mesActual,
+    },
+    ...TEMPORAL_KPI_ORDER.map((key) => {
+      const card = byKey.get(key);
+      return {
+        key,
+        titleKey: TEMPORAL_TITLE_KEY[key],
+        value: card?.value ?? null,
+        deltaPct: card?.deltaPct ?? null,
+        periodLabel: labels[key],
+      };
+    }),
+  ];
 }
 
 function previousQuarterMonths(periodo: string): [string, string, string] | null {

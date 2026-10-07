@@ -24,9 +24,9 @@ import {
   YAxis,
 } from "recharts";
 
-const ESPRESSO = "#1A1915";
-const INCREASE = "#4F6F52";
-const DECREASE = "#9F1239";
+const ESPRESSO = "var(--cifra-ink)";
+const INCREASE = "var(--cifra-good)";
+const DECREASE = "var(--cifra-bad)";
 
 const TOOLTIP_STYLE = {
   background: CHART.card,
@@ -104,7 +104,7 @@ export function FlujoWaterfallChart({
   return (
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h3 className="font-serif text-lg font-medium text-foreground">{t("flujo.historyTitle")}</h3>
+        <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.historyTitle")}</h3>
         <div className="flex flex-wrap items-center gap-2">
           <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
             {WINDOW_OPTIONS.map((option) => (
@@ -186,7 +186,7 @@ export function FlujoWaterfallChart({
               "inline-block h-2 w-2 shrink-0 rounded-full",
               model.insight.favorable ? "" : "bg-desfavorable",
             )}
-            style={model.insight.favorable ? { backgroundColor: "#4F6F52" } : undefined}
+            style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
             aria-hidden
           />
           {t(model.insight.messageKey, model.insight.values)}

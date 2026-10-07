@@ -1,6 +1,8 @@
 "use client";
 
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
 import { monthLabelKey } from "@/i18n/format";
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
@@ -27,8 +29,8 @@ import {
  * Negativos se leen por el eje (barra hacia abajo), sin fill condicional.
  */
 
-const COLOR_EBITDA = "#334155";
-const COLOR_EBIT = "#C25E38";
+const COLOR_EBITDA = "var(--cifra-ink)";
+const COLOR_EBIT = "var(--cifra-brand)";
 
 type ChartRow = EbitdaTtmPoint & { mesLabel: string };
 
@@ -97,7 +99,10 @@ export function EbitdaEbitTtmChart({
 
   return (
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <h3 className="font-serif text-xl font-medium text-foreground">{t("resultados.operativo.ttm.title")}</h3>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.ttm.title")}</h3>
+        <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ebitdaEbitTtm} label={t("resultados.operativo.ttm.title")} />
+      </div>
       <InsightText text={insightText ?? t("resultados.operativo.ttm.help")} />
       <div className="mt-4 h-[320px] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
@@ -124,7 +129,7 @@ export function EbitdaEbitTtmChart({
               }
               wrapperStyle={{ fontSize: 12 }}
             />
-            <ReferenceLine y={0} stroke="#94a3b8" strokeDasharray="3 3" />
+            <ReferenceLine y={0} stroke="var(--cifra-ink-3)" strokeDasharray="3 3" />
             <Bar dataKey="ebitda" fill={COLOR_EBITDA} radius={[3, 3, 0, 0]} isAnimationActive={false} />
             <Bar dataKey="ebit" fill={COLOR_EBIT} radius={[3, 3, 0, 0]} isAnimationActive={false} />
           </BarChart>

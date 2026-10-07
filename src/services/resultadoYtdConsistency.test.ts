@@ -161,15 +161,18 @@ function erYtd(rows: BalanzaPnL[], cierre: number): number {
   return utilidadNeta?.acumulado.monto ?? 0;
 }
 
-function arbolResultadoYtd(rows: BalanzaPnL[], cierre: number): { resultado: number; control: number } {
+function arbolResultadoYtd(rows: BalanzaPnL[], cierre: number): { resultado: number; control: number; activo: number } {
   const tree = buildPosicionTree({ "2026": rows.filter((row) => row.periodo === cierre) }, ["2026"]);
   const resultado = findNode(tree, "epf:cap:resultado-ejercicio-ytd");
   const control = findNode(tree, "epf:control");
+  const activo = findNode(tree, "epf:activo");
   assert.ok(resultado, "el árbol debe incluir la línea calculada de resultado del ejercicio");
   assert.ok(control, "el árbol debe cuadrar A = P + C (nodo de control presente)");
+  assert.ok(activo, "el árbol debe incluir el activo");
   return {
     resultado: resultado.values["2026"] ?? 0,
     control: control.values["2026"] ?? Number.NaN,
+    activo: activo.values["2026"] ?? Number.NaN,
   };
 }
 
@@ -186,10 +189,10 @@ test("consistencia cruzada con utilidad YTD: ER ≡ resultado del ejercicio del 
   const ytd = erYtd(rows, cierre);
   assert.equal(ytd, 970, "ER YTD ene→mar = 350 + 470 + 150");
 
-  const { resultado, control } = arbolResultadoYtd(rows, cierre);
+  const { resultado, control, activo } = arbolResultadoYtd(rows, cierre);
   assert.equal(resultado, 970, "árbol: la utilidad se presenta positiva (signo económico)");
   assert.equal(ytd, round2(resultado), "ER.utilidadNeta ≡ Árbol.resultadoYtd");
-  assert.equal(control, 0, "A = P + C cuadra al centavo con el resultado calculado");
+  assert.equal(control, activo, "la fila A = P + C muestra Pasivo + Capital, igual al activo");
 });
 
 test("consistencia cruzada con pérdida YTD: el árbol presenta la pérdida en negativo, como el ER", () => {
@@ -197,18 +200,18 @@ test("consistencia cruzada con pérdida YTD: el árbol presenta la pérdida en n
   const ytd = erYtd(rows, 1);
   assert.equal(ytd, -200, "ER YTD = pérdida de 200");
 
-  const { resultado, control } = arbolResultadoYtd(rows, 1);
+  const { resultado, control, activo } = arbolResultadoYtd(rows, 1);
   assert.equal(resultado, -200, "árbol: pérdida presentada en negativo (signo económico)");
   assert.equal(ytd, round2(resultado));
-  assert.equal(control, 0);
+  assert.equal(control, activo);
 });
 
 test("la identidad se sostiene en cualquier periodo de cierre intermedio", () => {
   const rows = buildBalancedYear(PROFIT_MONTHS);
   for (const cierre of [1, 2, 3]) {
     const ytd = erYtd(rows, cierre);
-    const { resultado, control } = arbolResultadoYtd(rows, cierre);
+    const { resultado, control, activo } = arbolResultadoYtd(rows, cierre);
     assert.equal(ytd, round2(resultado), `cierre ${cierre}: ER ≡ Árbol`);
-    assert.equal(control, 0, `cierre ${cierre}: A = P + C`);
+    assert.equal(control, activo, `cierre ${cierre}: la fila muestra Pasivo + Capital`);
   }
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { useLocale } from "@/context/LocaleContext";
-import { CHART } from "@/lib/chart-theme";
+import { canvasColor, CHART } from "@/lib/chart-theme";
 import type { FlujoLinea } from "@/services/flujoEfectivo";
 import { buildFlujoSankey } from "@/services/flujoSankey";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
@@ -16,7 +16,7 @@ echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
 
 type SankeyOption = echarts.ComposeOption<SankeySeriesOption | TooltipComponentOption>;
 
-const LABEL_COLOR = "#1A1915";
+const LABEL_COLOR = "var(--cifra-ink)";
 const EGRESO_COLORS = [CHART.coral, CHART.sand];
 
 function escapeHtml(value: string): string {
@@ -90,12 +90,13 @@ export function FlujoEfectivoSankey({
           data: graph.nodes.map((node) => ({
             name: node.name,
             itemStyle: {
-              color:
+              color: canvasColor(
                 node.side === "in"
                   ? CHART.olive
                   : node.side === "caja"
                     ? CHART.clay
                     : EGRESO_COLORS[(outIndex.get(node.name) ?? 0) % EGRESO_COLORS.length],
+              ),
               borderWidth: 0,
             },
             label: {
@@ -107,7 +108,7 @@ export function FlujoEfectivoSankey({
             distance: 12,
             fontSize: 13,
             fontWeight: 500,
-            color: LABEL_COLOR,
+            color: canvasColor(LABEL_COLOR),
             lineHeight: 18,
             overflow: "none",
             formatter: (params) => {

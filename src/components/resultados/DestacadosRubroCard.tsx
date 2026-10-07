@@ -6,12 +6,13 @@ import { useLocale } from "@/context/LocaleContext";
 import { cn } from "@/lib/utils";
 import type { DestacadosRubro } from "@/services/financialDataTransformer";
 import { formatAxisTick, type DisplayUnits } from "@/services/money";
-import { LineChart as LineChartIcon, Receipt, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
+import { LineChart as LineChartIcon, CircleDollarSign, Receipt, TrendingUp, Wallet, type LucideIcon } from "lucide-react";
 
 const RUBRO_ICONS: Record<DestacadosRubro["key"], LucideIcon> = {
   ingreso: TrendingUp,
   costo: Wallet,
   gasto: Receipt,
+  utilidad: CircleDollarSign,
   ebitda: LineChartIcon,
 };
 
@@ -28,7 +29,11 @@ function formatDelta(deltaPct: number): string {
 }
 
 export function rubroTitleKey(key: DestacadosRubro["key"]): string {
-  return `resultados.${key === "ingreso" ? "income" : key === "costo" ? "cost" : key === "gasto" ? "expense" : "ebitda"}`;
+  if (key === "ingreso") return "resultados.income";
+  if (key === "costo") return "resultados.cost";
+  if (key === "gasto") return "resultados.expense";
+  if (key === "utilidad") return "resultados.utilidad";
+  return "resultados.ebitda";
 }
 
 export function DestacadosRubroCard({
@@ -47,16 +52,17 @@ export function DestacadosRubroCard({
   return (
     <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="flex items-start justify-between gap-3">
-        <p className="font-serif text-lg text-foreground">{title}</p>
+        <p className="font-sans text-lg font-bold text-foreground">{title}</p>
         <div className="flex items-center gap-1">
           <FavoriteStarButton widgetId={`destacados:${rubro.key}`} label={title} />
           <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
         </div>
       </div>
       <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
-        {formatAxisTick(rubro.value, units)}
+        {rubro.value == null ? "N/A" : formatAxisTick(rubro.value, units)}
       </p>
       {rubro.key === "ebitda" ? <InsightText text={t("resultados.ebitdaInsight")} /> : null}
+      {rubro.key === "utilidad" ? <InsightText text={t("resultados.utilidadInsight")} /> : null}
       <div className="mt-4 flex flex-wrap items-center gap-2">
         {rubro.deltaPct == null ? (
           <span className="text-xs text-muted-foreground">{t("resultados.noComparable")}</span>

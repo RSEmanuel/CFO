@@ -203,7 +203,7 @@ export function StatementTreeTable({
       <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="font-serif text-xl font-medium text-foreground">{title}</h2>
+            <h2 className="font-sans text-xl font-medium text-foreground">{title}</h2>
             {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
             <Tooltip>
               <TooltipTrigger asChild>
@@ -333,14 +333,14 @@ export function StatementTreeTable({
                               }
                               title={t("polizas.audit.drillHint")}
                               className={cn(
-                                "rounded-[4px] text-left font-serif text-base text-foreground transition-colors hover:text-clay hover:underline hover:decoration-clay/40 hover:underline-offset-4",
+                                "rounded-[4px] text-left font-sans text-base text-foreground transition-colors hover:text-clay hover:underline hover:decoration-clay/40 hover:underline-offset-4",
                                 strong && "font-medium",
                               )}
                             >
                               {nodeLabel(row.node)}
                             </button>
                           ) : (
-                            <span className={cn("font-serif text-base text-foreground", strong && "font-medium")}>{nodeLabel(row.node)}</span>
+                            <span className={cn("font-sans text-base text-foreground", strong && "font-medium")}>{nodeLabel(row.node)}</span>
                           )}
                           {row.node.formulaKey || row.node.formula ? (
                             <Tooltip>

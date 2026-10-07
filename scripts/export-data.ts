@@ -96,7 +96,7 @@ async function main(): Promise<void> {
   const tables = await sortByForeignKeys(pool, await listTables(pool));
   const out = createWriteStream(OUTPUT_FILE, { encoding: "utf8" });
 
-  out.write(`-- Respaldo CFO Virtual generado el ${new Date().toISOString()}\n`);
+  out.write(`-- Respaldo Cifra generado el ${new Date().toISOString()}\n`);
   out.write(`-- Restaurar con: npm run db:import (después de npx prisma migrate deploy)\n\nBEGIN;\n\n`);
   out.write(
     `TRUNCATE TABLE ${tables.map(quoteIdent).join(", ")} CASCADE;\n\n`,

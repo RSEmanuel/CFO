@@ -46,7 +46,7 @@ function DeltaRow({ label, delta, units }: { label: string; delta: number | null
       <span className="flex items-center gap-2 text-muted-foreground">
         <span
           className={cn("inline-block h-2 w-2 shrink-0 rounded-full", favorable ? "" : "bg-desfavorable")}
-          style={favorable ? { backgroundColor: "#4F6F52" } : undefined}
+          style={favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
           aria-hidden
         />
         {label}
@@ -70,7 +70,7 @@ function ActividadCard({ family, periodo, units }: { family: FlujoActividadFamil
 
   return (
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <h3 className="font-serif text-lg font-medium text-foreground">{familyTitle}</h3>
+      <h3 className="font-sans text-lg font-medium text-foreground">{familyTitle}</h3>
       <div className="mt-4 flex flex-col gap-6 lg:flex-row">
         <div className="min-w-0 lg:w-[65%]">
           <div className="h-[240px] w-full">
@@ -106,7 +106,7 @@ function ActividadCard({ family, periodo, units }: { family: FlujoActividadFamil
         </div>
 
         <aside className="min-w-0 lg:w-[35%]">
-          <h3 className="font-serif text-base font-medium text-foreground">{t("flujo.explanation")}</h3>
+          <h3 className="font-sans text-base font-medium text-foreground">{t("flujo.explanation")}</h3>
           <p className="mt-2 text-sm text-muted-foreground">{family.descriptionKey ? t(family.descriptionKey) : family.description}</p>
           <dl className="mt-4 space-y-2">
             <div className="flex items-center justify-between gap-3 text-sm">

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "Virtual CFO",
+    "appName": "Cifra",
     "company": "Company",
     "loading": "Loading…",
     "loadingSession": "Loading session…",
@@ -139,30 +139,7 @@
     "emptyMessage": "To enable it, upload a trial balance for this company.",
     "emptyPeriodTitle": "No records for {periodo}",
     "emptyPeriodMessage": "There is no trial balance for this period. Upload the CONTPAQi 05 file for that month in Ingestion; we do not show estimated figures.",
-    "sankeyTitle": "Income statement flow",
-    "sankeyHelp": "We show the largest accounts. The rest is grouped in Other.",
     "sankeyError": "The income-statement flow could not be built. The rest of the dashboard is still available.",
-    "waterfallTitle": "Income statement",
-    "waterfallHelp": "How much costs and expenses take from revenue down to operating profit before tax and depreciation (what the business actually generates).",
-    "waterfallError": "The income statement could not be built. The rest of the dashboard is still available.",
-    "waterfallLegend": {
-      "increase": "Increase",
-      "decrease": "Decrease",
-      "total": "Total / subtotal"
-    },
-    "step": {
-      "income": "Revenue",
-      "costs": "Costs",
-      "grossProfit": "Gross profit",
-      "expenses": "Expenses",
-      "operatingResult": "Operating result",
-      "da": "D&A add-back",
-      "ebitda": "EBITDA"
-    },
-    "detail": "Detail",
-    "summary": "Summary",
-    "standard": "Standard",
-    "detailed": "Detailed",
     "companyFallback": "company",
     "income": "Revenue",
     "incomeTotal": "Total revenue",
@@ -184,6 +161,8 @@
     "expense": "Expense",
     "ebitda": "EBITDA",
     "ebitdaInsight": "Operating profit before tax and depreciation (what the business actually generates).",
+    "utilidad": "Utilidad",
+    "utilidadInsight": "What you have left after cost, expense, depreciation, interest, and taxes.",
     "vsPreviousMonth": "vs prior month",
     "vsPreviousYear": "vs prior year",
     "vsPreviousQuarter": "vs prior quarter",
@@ -244,6 +223,9 @@
       "saved": "Drivers saved",
       "saveError": "Could not save drivers"
     },
+    "monthIncome": "Revenue for the month",
+    "monthCost": "Cost for the month",
+    "monthExpense": "Expense for the month",
     "average3m": "3-Month Average",
     "previousMonth": "Prior Month",
     "previousYear": "Same Mo. Prior Year",
@@ -259,18 +241,6 @@
       "ebitdaIdentity": "EBITDA is always revenue less cost and expense; it is not projected separately.",
       "widerRange": "The range widens as the horizon moves away from the latest close.",
       "insufficientHistory": "The statistical projection requires at least 8 actual months in the ledger."
-    },
-    "sankey": {
-      "income": "Revenue",
-      "costs": "Costs",
-      "expenses": "Expenses",
-      "grossProfit": "Gross Profit",
-      "ebitda": "EBITDA",
-      "otherIncome": "Other revenue",
-      "otherCosts": "Other costs",
-      "otherExpenses": "Other expenses",
-      "groupedAccounts": "{count, plural, one {# grouped account} other {# grouped accounts}}",
-      "topAccounts": "Top accounts:"
     },
     "top5": {
       "clientsTitle": "Top 5 clients by revenue contribution",
@@ -615,6 +585,10 @@
         "costos": "Costs",
         "utilidadBruta": "Gross profit",
         "opex": "Operating expenses",
+        "ebit": "EBIT",
+        "da": "D&A",
+        "financieros": "Financial expenses",
+        "impuestos": "Taxes",
         "utilidadNeta": "Net income"
       },
       "legend": {
@@ -663,6 +637,11 @@
     "activities": "Activities",
     "alerts": "Alerts",
     "summary": "Summary",
+    "tabs": {
+      "vision": "Overview",
+      "libre": "Free Cash Flow",
+      "diaria": "Daily Cash"
+    },
     "activityFamilies": "Operations / Investing / Financing",
     "explanation": "Explanation",
     "currentPeriod": "Current period ({period})",
@@ -689,9 +668,9 @@
     "cashIncreased": "Cash increased {amount}",
     "cashDecreased": "Cash decreased ({amount})",
     "alertsMessages": {
-      "lowRunway": "Cash covers less than about 6 weeks of operations.",
-      "negativeTwoMonths": "Net cash flow was negative for two consecutive months.",
-      "highCapex": "This month's CapEx consumes more than half of operating cash flow."
+      "lowRunway": "Cash covers less than ~6 weeks of operations: renegotiate terms or accelerate collections.",
+      "negativeTwoMonths": "Two consecutive months of negative net cash flow: cut expenses or bring forward sales.",
+      "highCapex": "This month's CapEx consumes more than half of operations: reschedule investments or seek financing."
     },
     "operativo": {
       "tab": "Operational",
@@ -741,6 +720,86 @@
       "salidasOperativas": "Operating outflows",
       "emptyTitle": "Cash flow not available yet",
       "emptyMessage": "Upload the cash flow report (or the master template) to see category detail."
+    },
+    "libre": {
+      "title": "From profit to cash",
+      "subtitle": "Reconciliation: why profit is not the money in the bank. It shows how customer credit and supplier debt change your real cash.",
+      "estimated": "Cifra built this bridge from the monthly change in the trial balance. It is not the bank statement.",
+      "emptyTitle": "Free cash flow is not available yet",
+      "emptyMessage": "Upload this month's trial balance in Ingestion to build the reconciliation.",
+      "emptyPriorMessage": "The prior month's trial balance is missing. Upload it in Ingestion to measure the change in working capital.",
+      "loadError": "Could not load free cash flow",
+      "utilidadNeta": "Net income",
+      "depreciacion": "Depreciation and amortization",
+      "flujoOperativo": "Net operating cash flow",
+      "buckets": {
+        "cxc": {
+          "up": "Increase in accounts receivable",
+          "down": "Decrease in accounts receivable"
+        },
+        "inventario": {
+          "up": "Increase in inventory",
+          "down": "Decrease in inventory"
+        },
+        "impuestosFavor": {
+          "up": "Increase in tax receivables",
+          "down": "Decrease in tax receivables"
+        },
+        "anticiposActivo": {
+          "up": "Increase in prepayments",
+          "down": "Decrease in prepayments"
+        },
+        "otrosActivo": {
+          "up": "Increase in other current assets",
+          "down": "Decrease in other current assets"
+        },
+        "cxp": {
+          "up": "Increase in accounts payable",
+          "down": "Decrease in accounts payable"
+        },
+        "impuestosPagar": {
+          "up": "Increase in taxes payable",
+          "down": "Decrease in taxes payable"
+        },
+        "otrosPasivo": {
+          "up": "Increase in other current liabilities",
+          "down": "Decrease in other current liabilities"
+        }
+      },
+      "insight": {
+        "cxc": {
+          "up": "Customers owe you {amount} more than last month. Collect that balance before committing more spending.",
+          "down": "Receivables fell by {amount}. Keep that collection pace before extending terms."
+        },
+        "inventario": {
+          "up": "Inventory tied up {amount} of cash. Sell it or pause purchases until it comes down.",
+          "down": "Inventory released {amount}. Do not overbuy on the next order."
+        },
+        "impuestosFavor": {
+          "up": "Tax receivables rose by {amount}. Apply them to the next payment instead of leaving them idle.",
+          "down": "You recovered {amount} of tax receivables. Use it for the next payment."
+        },
+        "anticiposActivo": {
+          "up": "You advanced {amount} to suppliers. Do not advance more until they deliver.",
+          "down": "Prepayments fell by {amount}. Require delivery before advancing again."
+        },
+        "otrosActivo": {
+          "up": "Other current assets rose by {amount}. Check what has not turned into cash.",
+          "down": "Other current assets fell by {amount}. Confirm that cash is already in the bank."
+        },
+        "cxp": {
+          "up": "Suppliers financed {amount} more. Do not pay early if cash is tight.",
+          "down": "You paid suppliers {amount} more. Negotiate terms before the next cutoff."
+        },
+        "impuestosPagar": {
+          "up": "Taxes payable rose by {amount}. Set that cash aside before the due date.",
+          "down": "You paid {amount} of taxes that were still outstanding. Set aside the next payment."
+        },
+        "otrosPasivo": {
+          "up": "Other current liabilities rose by {amount}. Schedule those payments before they come due.",
+          "down": "Other current liabilities fell by {amount}. Confirm that payment does not leave you short of cash."
+        }
+      }
     }
   },
   "polizas": {
@@ -922,18 +981,23 @@
     "drivers": {
       "title": "Scenario drivers",
       "subtitle": "Move the controls to simulate; the baseline follows the active period.",
+      "groups": {
+        "commercial": "Commercial strategy",
+        "efficiency": "Operating efficiency",
+        "cash": "Cash and debt management"
+      },
       "crecimientoVentasPct": "Revenue growth",
-      "crecimientoVentasPctHelp": "Drags variable cost at the same pace",
-      "sensibilidadPreciosPct": "Price sensitivity",
-      "sensibilidadPreciosPctHelp": "Positive improves COGS absorption",
+      "crecimientoVentasPctHelp": "Increasing volume moves variable cost with it.",
+      "sensibilidadPreciosPct": "Selling price adjustment",
+      "sensibilidadPreciosPctHelp": "Raising prices lifts your direct margin without raising costs.",
       "variacionOpexPct": "Operating expense change",
-      "variacionOpexPctHelp": "Fixed OPEX: does not scale with revenue",
-      "dsoDias": "Δ DSO (collection days)",
-      "dsoDiasHelp": "Higher DSO consumes cash",
-      "dpoDias": "Δ DPO (payment days)",
-      "dpoDiasHelp": "Higher DPO releases cash",
+      "variacionOpexPctHelp": "Cutting operating expenses improves your net profit.",
+      "dsoDias": "Time to collect from customers",
+      "dsoDiasHelp": "Collecting more slowly ties up your money; collecting faster frees cash.",
+      "dpoDias": "Time to pay suppliers",
+      "dpoDiasHelp": "Paying later keeps cash in your account longer.",
       "tasaInteresDeltaPp": "Δ Interest rate",
-      "tasaInteresDeltaPpHelp": "Annual percentage points on financial debt"
+      "tasaInteresDeltaPpHelp": "Raising the rate makes your current loans more expensive."
     },
     "actions": {
       "reset": "Reset to actual values",
@@ -948,14 +1012,17 @@
       "netIncome": "Net income",
       "taxFallbackNote": "The period booked no tax provision: the scenario applies the 30% reference rate (catalog NOPAT criterion).",
       "cashImpact": "Cash impact",
+      "cashImpactMeaning": "The cash this scenario puts in or takes out of your account.",
       "cashReleased": "Cash released",
       "cashRequired": "Cash required",
       "noImpact": "No impact",
       "cashBreakdown": "ΔEBITDA {ebitda} − ΔNWC {nwc}",
       "ccc": "Cash conversion cycle",
+      "cccMeaning": "The days your money stays out, from when you pay until you get paid.",
       "cccNote": "DSO {dso} + DIO {dio} − DPO {dpo} simulated days.",
-      "runway": "Cash runway",
-      "runwayNote": "Months of cash = simulated cash / monthly operating outflows (metric #28)."
+      "runway": "Months of breathing room",
+      "runwayMeaning": "How long the business can keep going on the cash it has, without new revenue.",
+      "runwayNote": "Months of breathing room = simulated cash / monthly operating outflows (metric #28)."
     },
     "chart": {
       "compareTitle": "Base vs Simulated structure",
@@ -1009,7 +1076,7 @@
         "deltaCash": "Δ Cash",
         "cash": "Cash at close",
         "burn": "Monthly operating outflows",
-        "runway": "Cash runway (months)"
+        "runway": "Months of breathing room"
       }
     }
   },
@@ -1242,7 +1309,7 @@
       "help": "Of every $100 you owe in the short term, how much you already have in cash. At 0.3, you have $30. Higher gives more immediate safety; too high can mean cash sitting idle."
     },
     "cashRunwayMonths": {
-      "name": "Cash Runway",
+      "name": "Months of breathing room",
       "question": "How many months can we operate with current cash?",
       "help": "With today’s cash and the current spending pace, how many months you could keep operating. More months mean a bigger cushion. Few months mean you depend on collecting soon or on new financing."
     },
@@ -1356,7 +1423,8 @@
       "question": "What share of profit is distributed?",
       "help": "Of every $100 of net profit, how much is paid out to owners as dividends. At 30%, $30 leaves and $70 stays in the company. Neither high nor low is always better: it depends on whether the business needs that cash."
     },
-    "infoAriaLabel": "What is this metric?"
+    "infoAriaLabel": "What is this metric?",
+    "infoClose": "Close"
   },
   "ingesta": {
     "title": "Ingest",
@@ -1436,14 +1504,11 @@
     "downloadFailed": "Could not download the chart.",
     "downloadPng": "Download PNG",
     "cashProjection": "Cash projection at 3, 6 and 12 months",
-    "waterfallPnl": "P&L waterfall",
-    "waterfallPnlInsight": "How much costs and expenses take from revenue down to the period's profit.",
     "opexCenters": "OpEx by cost center",
     "agingCxc": "AR aging",
     "clientConcentration": "Customer concentration",
     "projectedBalance": "Projected cash",
     "projectedFcf": "Projected FCF",
-    "runningBalance": "Running total",
     "horizonMonths": "{count} months"
   },
   "errors": {
@@ -1468,7 +1533,7 @@
     "seedHelp": "This period was generated by the demo script; it does not come from real files."
   },
   "pdf": {
-    "brand": "Virtual CFO",
+    "brand": "Cifra",
     "period": "Period: {period}",
     "date": "Date: {date}",
     "packageTitle": "Month package",

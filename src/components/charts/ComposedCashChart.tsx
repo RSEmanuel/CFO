@@ -14,7 +14,7 @@ import {
   YAxis,
 } from "recharts";
 
-const ESPRESSO = "#1A1915";
+const ESPRESSO = "var(--cifra-ink)";
 
 const TOOLTIP_STYLE = {
   background: CHART.card,

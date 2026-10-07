@@ -69,7 +69,7 @@ function KpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="font-serif text-lg text-foreground">{label}</p>
+        <p className="font-sans text-lg font-bold text-foreground">{label}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={label} /> : null}
       </div>
       <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
@@ -102,7 +102,7 @@ function PlazoKpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <p className="font-serif text-lg text-foreground">{title}</p>
+        <p className="font-sans text-lg font-bold text-foreground">{title}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
       </div>
       <p className="mt-1 text-xs uppercase tracking-[0.08em] text-muted-foreground">{subtitle}</p>
@@ -417,7 +417,7 @@ function CarteraTable({
                       </button>
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">{row.accountNumber}</td>
-                    <td className="py-3 pr-4 font-serif text-base text-foreground">
+                    <td className="py-3 pr-4 font-sans text-base text-foreground">
                       {row.entityName}
                     </td>
                     <td className="financial-nums py-3 text-right text-foreground">

@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "CFO Virtual",
+    "appName": "Cifra",
     "company": "Empresa",
     "loading": "Cargando…",
     "loadingSession": "Cargando sesión…",
@@ -139,30 +139,7 @@
     "emptyMessage": "Para habilitarlo, carga una balanza de comprobación para esta empresa.",
     "emptyPeriodTitle": "Sin registros para {periodo}",
     "emptyPeriodMessage": "No hay balanza de comprobación para este periodo. Sube el archivo 05 de CONTPAQi de ese mes en Ingesta; no mostramos cifras estimadas.",
-    "sankeyTitle": "Flujo del estado de resultados",
-    "sankeyHelp": "Mostramos las cuentas de mayor importe. El resto se agrupa en Otros.",
     "sankeyError": "No se pudo armar el flujo del estado de resultados. El resto del tablero sigue disponible.",
-    "waterfallTitle": "Estado de resultados",
-    "waterfallHelp": "Cuánto restan costos y gastos al ingreso hasta la utilidad operativa antes de impuestos y depreciaciones (lo que realmente genera el negocio).",
-    "waterfallError": "No se pudo armar el estado de resultados. El resto del tablero sigue disponible.",
-    "waterfallLegend": {
-      "increase": "Aumento",
-      "decrease": "Disminución",
-      "total": "Total"
-    },
-    "step": {
-      "income": "Ingreso",
-      "costs": "Costos",
-      "grossProfit": "Utilidad Bruta",
-      "expenses": "Gastos",
-      "operatingResult": "Resultado op.",
-      "da": "D&A",
-      "ebitda": "EBITDA"
-    },
-    "detail": "Detalle",
-    "summary": "Resumen",
-    "standard": "Estándar",
-    "detailed": "Detallado",
     "companyFallback": "empresa",
     "income": "Ingreso",
     "incomeTotal": "Ingreso total",
@@ -184,6 +161,8 @@
     "expense": "Gasto",
     "ebitda": "EBITDA",
     "ebitdaInsight": "Utilidad operativa antes de impuestos y depreciaciones (lo que realmente genera el negocio).",
+    "utilidad": "Utilidad",
+    "utilidadInsight": "Lo que te queda después de costo, gasto, depreciación, intereses e impuestos.",
     "vsPreviousMonth": "vs mes anterior",
     "vsPreviousYear": "vs año anterior",
     "vsPreviousQuarter": "vs trimestre anterior",
@@ -244,6 +223,9 @@
       "saved": "Drivers guardados",
       "saveError": "No se pudieron guardar los drivers"
     },
+    "monthIncome": "Ingreso del mes",
+    "monthCost": "Costo del mes",
+    "monthExpense": "Gasto del mes",
     "average3m": "Promedio 3 Meses",
     "previousMonth": "Mes Anterior",
     "previousYear": "Mismo Mes Año Ant.",
@@ -259,18 +241,6 @@
       "ebitdaIdentity": "EBITDA siempre es ingreso menos costo menos gasto; no se proyecta por separado.",
       "widerRange": "El rango se amplía conforme el horizonte se aleja del último cierre.",
       "insufficientHistory": "La proyección estadística requiere al menos 8 meses reales en el ledger."
-    },
-    "sankey": {
-      "income": "Ingresos",
-      "costs": "Costos",
-      "expenses": "Gastos",
-      "grossProfit": "Utilidad Bruta",
-      "ebitda": "EBITDA",
-      "otherIncome": "Otros ingresos",
-      "otherCosts": "Otros costos",
-      "otherExpenses": "Otros gastos",
-      "groupedAccounts": "{count, plural, one {# cuenta agrupada} other {# cuentas agrupadas}}",
-      "topAccounts": "Cuentas principales:"
     },
     "top5": {
       "clientsTitle": "Top 5 clientes por contribución al ingreso",
@@ -615,6 +585,10 @@
         "costos": "Costos",
         "utilidadBruta": "Utilidad bruta",
         "opex": "Gastos operativos",
+        "ebit": "EBIT",
+        "da": "D&A",
+        "financieros": "Gastos financieros",
+        "impuestos": "Impuestos",
         "utilidadNeta": "Utilidad neta"
       },
       "legend": {
@@ -663,6 +637,11 @@
     "activities": "Actividades",
     "alerts": "Alertas",
     "summary": "Resumen",
+    "tabs": {
+      "vision": "Visión General",
+      "libre": "Flujo Libre",
+      "diaria": "Dinámica Diaria"
+    },
     "activityFamilies": "Operación / Inversión / Financiamiento",
     "explanation": "Explicación",
     "currentPeriod": "Periodo actual ({period})",
@@ -689,9 +668,9 @@
     "cashIncreased": "El efectivo incrementó {amount}",
     "cashDecreased": "El efectivo decreció ({amount})",
     "alertsMessages": {
-      "lowRunway": "Caja alcanza menos de ~6 semanas de operación.",
-      "negativeTwoMonths": "Dos meses consecutivos de flujo neto negativo.",
-      "highCapex": "CapEx del mes se come más de la mitad de la operación."
+      "lowRunway": "Tu caja alcanza menos de ~6 semanas de operación: renegocia plazos o acelera cobranza.",
+      "negativeTwoMonths": "Dos meses consecutivos de flujo neto negativo: recorta gastos o anticipa ventas.",
+      "highCapex": "CapEx del mes se come más de la mitad de la operación: reagenda inversiones o busca financiamiento."
     },
     "operativo": {
       "tab": "Operativo",
@@ -741,6 +720,86 @@
       "salidasOperativas": "Salidas operativas",
       "emptyTitle": "Flujo de efectivo aún no disponible",
       "emptyMessage": "Carga el reporte de flujo de efectivo (o la plantilla máster) para ver el detalle por categoría."
+    },
+    "libre": {
+      "title": "De la utilidad al efectivo",
+      "subtitle": "Conciliación: ¿Por qué la utilidad no es igual al dinero en el banco? Muestra cómo los créditos a clientes y deudas a proveedores afectan tu liquidez real.",
+      "estimated": "Cifra calculó este puente con la variación mensual de la balanza. No es el estado de cuenta del banco.",
+      "emptyTitle": "Flujo libre aún no disponible",
+      "emptyMessage": "Carga la balanza de comprobación de este mes en Ingesta para armar la conciliación.",
+      "emptyPriorMessage": "Falta la balanza del mes anterior. Súbela en Ingesta para medir cómo cambió el capital de trabajo.",
+      "loadError": "No se pudo cargar el flujo libre",
+      "utilidadNeta": "Utilidad neta",
+      "depreciacion": "Depreciación y amortización",
+      "flujoOperativo": "Flujo operativo neto",
+      "buckets": {
+        "cxc": {
+          "up": "Aumento en cuentas por cobrar",
+          "down": "Disminución en cuentas por cobrar"
+        },
+        "inventario": {
+          "up": "Aumento en inventario",
+          "down": "Disminución en inventario"
+        },
+        "impuestosFavor": {
+          "up": "Aumento en impuestos a favor",
+          "down": "Disminución en impuestos a favor"
+        },
+        "anticiposActivo": {
+          "up": "Aumento en anticipos",
+          "down": "Disminución en anticipos"
+        },
+        "otrosActivo": {
+          "up": "Aumento en otros activos de corto plazo",
+          "down": "Disminución en otros activos de corto plazo"
+        },
+        "cxp": {
+          "up": "Aumento en cuentas por pagar",
+          "down": "Disminución en cuentas por pagar"
+        },
+        "impuestosPagar": {
+          "up": "Aumento en impuestos por pagar",
+          "down": "Disminución en impuestos por pagar"
+        },
+        "otrosPasivo": {
+          "up": "Aumento en otros pasivos de corto plazo",
+          "down": "Disminución en otros pasivos de corto plazo"
+        }
+      },
+      "insight": {
+        "cxc": {
+          "up": "Tus clientes te deben {amount} más que el mes pasado. Cobra esa cartera antes de comprometer más gasto.",
+          "down": "La cartera bajó {amount}. Sostén ese ritmo de cobro antes de alargar plazos."
+        },
+        "inventario": {
+          "up": "El inventario amarró {amount} de caja. Vende o frena compras hasta que baje.",
+          "down": "El inventario liberó {amount}. No recompres de más en el siguiente pedido."
+        },
+        "impuestosFavor": {
+          "up": "Impuestos a favor subieron {amount}. Aplícalos al siguiente pago en vez de dejarlos parados.",
+          "down": "Recuperaste {amount} de impuestos a favor. Úsalo para el pago que sigue."
+        },
+        "anticiposActivo": {
+          "up": "Adelantaste {amount} a proveedores. No sueltes otro anticipo hasta que te entreguen.",
+          "down": "Los anticipos bajaron {amount}. Exige la entrega antes de volver a adelantar."
+        },
+        "otrosActivo": {
+          "up": "Otros activos de corto plazo subieron {amount}. Revisa qué se quedó sin convertirse en caja.",
+          "down": "Otros activos de corto plazo bajaron {amount}. Confirma que ese dinero ya está en el banco."
+        },
+        "cxp": {
+          "up": "Tus proveedores te financiaron {amount} más. No adelantes pagos si la caja está justa.",
+          "down": "Pagaste {amount} de más a proveedores. Negocia plazo antes del siguiente corte."
+        },
+        "impuestosPagar": {
+          "up": "Impuestos por pagar subieron {amount}. Aparta ese dinero antes de la fecha de pago.",
+          "down": "Pagaste {amount} de impuestos que seguían pendientes. Aparta el siguiente pago."
+        },
+        "otrosPasivo": {
+          "up": "Otros pasivos de corto plazo subieron {amount}. Agenda esos pagos antes de que venzan.",
+          "down": "Bajaron {amount} otros pasivos de corto plazo. Confirma que ese pago no te deje sin caja."
+        }
+      }
     }
   },
   "polizas": {
@@ -922,18 +981,23 @@
     "drivers": {
       "title": "Drivers del escenario",
       "subtitle": "Mueve los controles para simular; la línea base sigue al periodo activo.",
+      "groups": {
+        "commercial": "Estrategia Comercial",
+        "efficiency": "Eficiencia Operativa",
+        "cash": "Gestión de Efectivo y Deuda"
+      },
       "crecimientoVentasPct": "Crecimiento de ventas",
-      "crecimientoVentasPctHelp": "Arrastra el costo variable al mismo ritmo",
-      "sensibilidadPreciosPct": "Sensibilidad de precios",
-      "sensibilidadPreciosPctHelp": "Positivo mejora la absorción del COGS",
+      "crecimientoVentasPctHelp": "Aumentar el volumen influye en el costo variable.",
+      "sensibilidadPreciosPct": "Ajuste en precios de venta",
+      "sensibilidadPreciosPctHelp": "Subir precios aumenta tu margen directo sin subir costos.",
       "variacionOpexPct": "Variación de gastos operativos",
-      "variacionOpexPctHelp": "OPEX fijo: no escala con ventas",
-      "dsoDias": "Δ DSO (días de cobro)",
-      "dsoDiasHelp": "Más DSO consume caja",
-      "dpoDias": "Δ DPO (días de pago)",
-      "dpoDiasHelp": "Más DPO libera caja",
+      "variacionOpexPctHelp": "Reducir gastos operativos mejora tu utilidad neta.",
+      "dsoDias": "Tiempo de cobro a clientes",
+      "dsoDiasHelp": "Cobrar más lento atrapa tu dinero; cobrar rápido libera liquidez.",
+      "dpoDias": "Plazo de pago a proveedores",
+      "dpoDiasHelp": "Pagar más tarde retiene efectivo en tu cuenta por más tiempo.",
       "tasaInteresDeltaPp": "Δ Tasa de interés",
-      "tasaInteresDeltaPpHelp": "Puntos porcentuales anuales sobre la deuda financiera"
+      "tasaInteresDeltaPpHelp": "Subir la tasa encarece tus préstamos actuales."
     },
     "actions": {
       "reset": "Restablecer a valores reales",
@@ -948,14 +1012,17 @@
       "netIncome": "Utilidad neta",
       "taxFallbackNote": "El periodo no provisionó impuestos: el escenario aplica la tasa de referencia del 30% (criterio NOPAT del catálogo).",
       "cashImpact": "Impacto en caja",
+      "cashImpactMeaning": "El efectivo que este escenario mete o saca de tu cuenta.",
       "cashReleased": "Caja liberada",
       "cashRequired": "Caja requerida",
       "noImpact": "Sin impacto",
       "cashBreakdown": "ΔEBITDA {ebitda} − ΔNWC {nwc}",
       "ccc": "Ciclo de conversión de efectivo",
+      "cccMeaning": "Los días que tu dinero tarda en volver, desde que pagas hasta que te pagan.",
       "cccNote": "DSO {dso} + DIO {dio} − DPO {dpo} días simulados.",
-      "runway": "Cash runway",
-      "runwayNote": "Meses de caja = caja simulada / salidas operativas del mes (métrica #28)."
+      "runway": "Meses de respiro",
+      "runwayMeaning": "Cuánto tiempo puede sobrevivir el negocio con el efectivo actual sin recibir nuevos ingresos",
+      "runwayNote": "Meses de respiro = caja simulada / salidas operativas del mes (métrica #28)."
     },
     "chart": {
       "compareTitle": "Estructura Base vs Simulada",
@@ -1009,7 +1076,7 @@
         "deltaCash": "Δ Caja",
         "cash": "Caja al cierre",
         "burn": "Salidas operativas del mes",
-        "runway": "Cash runway (meses)"
+        "runway": "Meses de respiro"
       }
     }
   },
@@ -1242,7 +1309,7 @@
       "help": "De cada $100 que debes a corto plazo, cuántos tienes ya en caja. Si es 0.3, tienes $30. Más alto da más seguridad inmediata; demasiado alto puede significar dinero parado sin trabajar."
     },
     "cashRunwayMonths": {
-      "name": "Días de Caja (Cash Runway)",
+      "name": "Meses de respiro",
       "question": "¿Cuántos meses podemos operar con la caja actual?",
       "help": "Con la caja de hoy y el ritmo actual de gastos, cuántos meses podrías seguir operando. Más meses dan más colchón. Pocos meses significan que dependes de cobrar pronto o de nuevo financiamiento."
     },
@@ -1356,7 +1423,8 @@
       "question": "¿Qué parte de la utilidad se distribuye?",
       "help": "De cada $100 de utilidad neta, cuánto se reparte a los dueños en dividendos. Si es 30%, se van $30 y quedan $70 en la empresa. Ni alto ni bajo es siempre mejor: depende de si el negocio necesita esa caja."
     },
-    "infoAriaLabel": "¿Qué es esta métrica?"
+    "infoAriaLabel": "¿Qué es esta métrica?",
+    "infoClose": "Cerrar"
   },
   "ingesta": {
     "title": "Ingesta",
@@ -1436,14 +1504,11 @@
     "downloadFailed": "No se pudo descargar la gráfica.",
     "downloadPng": "Descargar PNG",
     "cashProjection": "Proyección de caja a 3, 6 y 12 meses",
-    "waterfallPnl": "Cascada de P&L",
-    "waterfallPnlInsight": "Cuánto restan costos y gastos al ingreso hasta la utilidad del periodo.",
     "opexCenters": "OpEx por centro de costos",
     "agingCxc": "Antigüedad de CxC",
     "clientConcentration": "Concentración de clientes",
     "projectedBalance": "Saldo proyectado",
     "projectedFcf": "FCF proyectado",
-    "runningBalance": "Saldo acumulado",
     "horizonMonths": "{count} meses"
   },
   "errors": {
@@ -1468,7 +1533,7 @@
     "seedHelp": "Este periodo fue generado por el script de demostración; no proviene de archivos reales."
   },
   "pdf": {
-    "brand": "CFO Virtual",
+    "brand": "Cifra",
     "period": "Periodo: {period}",
     "date": "Fecha: {date}",
     "packageTitle": "Paquete del mes",

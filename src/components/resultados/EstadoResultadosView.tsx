@@ -1,6 +1,6 @@
 "use client";
 
-import { ErWaterfallChart } from "@/components/posicion-financiera/ErWaterfallChart";
+import { ErWaterfallChart } from "@/components/resultados/ErWaterfallChart";
 import { StatementTreeTable } from "@/components/posicion-financiera/StatementTreeTable";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { useLocale } from "@/context/LocaleContext";

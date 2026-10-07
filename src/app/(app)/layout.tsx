@@ -9,7 +9,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
     <AuthGate>
       <div className="flex h-screen w-full overflow-hidden bg-chrome">
         <Sidebar />
-        <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-chrome">
+        <div className="relative flex h-full min-w-0 flex-1 flex-col overflow-hidden bg-chrome">
           <MobileNav />
           <Header />
           <main className="min-h-0 flex-1 overflow-y-auto bg-background">

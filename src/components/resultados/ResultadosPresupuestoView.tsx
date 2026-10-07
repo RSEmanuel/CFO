@@ -1,6 +1,8 @@
 "use client";
 
 import { BudgetForecastChart } from "@/components/charts/BudgetForecastChart";
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { BudgetDriversForm } from "@/components/resultados/BudgetDriversForm";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import {
@@ -124,9 +126,12 @@ export function ResultadosPresupuestoView({
       <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h3 className="font-serif text-xl font-medium text-foreground">
-              {t("resultados.budgetProjection")}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-sans text-xl font-medium text-foreground">
+                {t("resultados.budgetProjection")}
+              </h3>
+              <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.presupuesto} label={t("resultados.budgetProjection")} />
+            </div>
             <p className="mt-1 text-xs text-muted-foreground">
               {model.hasOfficial
                 ? t("resultados.budgetOfficialHelp")
@@ -217,7 +222,7 @@ export function ResultadosPresupuestoView({
         ) : (
           <>
             <div className="mt-6">
-              <h4 className="font-serif text-base font-medium">{t("resultados.incomeHistoryProjection")}</h4>
+              <h4 className="font-sans text-base font-medium">{t("resultados.incomeHistoryProjection")}</h4>
               <div className="mt-2 h-[340px] min-w-0">
                 <BudgetForecastChart
                   data={model.chart}
@@ -242,7 +247,7 @@ export function ResultadosPresupuestoView({
                 <tbody>
                   {model.rows.map((row) => (
                     <tr key={row.key} className="border-b border-beige-deep last:border-0">
-                      <td className="py-3 font-serif text-base">{t(`resultados.${row.key === "ingreso" ? "income" : row.key === "costo" ? "cost" : row.key === "gasto" ? "expense" : "ebitda"}`)}</td>
+                      <td className="py-3 font-sans text-base">{t(`resultados.${row.key === "ingreso" ? "income" : row.key === "costo" ? "cost" : row.key === "gasto" ? "expense" : "ebitda"}`)}</td>
                       <td className="financial-nums py-3 text-right">
                         {formatAxisTick(row.real, filters.units)}
                       </td>
@@ -284,7 +289,7 @@ export function ResultadosPresupuestoView({
         {model.unavailable ? null : (
           <div className="mt-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <h4 className="font-serif text-base font-medium">{t("resultados.projectedPl")}</h4>
+              <h4 className="font-sans text-base font-medium">{t("resultados.projectedPl")}</h4>
               <div className="inline-flex h-9 rounded-control border border-input p-0.5">
                 {GROUPINGS.map((item) => (
                   <button
@@ -318,7 +323,7 @@ export function ResultadosPresupuestoView({
                 <tbody>
                   {groupedRows.map((row) => (
                     <tr key={row.key} className="border-b border-beige-deep last:border-0">
-                      <td className="py-2.5 font-serif text-base">{row.label}</td>
+                      <td className="py-2.5 font-sans text-base">{row.label}</td>
                       <td className="financial-nums py-2.5 text-right">
                         {row.ingreso == null ? "—" : formatAxisTick(row.ingreso, filters.units)}
                       </td>
@@ -347,7 +352,7 @@ export function ResultadosPresupuestoView({
         </p>
 
         <div className="mt-5 border-t border-beige-deep pt-4">
-          <h4 className="font-serif text-base font-medium">{t("resultados.projectionAssumptions")}</h4>
+          <h4 className="font-sans text-base font-medium">{t("resultados.projectionAssumptions")}</h4>
           <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-muted-foreground">
             {model.assumptions.map((assumption) => (
               <li key={assumption.messageKey}>{t(assumption.messageKey, assumption.values)}</li>

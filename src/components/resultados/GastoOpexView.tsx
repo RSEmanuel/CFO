@@ -3,17 +3,18 @@
 import { useLocale } from "@/context/LocaleContext";
 import { useGastoOpex } from "@/hooks/use-gasto-opex";
 import { monthLabelKey } from "@/i18n/format";
-import { CHART, CHART_AXIS, OPEX_SPLIT, TOP5_RESTO, TOP5_SERIES } from "@/lib/chart-theme";
-import { cn } from "@/lib/utils";
+import { CHART, CHART_AXIS, TOP5_RESTO, TOP5_SERIES } from "@/lib/chart-theme";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import type { BudgetProjectionPayload } from "@/services/budgetProjectionService";
 import type { MonthlyFinancials } from "@/services/financialDataTransformer";
-import { calculateTopKPIs } from "@/services/resultadosKpis";
+import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
 import { OTROS_KEY, type Top5ChartSeries, type Top5EntitySeries } from "@/services/resultadosTop5";
-import { Tooltip as Hint, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ExpenseAlertsCard } from "@/components/resultados/ExpenseAlertsCard";
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
+import { GastoControlCard } from "@/components/resultados/GastoControlCard";
 import { GastoOpexTreemap } from "@/components/resultados/GastoOpexTreemap";
-import { AlertTriangle, CheckCircle2, HelpCircle, Receipt } from "lucide-react";
+import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
+import { Receipt } from "lucide-react";
 import { useMemo } from "react";
 import {
   CartesianGrid,
@@ -31,15 +32,9 @@ type GastoOpexViewProps = {
   comparable: string;
   budgetPayload?: BudgetProjectionPayload | null;
   rows: MonthlyFinancials[];
+  /** El panel de control reutiliza solo la serie. */
+  only?: "series";
 };
-
-const KPI_FORMATTER = new Intl.NumberFormat("es-MX", {
-  style: "currency",
-  currency: "MXN",
-  notation: "compact",
-  compactDisplay: "short",
-  maximumFractionDigits: 2,
-});
 
 const TOOLTIP_STYLE = {
   background: CHART.card,
@@ -59,45 +54,6 @@ function localeMonthLabel(key: string, t: (id: string) => string): string {
   }
   const abbr = t(monthLabelKey(Number(match[2]) - 1)).slice(0, 3);
   return `${abbr}-${match[1].slice(-2)}`;
-}
-
-function formatDelta(deltaPct: number): string {
-  const pct = deltaPct * 100;
-  const sign = pct > 0 ? "+" : "";
-  return `${sign}${pct.toFixed(1)}%`;
-}
-
-function formatSignedPct(value: number): string {
-  const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(1)}%`;
-}
-
-function formatPesos(value: number): string {
-  return `$${value.toFixed(2)}`;
-}
-
-const SPLIT_COLORS = OPEX_SPLIT;
-
-function splitSegments(split: {
-  venta: number;
-  admin: number;
-  otros: number;
-  pctVenta: number | null;
-  pctAdmin: number | null;
-  pctOtros: number | null;
-}) {
-  const includeOtros = Math.abs(split.otros) > 0.005;
-  const ventaW = Math.max(0, split.venta);
-  const adminW = Math.max(0, split.admin);
-  const otrosW = includeOtros ? Math.max(0, split.otros) : 0;
-  const denom = ventaW + adminW + otrosW;
-  return [
-    { key: "venta" as const, pct: split.pctVenta, width: denom > 0 ? (ventaW / denom) * 100 : 0, color: SPLIT_COLORS.venta },
-    { key: "admin" as const, pct: split.pctAdmin, width: denom > 0 ? (adminW / denom) * 100 : 0, color: SPLIT_COLORS.admin },
-    ...(includeOtros
-      ? [{ key: "otros" as const, pct: split.pctOtros, width: denom > 0 ? (otrosW / denom) * 100 : 0, color: SPLIT_COLORS.otros }]
-      : []),
-  ];
 }
 
 function chartRows(series: Top5ChartSeries, t: (id: string) => string, restLabel: string) {
@@ -223,22 +179,18 @@ function OpexTooltip({
   );
 }
 
-export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows }: GastoOpexViewProps) {
-  const { t } = useLocale();
+export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows, only }: GastoOpexViewProps) {
+  const { t, locale } = useLocale();
   const { data, loading, error } = useGastoOpex(periodo);
   const restLabel = t("resultados.opex.others");
   const kpis = useMemo(
     () => calculateTopKPIs(rows, "Gasto", periodo, budgetPayload, data?.totalesPorMes),
     [rows, periodo, budgetPayload, data],
   );
-
-  const kpiTitle = (card: (typeof kpis.cards)[number]) => {
-    if (card.key === "promedio3M") return t("resultados.average3m");
-    if (card.key === "mesAnterior") return t("resultados.previousMonth");
-    if (card.key === "anoAnterior") return t("resultados.previousYear");
-    if (card.key === "trimAnterior") return t("resultados.previousQuarter");
-    return t(card.title === "Presupuesto oficial" ? "resultados.officialBudget" : "resultados.monthProjection");
-  };
+  const temporalCards = useMemo(
+    () => categoryTemporalCards(kpis, periodo, "Gasto", t, locale),
+    [kpis, periodo, t, locale],
+  );
 
   if (loading) {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
@@ -275,154 +227,23 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows 
   }
   const rankingTotal = data.totalOpex;
   const pctOf = (monto: number) => (rankingTotal > 0.01 ? (monto / rankingTotal) * 100 : 0);
-  const control = data.control;
-  const splitRows = splitSegments(control.split);
-  const splitLabel = (key: "venta" | "admin" | "otros") =>
-    t(key === "venta" ? "resultados.opex.splitVenta" : key === "admin" ? "resultados.opex.splitAdmin" : "resultados.opex.splitOtros");
-  // Badge de la tarjeta: >0 verde ("Crecimiento Eficiente"), ≤0 rojo/ámbar.
-  const jawsPositive = control.jaws != null && control.jaws.jawsPp > 0;
-  const jawsVentasGanan =
-    control.jaws != null && control.jaws.deltaIngresosPct > control.jaws.deltaOpexPct;
-  const laborHintAccounts = control.laboral.cuentas
-    .filter((cuenta) => Math.abs(cuenta.monto) > 0.005)
-    .map((cuenta) => `${cuenta.idCuenta} ${cuenta.nombreCuenta}`)
-    .join(" · ");
-
   return (
-    <TooltipProvider delayDuration={200}>
     <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <article className="rounded-card border border-category-marginsFg/20 bg-category-margins px-4 py-3 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-base text-foreground">{t("resultados.opex.absorptionTitle")}</p>
-          <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
-            {control.absorcionPct == null ? t("resultados.opex.na") : `${control.absorcionPct.toFixed(1)}%`}
-          </p>
-          {control.pesosPorPeso == null ? null : (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {t("resultados.opex.absorptionHint", { pesos: formatPesos(control.pesosPorPeso) })}
-            </p>
-          )}
-        </article>
-
-        <article
-          className={cn(
-            "rounded-card border px-4 py-3 shadow-[var(--shadow-card)]",
-            control.jaws == null
-              ? "border-border bg-card"
-              : jawsPositive
-                ? "border-category-marginsFg/20 bg-category-margins"
-                : "border-category-solvencyFg/20 bg-category-solvency",
-          )}
-        >
-          <div className="flex items-center gap-1.5">
-            <p className="font-serif text-base text-foreground">{t("resultados.opex.jawsTitle")}</p>
-            <Hint>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={t("resultados.opex.jawsHelp")}
-                  className="text-muted-foreground/60 transition-colors hover:text-muted-foreground"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">{t("resultados.opex.jawsHelp")}</TooltipContent>
-            </Hint>
+      {only === "series" ? null : (
+        <>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
+            <GastoControlCard kind="absorcion" control={data.control} />
+            <GastoControlCard kind="jaws" control={data.control} />
+            <GastoControlCard kind="laboral" control={data.control} />
+            <GastoControlCard kind="split" control={data.control} />
           </div>
-          {control.jaws ? (
-            <>
-              <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
-                {formatSignedPct(control.jaws.jawsPp)}
-              </p>
-              <span
-                className={cn(
-                  "mt-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
-                  jawsPositive ? "bg-category-margins text-favorable" : "bg-category-solvency text-desfavorable",
-                )}
-              >
-                {jawsPositive ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
-                {t(jawsPositive ? "resultados.opex.jawsHealthy" : "resultados.opex.jawsInverted")}
-              </span>
-              <p className="mt-2 text-xs text-muted-foreground">
-                {t("resultados.opex.jawsNarrative", {
-                  deltaIngresos: formatSignedPct(control.jaws.deltaIngresosPct),
-                  deltaOpex: formatSignedPct(control.jaws.deltaOpexPct),
-                  periodo: localeMonthLabel(control.jaws.periodoAnterior, t),
-                })}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">
-                {t(jawsVentasGanan ? "resultados.opex.jawsNarrativePositive" : "resultados.opex.jawsNarrativeNegative")}
-              </p>
-            </>
-          ) : (
-            <Hint>
-              <TooltipTrigger asChild>
-                <p className="financial-nums mt-2 cursor-help text-2xl font-semibold tracking-tight underline decoration-dotted underline-offset-4">
-                  {t("resultados.opex.jawsUnavailable")}
-                </p>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">{t("resultados.opex.jawsUnavailableHint")}</TooltipContent>
-            </Hint>
-          )}
-        </article>
-
-        <article className="rounded-card border border-category-efficiencyFg/20 bg-category-efficiency px-4 py-3 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-base text-foreground">{t("resultados.opex.laborTitle")}</p>
-          <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight" title={laborHintAccounts || undefined}>
-            {KPI_FORMATTER.format(control.laboral.monto)}
-          </p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            {control.laboral.pctOpex == null
-              ? t("resultados.opex.laborEmpty")
-              : t("resultados.opex.laborHint", { pct: control.laboral.pctOpex.toFixed(1) })}
-          </p>
-        </article>
-
-        <article className="rounded-card border border-border bg-card px-4 py-3 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-base text-foreground">{t("resultados.opex.splitTitle")}</p>
-          <p className="mt-2 text-sm font-medium text-foreground">
-            {splitRows
-              .map((row) => `${row.pct == null ? t("resultados.opex.na") : `${row.pct.toFixed(1)}%`} ${splitLabel(row.key)}`)
-              .join(" | ")}
-          </p>
-          <div className="mt-3 flex h-2 overflow-hidden rounded-full bg-secondary">
-            {splitRows.map((row) => (
-              <span key={row.key} className="h-full" style={{ width: `${row.width}%`, backgroundColor: row.color }} />
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+            {temporalCards.map((card) => (
+              <CategoryTemporalKpiCard key={card.key} card={card} category="Gasto" />
             ))}
           </div>
-          <p className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-muted-foreground">
-            {splitRows.map((row) => (
-              <span key={row.key} className="inline-flex items-center gap-1">
-                <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: row.color }} />
-                {splitLabel(row.key)}
-              </span>
-            ))}
-          </p>
-        </article>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {kpis.cards.map((card) => (
-          <article key={card.key} className="rounded-card border border-border bg-card px-4 py-3 shadow-[var(--shadow-card)]">
-            <p className="font-serif text-base text-foreground">{kpiTitle(card)}</p>
-            <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
-              {card.value == null ? "N/A" : KPI_FORMATTER.format(card.value)}
-            </p>
-            {card.deltaPct == null ? null : (
-              <span
-                className={cn(
-                  "mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
-                  card.deltaPct >= 0
-                    ? "bg-category-margins text-favorable"
-                    : "bg-category-solvency text-desfavorable",
-                )}
-              >
-                {formatDelta(card.deltaPct)}
-              </span>
-            )}
-          </article>
-        ))}
-      </div>
+        </>
+      )}
 
       <section className="flex flex-col gap-6 rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)] md:flex-row">
         <div className="flex w-full min-w-0 flex-col md:w-[40%]">
@@ -430,12 +251,13 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows 
             <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
               <Receipt className="h-4 w-4" />
             </span>
-            <div>
-              <h2 className="font-serif text-xl font-medium text-foreground">{t("resultados.opex.title")}</h2>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.opex.title")}</h2>
               <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                 {t("resultados.monthly")} | {units.toUpperCase()} | MXN
               </p>
             </div>
+            <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.serieGasto} label={t("resultados.opex.title")} />
           </div>
           <p className="financial-nums text-4xl font-semibold tracking-tight">
             {formatAxisTick(data.totalOpex, units)}
@@ -446,7 +268,7 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows 
             </p>
           ) : null}
 
-          <h3 className="mb-3 mt-6 font-serif text-lg font-medium text-foreground">
+          <h3 className="mb-3 mt-6 font-sans text-lg font-medium text-foreground">
             {t("resultados.opex.mainItems")}
           </h3>
           {actors.length === 0 ? (
@@ -513,10 +335,21 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows 
         </div>
       </section>
 
-      <GastoOpexTreemap periodo={data.periodo} treemap={data.treemap} />
-
-      <ExpenseAlertsCard periodo={data.periodo} alertas={data.alertas} />
+      {only === "series" ? null : <GastoOpexTreemap periodo={data.periodo} treemap={data.treemap} />}
     </div>
-    </TooltipProvider>
   );
+}
+
+export function GastoOpexSeriesFavorite({
+  periodo,
+  units,
+  comparable,
+  rows,
+}: {
+  periodo: string;
+  units: DisplayUnits;
+  comparable: string;
+  rows: MonthlyFinancials[];
+}) {
+  return <GastoOpexView periodo={periodo} units={units} comparable={comparable} rows={rows} only="series" />;
 }

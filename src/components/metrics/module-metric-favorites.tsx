@@ -43,7 +43,7 @@ export function renderModuleFavoriteMetric(
       <MetricCard favoriteId={id} title="Free Cash Flow" value={fmtMoney(d?.freeCashFlow?.amount, d?.freeCashFlow?.amountFormatted)} loading={loading} currentNumeric={d?.freeCashFlow?.amount} />
     ),
     "metric:overview:cash-runway": (
-      <MetricCard favoriteId={id} title="Cash Runway" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} currentNumeric={flujo?.cashRunwayDias} />
+      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} currentNumeric={flujo?.cashRunwayDias} />
     ),
     "metric:overview:ebitda-margin": (
       <MetricCard favoriteId={id} title="Margen EBITDA" value={fmtPct(margin)} loading={loading} currentNumeric={margin} />
@@ -88,10 +88,10 @@ export function renderModuleFavoriteMetric(
       <MetricCard favoriteId={id} title="Free Cash Flow" value={fmtMoney(d?.freeCashFlow?.amount, d?.freeCashFlow?.amountFormatted)} loading={loading} />
     ),
     "metric:cashflow:runway-actual": (
-      <MetricCard favoriteId={id} title="Runway actual" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} />
+      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} />
     ),
     "metric:cashflow:runway-proyectado": (
-      <MetricCard favoriteId={id} title="Runway proyectado" value={fmtDays(flujo?.cashRunwayProyectadoDias)} loading={loading} />
+      <MetricCard favoriteId={id} title="Meses de respiro proyectados" value={fmtDays(flujo?.cashRunwayProyectadoDias)} loading={loading} />
     ),
     "metric:pnl:costos-fijos": (
       <MetricCard favoriteId={id} title="Costos fijos" value={fmtPct(mix?.fijoPct)} loading={loading} />

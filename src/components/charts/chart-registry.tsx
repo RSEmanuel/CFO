@@ -8,12 +8,6 @@ import { useLocale } from "@/context/LocaleContext";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const KIND_COLOR: Record<string, string> = {
-  increase: CHART.olive,
-  decrease: CHART.coral,
-  total: CHART.slate,
-};
-
 function ChartBody({ loading, children }: { loading: boolean; children: ReactNode }) {
   if (loading) {
     return <div className="h-full animate-pulse rounded-lg bg-muted" />;
@@ -23,7 +17,6 @@ function ChartBody({ loading, children }: { loading: boolean; children: ReactNod
 
 export const CHART_IDS = {
   cashProjection: "cash-projection",
-  waterfallPnl: "waterfall-pnl",
   opexCenters: "opex-centers",
   agingCxc: "aging-cxc",
   clientConcentration: "client-concentration",
@@ -31,7 +24,6 @@ export const CHART_IDS = {
 
 export const CHART_TITLE_KEYS: Record<string, string> = {
   [CHART_IDS.cashProjection]: "charts.cashProjection",
-  [CHART_IDS.waterfallPnl]: "charts.waterfallPnl",
   [CHART_IDS.opexCenters]: "charts.opexCenters",
   [CHART_IDS.agingCxc]: "charts.agingCxc",
   [CHART_IDS.clientConcentration]: "charts.clientConcentration",
@@ -56,40 +48,6 @@ export function CashProjectionChart({ pack, loading }: { pack: ModulePack | null
             <Tooltip formatter={chartMoney} />
             <Bar dataKey="saldo" name={t("charts.projectedBalance")} fill={CHART.olive} radius={[8, 8, 0, 0]} />
             <Bar dataKey="fcf" name={t("charts.projectedFcf")} fill={CHART.slate} radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
-      </ChartBody>
-    </ChartCard>
-  );
-}
-
-export function WaterfallPnlChart({ pack, loading }: { pack: ModulePack | null; loading: boolean }) {
-  const { t } = useLocale();
-  const waterfall = arr(pack?.pnl?.waterfall).map((step) => ({
-    name: step.label ?? step.key,
-    nivel: n(step.runningTotal),
-    kind: step.kind ?? "total",
-  }));
-
-  return (
-    <ChartCard
-      id={CHART_IDS.waterfallPnl}
-      title={t(CHART_TITLE_KEYS[CHART_IDS.waterfallPnl])}
-      insightText={t("charts.waterfallPnlInsight")}
-      heightClass="h-96"
-    >
-      <ChartBody loading={loading}>
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={waterfall} margin={{ bottom: 64 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke={CHART_AXIS.stroke} />
-            <XAxis dataKey="name" interval={0} angle={-28} textAnchor="end" height={70} tick={{ fontSize: 11, fill: CHART_AXIS.tick }} />
-            <YAxis tickFormatter={(value: number) => `${Math.round(value / 1000)}k`} tick={{ fill: CHART_AXIS.tick }} />
-            <Tooltip formatter={chartMoney} />
-            <Bar dataKey="nivel" name={t("charts.runningBalance")} radius={[8, 8, 0, 0]}>
-              {waterfall.map((step) => (
-                <Cell key={step.name} fill={KIND_COLOR[step.kind] ?? KIND_COLOR.total} />
-              ))}
-            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </ChartBody>
@@ -174,7 +132,6 @@ export function ClientConcentrationChart({ pack, loading }: { pack: ModulePack |
 
 const CHART_RENDERERS: Record<string, (pack: ModulePack | null, loading: boolean) => ReactNode> = {
   [CHART_IDS.cashProjection]: (pack, loading) => <CashProjectionChart pack={pack} loading={loading} />,
-  [CHART_IDS.waterfallPnl]: (pack, loading) => <WaterfallPnlChart pack={pack} loading={loading} />,
   [CHART_IDS.opexCenters]: (pack, loading) => <OpexCentersChart pack={pack} loading={loading} />,
   [CHART_IDS.agingCxc]: (pack, loading) => <AgingCxcChart pack={pack} loading={loading} />,
   [CHART_IDS.clientConcentration]: (pack, loading) => <ClientConcentrationChart pack={pack} loading={loading} />,

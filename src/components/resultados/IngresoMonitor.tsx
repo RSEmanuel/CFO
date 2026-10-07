@@ -1,6 +1,8 @@
 "use client";
 
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
 import { useIngresoCalidad } from "@/hooks/use-ingreso-calidad";
 import { cn } from "@/lib/utils";
@@ -10,13 +12,16 @@ import { formatCompactAxis, formatMxn } from "@/services/money";
 import { ArrowDown, ArrowUp, Gauge, ReceiptText } from "lucide-react";
 import { useState } from "react";
 
+type IngresoMonitorPart = "calidad" | "pacing" | "tabla";
+
 type IngresoMonitorProps = {
   periodo: string;
+  part?: IngresoMonitorPart;
 };
 
-const BAR_BRUTAS = "#334155";
-const BAR_DEDUCCIONES = "#EF4444";
-const BAR_NETAS = "#4F6F52";
+const BAR_BRUTAS = "var(--cifra-ink)";
+const BAR_DEDUCCIONES = "var(--cifra-bad)";
+const BAR_NETAS = "var(--cifra-good)";
 
 function formatSignedPct(value: number): string {
   const sign = value > 0 ? "+" : "";
@@ -79,7 +84,7 @@ function ImpactBar({
   );
 }
 
-export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
+export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
   const { t } = useLocale();
   const { data, loading, error } = useIngresoCalidad(periodo);
   const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
@@ -115,9 +120,13 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
     });
   };
 
+  const show = (name: IngresoMonitorPart) => part == null || part === name;
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      {show("calidad") || show("pacing") ? (
+      <div className={cn("grid grid-cols-1 gap-4", show("calidad") && show("pacing") && "lg:grid-cols-2")}>
+        {show("calidad") ? (
         <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
           <div className="mb-4 flex items-start justify-between gap-3">
             <div className="flex items-center gap-2">
@@ -125,9 +134,12 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
                 <ReceiptText className="h-4 w-4" />
               </span>
               <div>
-                <h2 className="font-serif text-xl font-medium text-foreground">
-                  {t("resultados.ingreso.calidadTitle")}
-                </h2>
+                <div className="flex items-center gap-2">
+                  <h2 className="font-sans text-xl font-medium text-foreground">
+                    {t("resultados.ingreso.calidadTitle")}
+                  </h2>
+                  <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoCalidad} label={t("resultados.ingreso.calidadTitle")} />
+                </div>
                 <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                   {t("resultados.ingreso.calidadSubtitle")}
                 </p>
@@ -139,7 +151,7 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
                   "inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
                   calidad.badge === "verde"
                     ? "bg-category-margins text-favorable"
-                    : "bg-category-efficiency text-[#B45309]",
+                    : "bg-category-efficiency text-[var(--cifra-warn)]",
                 )}
               >
                 {t("resultados.ingreso.erosion")}: {calidad.tasaErosionPct?.toFixed(1)}% ·{" "}
@@ -173,16 +185,21 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
           </div>
           <p className="mt-4 text-xs text-muted-foreground">{t("resultados.ingreso.calidadHelp")}</p>
         </section>
+        ) : null}
 
+        {show("pacing") ? (
         <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
           <div className="mb-4 flex items-center gap-2">
             <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
               <Gauge className="h-4 w-4" />
             </span>
-            <div>
-              <h2 className="font-serif text-xl font-medium text-foreground">
-                {t("resultados.ingreso.pacingTitle")}
-              </h2>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2">
+                <h2 className="font-sans text-xl font-medium text-foreground">
+                  {t("resultados.ingreso.pacingTitle")}
+                </h2>
+                <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoRitmo} label={t("resultados.ingreso.pacingTitle")} />
+              </div>
               <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                 {t("resultados.ingreso.diasAvance", {
                   elapsed: pacing.diasTranscurridos,
@@ -228,11 +245,19 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
             )}
           </div>
         </section>
+        ) : null}
       </div>
+      ) : null}
 
+      {show("tabla") ? (
       <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <h2 className="font-serif text-xl font-medium text-foreground">{t("resultados.ingreso.tablaTitle")}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{t("resultados.ingreso.tablaHelp")}</p>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.ingreso.tablaTitle")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">{t("resultados.ingreso.tablaHelp")}</p>
+          </div>
+          <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoTabla} label={t("resultados.ingreso.tablaTitle")} />
+        </div>
 
         {tabla.length === 0 ? (
           <p className="mt-4 text-sm text-muted-foreground">{t("resultados.ingreso.tablaEmpty")}</p>
@@ -284,6 +309,7 @@ export function IngresoMonitor({ periodo }: IngresoMonitorProps) {
           </div>
         )}
       </section>
+      ) : null}
 
       <PolizasAuditSheet target={auditTarget} onClose={() => setAuditTarget(null)} />
     </div>

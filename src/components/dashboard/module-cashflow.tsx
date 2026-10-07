@@ -18,8 +18,8 @@ export function ModuleCashflow({ pack, loading }: { pack: ModulePack | null; loa
         <MetricCard favoriteId="metric:cashflow:capex" title="CapEx" value={fmtMoney(d?.salidasCapex?.amount, d?.salidasCapex?.amountFormatted)} loading={loading} />
         <MetricCard favoriteId="metric:cashflow:servicio-deuda" title="Servicio de deuda" value={fmtMoney(d?.servicioDeuda?.amount, d?.servicioDeuda?.amountFormatted)} loading={loading} />
         <MetricCard favoriteId="metric:cashflow:free-cash-flow" title="Free Cash Flow" value={fmtMoney(d?.freeCashFlow?.amount, d?.freeCashFlow?.amountFormatted)} loading={loading} />
-        <MetricCard favoriteId="metric:cashflow:runway-actual" title="Runway actual" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} />
-        <MetricCard favoriteId="metric:cashflow:runway-proyectado" title="Runway proyectado" value={fmtDays(flujo?.cashRunwayProyectadoDias)} loading={loading} hint="N/D si el promedio histórico genera caja" />
+        <MetricCard favoriteId="metric:cashflow:runway-actual" title="Meses de respiro" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} />
+        <MetricCard favoriteId="metric:cashflow:runway-proyectado" title="Meses de respiro proyectados" value={fmtDays(flujo?.cashRunwayProyectadoDias)} loading={loading} hint="N/D si el promedio histórico genera caja" />
       </div>
 
       <CashProjectionChart pack={pack} loading={loading} />

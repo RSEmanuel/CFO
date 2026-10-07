@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 208 60" width="208" height="60" role="img" aria-label="Cifra">
+  <rect x="0" y="0" width="60" height="60" rx="14" fill="#7E97FF"/>
+  <ellipse cx="30" cy="30" rx="13.1" ry="17.8" fill="none" stroke="#080A14" stroke-width="6.1"/>
+  <circle cx="30" cy="30" r="3.9" fill="#080A14"/>
+  <text x="74" y="41" font-family="Manrope, Helvetica Neue, Arial, sans-serif" font-size="34" font-weight="800" letter-spacing="-1.8" fill="#FFFFFF">Cifra</text>
+</svg>

@@ -121,7 +121,7 @@ export function downloadScenarioPdf(input: ScenarioExportInput): void {
   doc.setFont("helvetica", "bold");
   doc.setFontSize(20);
   doc.setTextColor(26, 25, 21);
-  doc.text("CFO Virtual", 20, 24);
+  doc.text("Cifra", 20, 24);
 
   doc.setFont("helvetica", "normal");
   doc.setFontSize(11);

@@ -6,14 +6,14 @@ export async function GET() {
     await prisma.$queryRaw`SELECT 1`;
     return NextResponse.json({
       status: "ok",
-      servicio: "CFO Virtual",
+      servicio: "Cifra",
       baseDeDatos: "conectada",
     });
   } catch {
     return NextResponse.json(
       {
         status: "error",
-        servicio: "CFO Virtual",
+        servicio: "Cifra",
         baseDeDatos: "sin conexión",
       },
       { status: 503 },

@@ -31,6 +31,7 @@ function DeltaPill({ value, suffix }: { value: number | null; suffix?: string })
 
 function CompareCard({
   title,
+  subtitle,
   base,
   sim,
   format,
@@ -38,6 +39,7 @@ function CompareCard({
   footnote,
 }: {
   title: string;
+  subtitle?: string;
   base: number | null;
   sim: number | null;
   format: (value: number) => string;
@@ -48,6 +50,7 @@ function CompareCard({
   return (
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
+      {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
       <p className="financial-nums mt-3 text-2xl font-semibold tracking-tight text-foreground">
         {sim != null ? format(sim) : "N/D"}
       </p>
@@ -150,6 +153,7 @@ export function SimulatorCards({
             </p>
             {cashBadge}
           </div>
+          <p className="mt-1 text-sm text-muted-foreground">{t("simulator.cards.cashImpactMeaning")}</p>
           <p
             className={cn(
               "financial-nums mt-3 text-2xl font-semibold tracking-tight",
@@ -172,6 +176,7 @@ export function SimulatorCards({
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <CompareCard
           title={t("simulator.cards.ccc")}
+          subtitle={t("simulator.cards.cccMeaning")}
           base={baseline.ccc}
           sim={sim.ccc}
           format={(value) => `${value.toFixed(1)} ${t("simulator.units.days")}`}
@@ -184,6 +189,7 @@ export function SimulatorCards({
         />
         <CompareCard
           title={t("simulator.cards.runway")}
+          subtitle={t("simulator.cards.runwayMeaning")}
           base={base.cashRunwayMeses}
           sim={sim.cashRunwayMeses}
           format={(value) => `${value.toFixed(1)} ${t("simulator.units.months")}`}

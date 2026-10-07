@@ -21,7 +21,7 @@ export const TIME_COMPARE_COLORS = {
 
 export const PROJECTION_LAYER_COLORS = {
   oficial: CHART.beigeDeep,
-  estadistica: "#1A1915",
+  estadistica: "var(--cifra-ink)",
   escenario: CHART.clay,
 } as const;
 

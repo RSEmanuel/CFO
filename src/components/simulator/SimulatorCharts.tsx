@@ -67,7 +67,7 @@ export function SimulatorCharts({ baseline, sim, units }: SimulatorChartsProps) 
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-serif text-xl font-medium text-foreground">
+          <h2 className="font-sans text-xl font-medium text-foreground">
             {view === "compare" ? t("simulator.chart.compareTitle") : t("simulator.chart.tornadoTitle")}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">

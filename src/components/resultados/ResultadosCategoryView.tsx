@@ -3,18 +3,18 @@
 import { HERO_CHART_COLORS, HeroBarChart } from "@/components/charts/HeroBarChart";
 import { HeroLineChart } from "@/components/charts/HeroLineChart";
 import { IncomeBreakdownPie } from "@/components/charts/IncomeBreakdownPie";
-import { TendenciaIngresosCostosChart } from "@/components/dashboard/TendenciaIngresosCostosChart";
-import { CostoMixCompareChart } from "@/components/resultados/CostoMixCompareChart";
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
+import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
 import { CogsAnalisisCard } from "@/components/resultados/CogsAnalisisCard";
 import { GastoOpexView } from "@/components/resultados/GastoOpexView";
 import { IngresoMonitor } from "@/components/resultados/IngresoMonitor";
 import { ResultadosTop5Charts } from "@/components/resultados/ResultadosTop5Charts";
-import { cn } from "@/lib/utils";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
 import { formatAxisTick, formatMxn } from "@/services/money";
 import { buildIncomeBreakdown } from "@/services/financialDataTransformer";
 import type { MonthlyFinancials, ResultadosCategoryName } from "@/services/financialDataTransformer";
-import { calculateTopKPIs } from "@/services/resultadosKpis";
+import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
 import type { BudgetProjectionPayload } from "@/services/budgetProjectionService";
 import { LineChart as LineChartIcon, PieChart as PieChartIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -85,10 +85,135 @@ function IncomeTotalChart({
   );
 }
 
-function formatDelta(deltaPct: number): string {
-  const pct = deltaPct * 100;
-  const sign = pct > 0 ? "+" : "";
-  return `${sign}${pct.toFixed(1)}%`;
+export function CategorySeriesCard({
+  category,
+  units,
+  temporalidad,
+  comparable,
+  chartData,
+  seriesKeys,
+  headlineLabel,
+  headlineTotal,
+  comparableLabel,
+  comparableTotal,
+}: {
+  category: "Ingreso" | "Costo";
+  units: "k" | "m" | "b";
+  temporalidad: string;
+  comparable: string;
+  chartData: Array<Record<string, string | number | null>>;
+  seriesKeys: string[];
+  headlineLabel: string;
+  headlineTotal: number | null;
+  comparableLabel: string | null;
+  comparableTotal: number | null;
+}) {
+  const { t } = useLocale();
+  const tempoLabel =
+    temporalidad === "year"
+      ? t("resultados.annual")
+      : temporalidad === "quarter"
+        ? t("resultados.quarterly")
+        : t("resultados.monthly");
+  const categoryLabel = t(category === "Ingreso" ? "resultados.income" : "resultados.cost");
+  const favoriteId = category === "Ingreso" ? RESULTADOS_FAVORITE.serieIngreso : RESULTADOS_FAVORITE.serieCosto;
+
+  return (
+    <section className="flex flex-col gap-6 rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)] lg:flex-row">
+      <div className="flex w-full flex-col lg:w-[30%]">
+        <div className="mb-4 flex items-center gap-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+            <LineChartIcon className="h-4 w-4" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <h2 className="font-sans text-xl font-medium text-foreground">{categoryLabel}</h2>
+            <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+              {tempoLabel} | {units.toUpperCase()} | MXN
+            </p>
+          </div>
+          <FavoriteStarButton widgetId={favoriteId} label={categoryLabel} />
+        </div>
+
+        <p className="font-sans text-lg text-muted-foreground">{headlineLabel}</p>
+        <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">
+          {headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units)}
+        </p>
+        {comparableLabel && comparableTotal != null ? (
+          <p className="mt-2 text-xs text-muted-foreground">
+            {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal, units)}
+          </p>
+        ) : null}
+      </div>
+
+      <div className="h-[380px] w-full min-w-0 overflow-visible lg:h-[420px] lg:w-[70%]">
+        {category === "Ingreso" ? (
+          <IncomeTotalChart data={chartData} series={seriesKeys} units={units} selectedLabel={headlineLabel} />
+        ) : (
+          <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
+        )}
+      </div>
+    </section>
+  );
+}
+
+export function IncomeBreakdownCard({
+  rows,
+  periodo,
+  temporalidad,
+  units,
+  comparable,
+  headlineLabel,
+}: {
+  rows: MonthlyFinancials[];
+  periodo: string;
+  temporalidad: string;
+  units: "k" | "m" | "b";
+  comparable: string;
+  headlineLabel: string;
+}) {
+  const { t } = useLocale();
+  const incomeBreakdown = useMemo(
+    () =>
+      buildIncomeBreakdown(rows, {
+        temporalidad,
+        periodo,
+        comparable,
+        currency: "mxn",
+        units,
+        analysis: "amount",
+      }).map((slice) => ({
+        ...slice,
+        name: slice.isOther ? t("resultados.incomeBreakdownOther") : slice.name,
+      })),
+    [rows, temporalidad, periodo, comparable, units, t],
+  );
+  if (incomeBreakdown.length === 0) return null;
+
+  return (
+    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-4 flex items-center gap-2">
+        <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+          <PieChartIcon className="h-4 w-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.incomeBreakdown")}</h2>
+          <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+            {headlineLabel} | {t("resultados.pctOfRevenue")}
+          </p>
+        </div>
+        <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoDesglose} label={t("resultados.incomeBreakdown")} />
+      </div>
+      <div className="h-[400px] w-full min-w-0">
+        <IncomeBreakdownPie
+          data={incomeBreakdown}
+          valueFormatter={formatMxn}
+          centerValueFormatter={(value) => KPI_FORMATTER.format(value)}
+          totalLabel={t("resultados.incomeBreakdownCenter")}
+          chartKey={`${periodo}-${temporalidad}-${units}`}
+        />
+      </div>
+    </section>
+  );
 }
 
 export type ResultadosCategoryViewProps = {
@@ -122,41 +247,15 @@ export function ResultadosCategoryView({
   budgetPayload,
   rows,
 }: ResultadosCategoryViewProps) {
-  const { t } = useLocale();
-  const tempoLabel =
-    temporalidad === "year"
-      ? t("resultados.annual")
-      : temporalidad === "quarter"
-        ? t("resultados.quarterly")
-        : t("resultados.monthly");
-  const categoryLabel = t(`resultados.${category === "Ingreso" ? "income" : category === "Costo" ? "cost" : "expense"}`);
+  const { t, locale } = useLocale();
   const kpis = useMemo(
     () => calculateTopKPIs(rows, category, periodo, budgetPayload),
     [rows, category, periodo, budgetPayload],
   );
-  const incomeBreakdown = useMemo(() => {
-    if (category !== "Ingreso") {
-      return [];
-    }
-    return buildIncomeBreakdown(rows, {
-      temporalidad,
-      periodo,
-      comparable,
-      currency: "mxn",
-      units,
-      analysis: "amount",
-    }).map((slice) => ({
-      ...slice,
-      name: slice.isOther ? t("resultados.incomeBreakdownOther") : slice.name,
-    }));
-  }, [category, rows, temporalidad, periodo, comparable, units, t]);
-  const kpiTitle = (card: (typeof kpis.cards)[number]) => {
-    if (card.key === "promedio3M") return t("resultados.average3m");
-    if (card.key === "mesAnterior") return t("resultados.previousMonth");
-    if (card.key === "anoAnterior") return t("resultados.previousYear");
-    if (card.key === "trimAnterior") return t("resultados.previousQuarter");
-    return t(card.title === "Presupuesto oficial" ? "resultados.officialBudget" : "resultados.monthProjection");
-  };
+  const temporalCards = useMemo(
+    () => categoryTemporalCards(kpis, periodo, category, t, locale),
+    [kpis, periodo, category, t, locale],
+  );
   if (category === "Gasto") {
     return (
       <GastoOpexView
@@ -170,106 +269,42 @@ export function ResultadosCategoryView({
   }
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        {kpis.cards.map((card) => (
-          <article key={card.key} className="rounded-card border border-border bg-card px-4 py-3 shadow-[var(--shadow-card)]">
-            <p className="font-serif text-base text-foreground">{kpiTitle(card)}</p>
-            <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
-              {card.value == null ? "N/A" : KPI_FORMATTER.format(card.value)}
-            </p>
-            {card.deltaPct == null ? null : (
-              <span
-                className={cn(
-                  "mt-2 inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium",
-                  card.deltaPct >= 0
-                    ? "bg-category-margins text-favorable"
-                    : "bg-category-solvency text-desfavorable",
-                )}
-              >
-                {formatDelta(card.deltaPct)}
-              </span>
-            )}
-          </article>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        {temporalCards.map((card) => (
+          <CategoryTemporalKpiCard key={card.key} card={card} category={category} />
         ))}
       </div>
 
-      <section className="flex flex-col gap-6 rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)] lg:flex-row">
-        <div className="flex w-full flex-col lg:w-[30%]">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-              <LineChartIcon className="h-4 w-4" />
-            </span>
-            <div>
-              <h2 className="font-serif text-xl font-medium text-foreground">{categoryLabel}</h2>
-              <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                {tempoLabel} | {units.toUpperCase()} | MXN
-              </p>
-            </div>
-          </div>
-
-          <p className="font-serif text-lg text-muted-foreground">{headlineLabel}</p>
-          <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">
-            {headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units)}
-          </p>
-          {comparableLabel && comparableTotal != null ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal, units)}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="h-[380px] w-full min-w-0 overflow-visible lg:h-[420px] lg:w-[70%]">
-          {category === "Ingreso" ? (
-            <IncomeTotalChart
-              data={chartData}
-              series={seriesKeys}
-              units={units}
-              selectedLabel={headlineLabel}
-            />
-          ) : (
-            <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
-          )}
-        </div>
-      </section>
-
-      {category === "Ingreso" ? (
-        <TendenciaIngresosCostosChart rows={rows} units={units} endPeriod={periodo} />
-      ) : null}
+      <CategorySeriesCard
+        category={category}
+        units={units}
+        temporalidad={temporalidad}
+        comparable={comparable}
+        chartData={chartData}
+        seriesKeys={seriesKeys}
+        headlineLabel={headlineLabel}
+        headlineTotal={headlineTotal}
+        comparableLabel={comparableLabel}
+        comparableTotal={comparableTotal}
+      />
 
       {category === "Ingreso" ? (
         <ResultadosTop5Charts periodo={periodo} units={units} />
       ) : null}
 
-      {category === "Ingreso" && incomeBreakdown.length > 0 ? (
-        <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-              <PieChartIcon className="h-4 w-4" />
-            </span>
-            <div>
-              <h2 className="font-serif text-xl font-medium text-foreground">
-                {t("resultados.incomeBreakdown")}
-              </h2>
-              <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                {headlineLabel} | {t("resultados.pctOfRevenue")}
-              </p>
-            </div>
-          </div>
-          <div className="h-[400px] w-full min-w-0">
-            <IncomeBreakdownPie
-              data={incomeBreakdown}
-              valueFormatter={formatMxn}
-              centerValueFormatter={(value) => KPI_FORMATTER.format(value)}
-              totalLabel={t("resultados.incomeBreakdownCenter")}
-              chartKey={`${periodo}-${temporalidad}-${units}`}
-            />
-          </div>
-        </section>
+      {category === "Ingreso" ? (
+        <IncomeBreakdownCard
+          rows={rows}
+          periodo={periodo}
+          temporalidad={temporalidad}
+          units={units}
+          comparable={comparable}
+          headlineLabel={headlineLabel}
+        />
       ) : null}
 
       {category === "Ingreso" ? <IngresoMonitor periodo={periodo} /> : null}
       {category === "Costo" ? <CogsAnalisisCard periodo={periodo} /> : null}
-      {category === "Costo" ? <CostoMixCompareChart rows={rows} periodo={periodo} /> : null}
     </div>
   );
 }

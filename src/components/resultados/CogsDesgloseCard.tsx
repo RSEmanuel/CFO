@@ -9,7 +9,16 @@ import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { PackageSearch } from "lucide-react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-const COGS_LINE_PALETTE = ["#334155", "#3f4f5f", "#4A6670", "#5c6b73", "#64748b", "#78716c", "#94a3b8", "#a8a29e"] as const;
+const COGS_LINE_PALETTE = [
+  "var(--cifra-ink)",
+  "var(--cifra-ink-2)",
+  "var(--cifra-ink-3)",
+  "var(--cifra-line)",
+  "var(--cifra-line-2)",
+  "var(--cifra-brand)",
+  "var(--cifra-brand-soft)",
+  "var(--cifra-surface-2)",
+] as const;
 
 type CogsDesgloseCardProps = {
   periodo: string;
@@ -34,7 +43,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
             <PackageSearch className="h-4 w-4" />
           </span>
           <div>
-            <h3 className="font-serif text-lg font-medium text-foreground">{t("resultados.cogs.title")}</h3>
+            <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.cogs.title")}</h3>
             <p className="text-sm text-muted-foreground">
               {error ?? (data?.hasBalanza ? t("resultados.cogs.empty") : t("resultados.incomeMixEmpty"))}
             </p>
@@ -61,7 +70,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h3 className="font-serif text-lg font-medium text-foreground">{t("resultados.cogs.title")}</h3>
+          <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.cogs.title")}</h3>
           <p className="mt-1 text-sm text-muted-foreground">{t("resultados.cogs.help")}</p>
         </div>
         <div className="flex items-center gap-1">

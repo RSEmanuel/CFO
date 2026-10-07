@@ -11,8 +11,9 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ["var(--font-sans)", "Arial", "sans-serif"],
-        serif: ["var(--font-serif)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "Manrope", "ui-sans-serif", "system-ui", "Helvetica Neue", "Arial", "sans-serif"],
+        serif: ["var(--font-sans)", "Manrope", "ui-sans-serif", "system-ui", "Helvetica Neue", "Arial", "sans-serif"],
+        mono: ["var(--font-mono)", "Azeret Mono", "ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       colors: {
         border: "hsl(var(--border))",

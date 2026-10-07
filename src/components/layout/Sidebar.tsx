@@ -11,6 +11,7 @@ import { ChevronsLeft, ChevronsRight, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { CifraMark } from "@/components/brand/CifraMark";
 
 const STORAGE_KEY = "cfo.sidebarCollapsed";
 
@@ -91,16 +92,19 @@ export function Sidebar() {
           {collapsed ? (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="flex h-9 w-9 items-center justify-center rounded-control bg-primary text-xs font-semibold text-primary-foreground">
-                  CV
+                <span className="flex h-9 w-9 items-center justify-center rounded-control text-primary">
+                  <CifraMark state="confirmed" size={24} blink />
                 </span>
               </TooltipTrigger>
               <TooltipContent side="right">{t("common.appName")}</TooltipContent>
             </Tooltip>
           ) : (
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-clay">{t("common.appName")}</p>
-              <p className="truncate text-xs text-muted-foreground">{t("common.executivePortal")}</p>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/assets/cifra-lockup.svg" alt={t("common.appName")} className="h-7 w-auto dark:hidden" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/assets/cifra-lockup-dark.svg" alt={t("common.appName")} className="hidden h-7 w-auto dark:block" />
+              <p className="mt-1 truncate text-xs text-muted-foreground">{t("common.executivePortal")}</p>
             </div>
           )}
           <Button

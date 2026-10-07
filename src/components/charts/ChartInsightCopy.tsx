@@ -14,7 +14,7 @@ type ChartInsightCopyProps = {
 export function ChartInsightCopy({ frase, chartName, empresa, periodo }: ChartInsightCopyProps) {
   const { t } = useLocale();
   const copy = async () => {
-    const payload = `${frase}\n${chartName} · ${empresa} · ${periodo}\nCFO Virtual`;
+    const payload = `${frase}\n${chartName} · ${empresa} · ${periodo}\nCifra`;
     try {
       await navigator.clipboard.writeText(payload);
       toast.success(t("charts.copied"));

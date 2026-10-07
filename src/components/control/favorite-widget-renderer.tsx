@@ -11,20 +11,35 @@ import {
   type FlujoOperativoKpiKey,
 } from "@/components/flujo/FlujoOperativoView";
 import { StatementTreeTable } from "@/components/posicion-financiera/StatementTreeTable";
+import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
+import { CategorySeriesCard, IncomeBreakdownCard } from "@/components/resultados/ResultadosCategoryView";
+import { CogsAnalisisCard } from "@/components/resultados/CogsAnalisisCard";
 import { CogsDesgloseCard } from "@/components/resultados/CogsDesgloseCard";
 import { DestacadosRubroCard } from "@/components/resultados/DestacadosRubroCard";
+import { EbitdaEbitTtmChart } from "@/components/resultados/EbitdaEbitTtmChart";
+import { ErWaterfallChart } from "@/components/resultados/ErWaterfallChart";
+import { EstadoOperativoCard } from "@/components/resultados/EstadoOperativoCard";
+import { GastoControlFavorite } from "@/components/resultados/GastoControlCard";
+import { GastoOpexSeriesFavorite } from "@/components/resultados/GastoOpexView";
 import { GastoOpexTreemapCard } from "@/components/resultados/GastoOpexTreemap";
+import { IngresoMonitor } from "@/components/resultados/IngresoMonitor";
+import { ResultadosPresupuestoView } from "@/components/resultados/ResultadosPresupuestoView";
 import { ResultadosTop5Card } from "@/components/resultados/ResultadosTop5Charts";
-import { ResultadosWaterfallChart } from "@/components/resultados/ResultadosWaterfallChart";
-import { INITIAL_RESULTADOS_FILTERS } from "@/components/resultados/resultados-filter-bar";
 import { useLocale } from "@/context/LocaleContext";
+import { useBudgetProjection } from "@/hooks/use-budget-projection";
+import { useEstadoOperativo } from "@/hooks/use-estado-operativo";
 import { usePosicionFinanciera } from "@/hooks/use-posicion-financiera";
-import type { FavoritableWidget } from "@/services/favoritesRegistry";
-import type {
-  DestacadosKpis,
-  DestacadosRubro,
-  MonthlyFinancials,
-} from "@/services/financialDataTransformer";
+import {
+  GASTO_CONTROL_FAVORITE_ID,
+  parseCategoryTemporalFavoriteId,
+  RESULTADOS_FAVORITE,
+  type FavoritableWidget,
+  type GastoControlKind,
+} from "@/services/favoritesRegistry";
+import { buildStackedSeries, type DestacadosKpis, type DestacadosRubro, type MonthlyFinancials } from "@/services/financialDataTransformer";
+import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
+import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
+import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import type { DisplayUnits } from "@/services/money";
 import { yearColumns } from "@/services/posicionFinanciera";
 import { useMemo, type ReactNode } from "react";
@@ -35,6 +50,7 @@ export type ControlWidgetContext = {
   units: DisplayUnits;
   rows: MonthlyFinancials[];
   kpis: DestacadosKpis;
+  filters: ResultadosFilters;
 };
 
 type PosicionStatementKey = "posicion" | "resultados" | "razones";
@@ -116,8 +132,51 @@ export function FavoriteWidgetRenderer({
         <DestacadosRubroCard rubro={rubro} units={context.units} contextLabel={context.kpis.contextLabel} />
       ) : null;
     }
+    case "destacadosUtilidad":
+      return <UtilidadFavorite context={context} />;
+    case "categoryTemporalKpi":
+      return <CategoryTemporalFavorite id={widget.id} context={context} />;
+    case "gastoControlKpi": {
+      const kind = (Object.entries(GASTO_CONTROL_FAVORITE_ID) as Array<[GastoControlKind, string]>).find(
+        ([, id]) => id === widget.id,
+      )?.[0];
+      return kind ? <GastoControlFavorite kind={kind} periodo={context.periodo} /> : null;
+    }
     case "tendenciaIngresosCostos":
       return <TendenciaIngresosCostosChart rows={context.rows} units={context.units} endPeriod={context.periodo} />;
+    case "categorySeries":
+      return widget.id === RESULTADOS_FAVORITE.serieCosto ? (
+        <CategorySeriesFavorite category="Costo" context={context} />
+      ) : (
+        <CategorySeriesFavorite category="Ingreso" context={context} />
+      );
+    case "gastoSeries":
+      return (
+        <GastoOpexSeriesFavorite
+          periodo={context.periodo}
+          units={context.units}
+          comparable={context.filters.comparable}
+          rows={context.rows}
+        />
+      );
+    case "incomeBreakdown":
+      return <IncomeBreakdownFavorite context={context} />;
+    case "ingresoCalidad":
+      return <IngresoMonitor periodo={context.periodo} part="calidad" />;
+    case "ingresoPacing":
+      return <IngresoMonitor periodo={context.periodo} part="pacing" />;
+    case "ingresoTabla":
+      return <IngresoMonitor periodo={context.periodo} part="tabla" />;
+    case "cogsAnalisis":
+      return <CogsAnalisisCard periodo={context.periodo} />;
+    case "erWaterfall":
+      return <ErWaterfallFavorite periodo={context.periodo} />;
+    case "ebitdaEbitTtm":
+      return <EbitdaTtmFavorite periodo={context.periodo} />;
+    case "estadoOperativo":
+      return <EstadoOperativoCard periodo={context.periodo} />;
+    case "presupuesto":
+      return <PresupuestoFavorite filters={context.filters} />;
     case "top5Clientes":
       return <ResultadosTop5Card kind="clientes" periodo={context.periodo} units={context.units} />;
     case "top5Lineas":
@@ -126,17 +185,6 @@ export function FavoriteWidgetRenderer({
       return <CogsDesgloseCard periodo={context.periodo} units={context.units} />;
     case "gastoTreemap":
       return context.periodo ? <GastoOpexTreemapCard periodo={context.periodo} /> : null;
-    case "resultadosWaterfall":
-      return (
-        <ResultadosWaterfallChart
-          filters={{
-            ...INITIAL_RESULTADOS_FILTERS,
-            periodo: context.periodo,
-            units: context.units,
-          }}
-          rows={context.rows}
-        />
-      );
     case "flujoOperativoKpi": {
       const kpi = widget.id.slice("kpi-flujo-".length) as FlujoOperativoKpiKey;
       return <FlujoOperativoKpiCard kpi={kpi} periodo={context.periodo} />;
@@ -166,4 +214,103 @@ export function FavoriteWidgetRenderer({
     default:
       return null;
   }
+}
+
+function UtilidadFavorite({ context }: { context: ControlWidgetContext }) {
+  const priorShift = comparableShift(context.kpis.contextLabel);
+  const priorPeriod = priorShift == null ? context.periodo : shiftPeriodo(context.periodo, priorShift);
+  const { data: estadoActual } = useEstadoOperativo(context.periodo);
+  const { data: estadoPrior } = useEstadoOperativo(priorPeriod);
+  const rubro = buildUtilidadRubro(estadoActual, estadoPrior, context.kpis.contextLabel);
+  return <DestacadosRubroCard rubro={rubro} units={context.units} contextLabel={context.kpis.contextLabel} />;
+}
+
+function CategoryTemporalFavorite({ id, context }: { id: string; context: ControlWidgetContext }) {
+  const { t, locale } = useLocale();
+  const parsed = parseCategoryTemporalFavoriteId(id);
+  if (!parsed || !context.periodo) return null;
+  const top = calculateTopKPIs(context.rows, parsed.category, context.periodo);
+  const card = categoryTemporalCards(top, context.periodo, parsed.category, t, locale).find(
+    (item) => item.key === parsed.key,
+  );
+  return card ? <CategoryTemporalKpiCard card={card} category={parsed.category} /> : null;
+}
+
+function CategorySeriesFavorite({
+  category,
+  context,
+}: {
+  category: "Ingreso" | "Costo";
+  context: ControlWidgetContext;
+}) {
+  const series = useMemo(
+    () => buildStackedSeries(context.rows, context.filters, category),
+    [category, context.filters, context.rows],
+  );
+  return (
+    <CategorySeriesCard
+      category={category}
+      units={context.units}
+      temporalidad={context.filters.temporalidad}
+      comparable={context.filters.comparable}
+      chartData={series.chartData}
+      seriesKeys={series.seriesKeys}
+      headlineLabel={series.headlineLabel}
+      headlineTotal={series.headlineTotal}
+      comparableLabel={series.comparableLabel}
+      comparableTotal={series.comparableTotal}
+    />
+  );
+}
+
+function IncomeBreakdownFavorite({ context }: { context: ControlWidgetContext }) {
+  const series = useMemo(
+    () => buildStackedSeries(context.rows, context.filters, "Ingreso"),
+    [context.filters, context.rows],
+  );
+  return (
+    <IncomeBreakdownCard
+      rows={context.rows}
+      periodo={context.periodo}
+      temporalidad={context.filters.temporalidad}
+      units={context.units}
+      comparable={context.filters.comparable}
+      headlineLabel={series.headlineLabel}
+    />
+  );
+}
+
+function ErWaterfallFavorite({ periodo }: { periodo: string }) {
+  const yearFromPeriod = periodo ? Number(periodo.slice(0, 4)) : null;
+  const year = Number.isInteger(yearFromPeriod) && (yearFromPeriod ?? 0) > 2000 ? yearFromPeriod : null;
+  const { data, loading } = usePosicionFinanciera(year, null);
+  return (
+    <ErWaterfallChart
+      nodes={data?.statements.resultados ?? []}
+      yearKey={String(data?.year ?? year ?? "")}
+      loading={loading}
+      empty={Boolean(data && !data.hasBalanza)}
+    />
+  );
+}
+
+function EbitdaTtmFavorite({ periodo }: { periodo: string }) {
+  const { data, loading } = useEstadoOperativo(periodo);
+  if (loading || !data) {
+    return <div className="h-72 animate-pulse rounded-card bg-secondary" />;
+  }
+  return <EbitdaEbitTtmChart ttm={data.ttm} />;
+}
+
+function PresupuestoFavorite({ filters }: { filters: ResultadosFilters }) {
+  const { data, loading, error, refetch } = useBudgetProjection(filters.periodo);
+  return (
+    <ResultadosPresupuestoView
+      filters={filters}
+      data={data}
+      loading={loading}
+      error={error}
+      onDriversSaved={refetch}
+    />
+  );
 }

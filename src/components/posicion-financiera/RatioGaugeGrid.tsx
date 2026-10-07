@@ -24,15 +24,15 @@ import {
 } from "recharts";
 
 const ZONE_WASH: Record<RatioGaugeZone, string> = {
-  red: "rgba(239, 68, 68, 0.18)",
-  yellow: "rgba(245, 158, 11, 0.18)",
-  green: "rgba(16, 185, 129, 0.18)",
+  red: "color-mix(in srgb, var(--cifra-bad) 18%, transparent)",
+  yellow: "color-mix(in srgb, var(--cifra-warn) 18%, transparent)",
+  green: "color-mix(in srgb, var(--cifra-good) 18%, transparent)",
 };
 
 const ZONE_FILL: Record<RatioGaugeZone, string> = {
-  red: "#EF4444",
-  yellow: "#F59E0B",
-  green: "#10B981",
+  red: "var(--cifra-bad)",
+  yellow: "var(--cifra-warn)",
+  green: "var(--cifra-good)",
 };
 
 const GAUGE_IDS: RatioGaugeId[] = ["currentRatio", "operatingMargin", "roe", "dso"];
@@ -90,7 +90,7 @@ function RatioBullet({
     <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-serif text-base font-medium tracking-tight text-foreground">{title}</h3>
+          <h3 className="font-sans text-base font-bold tracking-tight text-foreground">{title}</h3>
           <InsightText text={t(`posicionFinanciera.gauges.insights.${id}`)} />
         </div>
         <p className="financial-nums text-lg font-semibold tabular-nums text-foreground">{formatted}</p>
@@ -160,7 +160,7 @@ export function RatioGaugeGrid({ nodes, yearKey, loading, empty }: RatioGaugeGri
         <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-clay">
           {t("posicionFinanciera.gauges.eyebrow")}
         </p>
-        <h2 className="mt-1 font-serif text-xl font-medium tracking-tight text-foreground">
+        <h2 className="mt-1 font-sans text-xl font-medium tracking-tight text-foreground">
           {t("posicionFinanciera.gauges.title")}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{t("posicionFinanciera.gauges.help")}</p>

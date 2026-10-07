@@ -1,4 +1,4 @@
-# CFO Virtual — Estructura Actual de la Plataforma
+# Cifra — Estructura Actual de la Plataforma
 
 > Documento de referencia para compartir con otros modelos de IA (p. ej. Gemini) o con el equipo.
 > Describe los módulos, opciones, KPIs y gráficos que **actualmente existen** en la plataforma.
@@ -8,7 +8,7 @@
 
 ## 1. Resumen General
 
-**CFO Virtual** es una plataforma web de CFO virtual / inteligencia financiera para PyMEs mexicanas. Ingiere archivos Excel contables (Balanza de Comprobación, Auxiliares, Pólizas y Flujo de Efectivo de CONTPAQi, o una Plantilla Máster propia) y genera dashboards ejecutivos, un catálogo de 50 métricas financieras, proyecciones de presupuesto y herramientas de auditoría.
+**Cifra** es una plataforma web de CFO virtual / inteligencia financiera para PyMEs mexicanas. Ingiere archivos Excel contables (Balanza de Comprobación, Auxiliares, Pólizas y Flujo de Efectivo de CONTPAQi, o una Plantilla Máster propia) y genera dashboards ejecutivos, un catálogo de 50 métricas financieras, proyecciones de presupuesto y herramientas de auditoría.
 
 **Stack técnico:**
 - Frontend: Next.js 14 (App Router) + React 18 + TailwindCSS + Radix UI + next-intl (ES/EN)

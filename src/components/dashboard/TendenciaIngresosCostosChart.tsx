@@ -45,10 +45,10 @@ const TOOLTIP_STYLE = {
 } as const;
 
 /** Paleta local ingreso/costo (no usa CHART.clay/coral: esos alimentan HeroLine y otros). */
-const INGRESO_LINE = "#10B981";
-const INGRESO_LABEL = "#047857";
-const COSTO_LINE = "#EF4444";
-const COSTO_LABEL = "#B91C1C";
+const INGRESO_LINE = "var(--cifra-good)";
+const INGRESO_LABEL = "var(--cifra-good)";
+const COSTO_LINE = "var(--cifra-bad)";
+const COSTO_LABEL = "var(--cifra-bad)";
 
 function seriesNumbers(data: TrendDatum[], key: "ingreso" | "costo"): Array<number | null> {
   return data.map((datum) => {
@@ -255,7 +255,7 @@ function TrendPointLabel({
       fill={color}
       fontSize={11}
       fontWeight={600}
-      stroke="#fff"
+      stroke="var(--cifra-brand-contrast)"
       strokeWidth={3}
       paintOrder="stroke fill"
       style={{ pointerEvents: "none" }}
@@ -299,7 +299,7 @@ export function TendenciaIngresosCostosChart({
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-serif text-xl font-medium text-foreground">{t("widgets.trendTitle")}</h2>
+          <h2 className="font-sans text-xl font-medium text-foreground">{t("widgets.trendTitle")}</h2>
           <InsightText text={insightText ?? t("widgets.trendHelp")} />
         </div>
         <div className="flex items-center gap-2">
@@ -346,8 +346,8 @@ export function TendenciaIngresosCostosChart({
               name={t("resultados.income")}
               stroke={INGRESO_LINE}
               strokeWidth={2.5}
-              dot={{ r: 3.5, fill: "#ffffff", stroke: INGRESO_LINE, strokeWidth: 2 }}
-              activeDot={{ r: 6, fill: "#ffffff", stroke: INGRESO_LINE, strokeWidth: 2 }}
+              dot={{ r: 3.5, fill: "var(--cifra-brand-contrast)", stroke: INGRESO_LINE, strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: "var(--cifra-brand-contrast)", stroke: INGRESO_LINE, strokeWidth: 2 }}
               isAnimationActive={false}
             >
               <LabelList
@@ -365,8 +365,8 @@ export function TendenciaIngresosCostosChart({
               name={t("resultados.cost")}
               stroke={COSTO_LINE}
               strokeWidth={2.5}
-              dot={{ r: 3.5, fill: "#ffffff", stroke: COSTO_LINE, strokeWidth: 2 }}
-              activeDot={{ r: 6, fill: "#ffffff", stroke: COSTO_LINE, strokeWidth: 2 }}
+              dot={{ r: 3.5, fill: "var(--cifra-brand-contrast)", stroke: COSTO_LINE, strokeWidth: 2 }}
+              activeDot={{ r: 6, fill: "var(--cifra-brand-contrast)", stroke: COSTO_LINE, strokeWidth: 2 }}
               isAnimationActive={false}
             >
               <LabelList

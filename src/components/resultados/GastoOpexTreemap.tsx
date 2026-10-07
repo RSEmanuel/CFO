@@ -2,11 +2,11 @@
 
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
-import { Tooltip as Hint, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoDialog } from "@/components/ui/info-dialog";
 import { useLocale } from "@/context/LocaleContext";
 import { useGastoOpex } from "@/hooks/use-gasto-opex";
 import { monthLabelKey } from "@/i18n/format";
-import { CHART, OPEX_SPLIT } from "@/lib/chart-theme";
+import { canvasColor, CHART } from "@/lib/chart-theme";
 import { parseIngresoPeriodo } from "@/services/ingresoMix";
 import { formatMxn } from "@/services/money";
 import {
@@ -40,29 +40,63 @@ type TreemapNodeData = {
   idCuenta?: string;
   esOtrosMenores?: boolean;
   itemStyle: { color: string };
+  label?: { color: string };
+  upperLabel?: { color: string };
   children?: TreemapNodeData[];
 };
 
-/** Tinte del color base mezclado con blanco (0 = base, 1 = blanco). */
-function tintWithWhite(hex: string, ratio: number): string {
-  const raw = hex.replace("#", "");
-  const channel = (index: number) => parseInt(raw.slice(index, index + 2), 16);
-  const mixed = [0, 2, 4].map((index) => Math.round(channel(index) + (255 - channel(index)) * ratio));
+function hexChannels(color: string): [number, number, number] | null {
+  const resolved = canvasColor(color);
+  const raw = resolved.replace("#", "");
+  if (!/^[\da-fA-F]{6}$/.test(raw)) {
+    return null;
+  }
+  return [0, 2, 4].map((index) => parseInt(raw.slice(index, index + 2), 16)) as [number, number, number];
+}
+
+function mixHex(from: string, to: string, ratio: number): string {
+  const start = hexChannels(from);
+  const end = hexChannels(to);
+  if (!start || !end) {
+    return canvasColor(from);
+  }
+  const mixed = start.map((channel, index) => Math.round(channel + (end[index] - channel) * ratio));
   return `#${mixed.map((value) => value.toString(16).padStart(2, "0")).join("")}`;
 }
 
-/** Hojas de un bucket: la mayor usa el color base; las menores, tintes crecientes. */
-function leafColor(bucket: OpexTreemapBucket, index: number, count: number): string {
-  const base = OPEX_SPLIT[bucket];
+/** Escala de cobalto: venta más profundo, admin medio, otros más claro. */
+function bucketBlue(bucket: OpexTreemapBucket): string {
+  if (bucket === "venta") {
+    return mixHex("var(--cifra-brand)", "var(--cifra-ink)", 0.32);
+  }
+  if (bucket === "admin") {
+    return canvasColor("var(--cifra-brand)");
+  }
+  return mixHex("var(--cifra-brand)", "var(--cifra-paper)", 0.45);
+}
+
+/** Dentro del grupo, la cuenta mayor conserva el azul base y las menores se aclaran. */
+function leafBlue(bucket: OpexTreemapBucket, index: number, count: number): string {
+  const base = bucketBlue(bucket);
   if (count <= 1) {
     return base;
   }
-  const ratio = 0.12 + (0.5 * index) / Math.max(1, count - 1);
-  return tintWithWhite(base, Math.min(0.62, ratio));
+  const ratio = 0.16 + (0.58 * index) / Math.max(1, count - 1);
+  return mixHex(base, "var(--cifra-paper)", Math.min(0.74, ratio));
 }
 
-function escapeHtml(value: string): string {
-  return value
+function labelOn(fill: string): string {
+  const channels = hexChannels(fill);
+  if (!channels) {
+    return canvasColor("var(--cifra-brand-contrast)");
+  }
+  const [red, green, blue] = channels;
+  const luminance = (0.299 * red + 0.587 * green + 0.114 * blue) / 255;
+  return luminance > 0.62 ? canvasColor("var(--cifra-ink)") : canvasColor("var(--cifra-brand-contrast)");
+}
+
+function escapeHtml(value: unknown): string {
+  return String(value ?? "")
     .replaceAll("&", "&amp;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;")
@@ -102,24 +136,33 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
   }, [treemap.periodoAnterior, t]);
 
   const option = useMemo<TreemapOption>(() => {
-    const data: TreemapNodeData[] = treemap.buckets.map((bucket) => ({
-      name: bucketLabel(bucket.bucket),
-      value: bucket.monto,
-      pctTotal: bucket.pctTotal,
-      deltaMomPct: bucket.deltaMomPct,
-      itemStyle: { color: OPEX_SPLIT[bucket.bucket] },
-      children: bucket.leaves.map((leaf: OpexTreemapLeaf, index: number) => ({
-        name: leaf.esOtrosMenores
-          ? t("resultados.opex.treemap.otrosMenores")
-          : cleanOpexCuentaNombre(leaf.nombreCuenta),
-        value: leaf.monto,
-        pctTotal: leaf.pctTotal,
-        deltaMomPct: leaf.deltaMomPct,
-        ...(leaf.idCuenta ? { idCuenta: leaf.idCuenta } : {}),
-        ...(leaf.esOtrosMenores ? { esOtrosMenores: true } : {}),
-        itemStyle: { color: leafColor(bucket.bucket, index, bucket.leaves.length) },
-      })),
-    }));
+    const data: TreemapNodeData[] = treemap.buckets.map((bucket) => {
+      const groupColor = bucketBlue(bucket.bucket);
+      return {
+        name: bucketLabel(bucket.bucket),
+        value: bucket.monto,
+        pctTotal: bucket.pctTotal,
+        deltaMomPct: bucket.deltaMomPct,
+        itemStyle: { color: groupColor },
+        label: { color: labelOn(groupColor) },
+        upperLabel: { color: labelOn(groupColor) },
+        children: bucket.leaves.map((leaf: OpexTreemapLeaf, index: number) => {
+          const color = leafBlue(bucket.bucket, index, bucket.leaves.length);
+          return {
+            name: leaf.esOtrosMenores
+              ? t("resultados.opex.treemap.otrosMenores")
+              : cleanOpexCuentaNombre(leaf.nombreCuenta),
+            value: leaf.monto,
+            pctTotal: leaf.pctTotal,
+            deltaMomPct: leaf.deltaMomPct,
+            ...(leaf.idCuenta ? { idCuenta: leaf.idCuenta } : {}),
+            ...(leaf.esOtrosMenores ? { esOtrosMenores: true } : {}),
+            itemStyle: { color },
+            label: { color: labelOn(color) },
+          };
+        }),
+      };
+    });
 
     return {
       tooltip: {
@@ -132,7 +175,8 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
             | { name?: string; value?: unknown; data?: TreemapNodeData }
             | undefined;
           const node = item?.data;
-          if (!node) {
+          const name = typeof node?.name === "string" ? node.name : typeof item?.name === "string" ? item.name : null;
+          if (!node || !name) {
             return "";
           }
           const monto = Number(node.value);
@@ -149,7 +193,7 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
               )}</span>`
             : "";
           return [
-            `<strong>${escapeHtml(node.name)}</strong>`,
+            `<strong>${escapeHtml(name)}</strong>`,
             `<br/>${escapeHtml(formatMxn(monto))}`,
             `<br/><span style="color:${CHART.mute}">${escapeHtml(
               t("resultados.opex.treemap.tooltipShare", { pct: pct.toFixed(1) }),
@@ -173,9 +217,9 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
           data,
           label: {
             show: true,
-            fontSize: 11,
-            lineHeight: 14,
-            color: "#FFFFFF",
+            fontSize: 13,
+            fontWeight: "bold",
+            lineHeight: 16,
             overflow: "truncate",
             formatter: (params) => {
               const node = params.data as TreemapNodeData | undefined;
@@ -188,14 +232,13 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
           },
           upperLabel: {
             show: true,
-            height: 22,
-            color: "#FFFFFF",
-            fontSize: 11,
-            fontWeight: 600,
+            height: 26,
+            fontSize: 13,
+            fontWeight: "bold",
             backgroundColor: "transparent",
           },
           itemStyle: {
-            borderColor: CHART.card,
+            borderColor: canvasColor(CHART.card),
             borderWidth: 2,
             gapWidth: 2,
           },
@@ -226,22 +269,15 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
     <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-4">
         <div className="flex items-center gap-1.5">
-          <h2 className="font-serif text-xl font-medium text-foreground">{t("resultados.opex.treemap.title")}</h2>
+          <h2 className="font-sans text-xl font-bold text-foreground">{t("resultados.opex.treemap.title")}</h2>
           <FavoriteStarButton widgetId="chart-gasto-treemap" label={t("resultados.opex.treemap.title")} />
-          <TooltipProvider delayDuration={200}>
-            <Hint>
-              <TooltipTrigger asChild>
-                <button
-                  type="button"
-                  aria-label={t("resultados.opex.treemap.helpTooltip")}
-                  className="text-muted-foreground/60 transition-colors hover:text-muted-foreground"
-                >
-                  <HelpCircle className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">{t("resultados.opex.treemap.helpTooltip")}</TooltipContent>
-            </Hint>
-          </TooltipProvider>
+          <InfoDialog
+            title={t("resultados.opex.treemap.title")}
+            body={t("resultados.opex.treemap.helpTooltip")}
+            ariaLabel={t("resultados.opex.treemap.title")}
+            icon={HelpCircle}
+            triggerClassName="p-0 text-muted-foreground/60 hover:bg-transparent hover:text-muted-foreground"
+          />
         </div>
         <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("resultados.opex.treemap.help")}</p>
       </div>

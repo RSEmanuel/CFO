@@ -17,7 +17,7 @@ type IncomeBreakdownPieProps = {
 };
 
 const RADIAN = Math.PI / 180;
-const LABEL_LINE_STROKE = "#94a3b8";
+const LABEL_LINE_STROKE = "var(--cifra-ink-3)";
 
 function formatSharePct(value: number, total: number): string {
   if (total <= 0) {

@@ -1,0 +1,94 @@
+:root {
+  /* ---- Marca ---- */
+  --cifra-brand:        #1550E0; /* Cobalto: marca, acciones, enlaces, foco */
+  --cifra-brand-soft:   #DEE6FC;
+  --cifra-brand-contrast:#FFFFFF;
+
+  /* ---- Superficies ---- */
+  --cifra-paper:        #F1F3FB; /* Papel: fondo base, blanco tenido de cobalto */
+  --cifra-surface:      #FFFFFF;
+  --cifra-surface-2:    #E4E8F7;
+
+  /* ---- Texto ---- */
+  --cifra-ink:          #101425; /* Tinta: azul-negro, nunca negro puro */
+  --cifra-ink-2:        #3B4260;
+  --cifra-ink-3:        #646B85; /* Grafito: secundario, etiquetas, ejes */
+
+  /* ---- Lineas ---- */
+  --cifra-line:         #D2D8EE;
+  --cifra-line-2:       #E5E9F6;
+
+  /* ---- Senal (semaforo). SOLO estados, nunca decoracion ---- */
+  --cifra-good:         #0D7350;
+  --cifra-good-soft:    #D9EDE5;
+  --cifra-warn:         #8A5A05;
+  --cifra-warn-soft:    #F4E9D3;
+  --cifra-bad:          #9B2C20;
+  --cifra-bad-soft:     #F5DEDA;
+
+  /* ---- Tipografia ---- */
+  --cifra-font-sans: "Manrope", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --cifra-font-mono: "Azeret Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* ---- Radio y sombra ---- */
+  --cifra-radius:    10px;
+  --cifra-radius-lg: 15px; /* proporcion del simbolo: 15/64 del lado */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --cifra-brand:       #7E97FF;
+    --cifra-brand-soft:  #141E46;
+    --cifra-brand-contrast:#080A14;
+    --cifra-paper:       #080A14;
+    --cifra-surface:     #111528;
+    --cifra-surface-2:   #191E36;
+    --cifra-ink:         #E8EBF7;
+    --cifra-ink-2:       #AEB5D0;
+    --cifra-ink-3:       #78809E;
+    --cifra-line:        #272D4A;
+    --cifra-line-2:      #1C2239;
+    --cifra-good:        #4BC698;
+    --cifra-good-soft:   #0C2C23;
+    --cifra-warn:        #D8A455;
+    --cifra-warn-soft:   #2E2410;
+    --cifra-bad:         #EC8579;
+    --cifra-bad-soft:    #361A17;
+  }
+}
+
+:root[data-theme="dark"] {
+  --cifra-brand:       #7E97FF;
+  --cifra-brand-soft:  #141E46;
+  --cifra-brand-contrast:#080A14;
+  --cifra-paper:       #080A14;
+  --cifra-surface:     #111528;
+  --cifra-surface-2:   #191E36;
+  --cifra-ink:         #E8EBF7;
+  --cifra-ink-2:       #AEB5D0;
+  --cifra-ink-3:       #78809E;
+  --cifra-line:        #272D4A;
+  --cifra-line-2:      #1C2239;
+  --cifra-good:        #4BC698;
+  --cifra-good-soft:   #0C2C23;
+  --cifra-warn:        #D8A455;
+  --cifra-warn-soft:   #2E2410;
+  --cifra-bad:         #EC8579;
+  --cifra-bad-soft:    #361A17;
+}
+
+/* ---- Base ---- */
+body {
+  background: var(--cifra-paper);
+  color: var(--cifra-ink);
+  font-family: var(--cifra-font-sans);
+}
+
+/* ---- OBLIGATORIO: toda cifra usa mono + tabular ---- */
+.cifra-num,
+td.num,
+[data-numeric] {
+  font-family: var(--cifra-font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}

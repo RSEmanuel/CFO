@@ -186,7 +186,7 @@ function Top5Card({
   if (series.entidades.length === 0) {
     return (
       <section className="w-full overflow-x-hidden rounded-card border border-dashed border-border bg-card/60 p-6">
-        <h3 className="font-serif text-lg font-medium text-foreground">{title}</h3>
+        <h3 className="font-sans text-lg font-medium text-foreground">{title}</h3>
         <InsightText text={insightText} />
         <p className="mt-2 text-sm text-muted-foreground">{emptyMessage}</p>
       </section>
@@ -200,7 +200,7 @@ function Top5Card({
     <section className="w-full overflow-x-hidden rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="mb-1 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-serif text-lg font-medium text-foreground">{title}</h3>
+          <h3 className="font-sans text-lg font-medium text-foreground">{title}</h3>
           <InsightText text={insightText} />
         </div>
         <div className="flex items-center gap-1">

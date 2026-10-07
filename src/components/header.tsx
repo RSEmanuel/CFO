@@ -17,14 +17,14 @@ export function Header() {
   const title = titleKey ? t(titleKey) : "";
 
   return (
-    <header className="z-30 flex h-[var(--app-header-h)] w-full shrink-0 items-center justify-end gap-4 border-b border-beige-deep bg-chrome px-4 md:px-6">
+    <div className="pointer-events-none absolute right-4 top-3 z-30 md:right-6 md:top-4">
       <h1 className="sr-only">{title}</h1>
       <TooltipProvider delayDuration={200}>
         <Tooltip>
           <TooltipTrigger asChild>
             <button
               type="button"
-              className="shrink-0 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="pointer-events-auto shrink-0 rounded-full shadow-sm ring-1 ring-border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               aria-label={t("common.sessionOf", { email: user?.email ?? t("common.user") })}
             >
               <Avatar className="h-9 w-9">
@@ -35,6 +35,6 @@ export function Header() {
           <TooltipContent>{user?.email ?? t("common.user")}</TooltipContent>
         </Tooltip>
       </TooltipProvider>
-    </header>
+    </div>
   );
 }

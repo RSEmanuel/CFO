@@ -39,7 +39,7 @@ export function MetricCard({
   return (
     <Card className="border-border bg-card">
       <CardHeader className="flex flex-row items-start justify-between gap-2 space-y-0 pb-2">
-        <CardTitle className="font-serif text-lg font-medium text-foreground">{title}</CardTitle>
+        <CardTitle className="font-sans text-lg font-bold text-foreground">{title}</CardTitle>
         {favoriteId ? <FavoriteStar kind="metric" id={favoriteId} label={title} /> : null}
       </CardHeader>
       <CardContent>

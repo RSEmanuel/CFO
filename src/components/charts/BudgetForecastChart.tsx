@@ -105,7 +105,7 @@ export function BudgetForecastChart({
           type="monotone"
           dataKey="real"
           name="real"
-          stroke="#1A1915"
+          stroke="var(--cifra-ink)"
           strokeWidth={2}
           dot={false}
           connectNulls={false}

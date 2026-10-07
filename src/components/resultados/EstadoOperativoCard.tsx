@@ -1,6 +1,8 @@
 "use client";
 
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
+import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { EbitdaEbitTtmChart } from "@/components/resultados/EbitdaEbitTtmChart";
 import { useLocale } from "@/context/LocaleContext";
 import { useEstadoOperativo } from "@/hooks/use-estado-operativo";
@@ -66,7 +68,7 @@ function deltaTone(value: number | null, invertDelta: boolean): string {
     return "text-muted-foreground";
   }
   const favorable = invertDelta ? value > 0 : value < 0;
-  return favorable ? "text-[#059669]" : "text-[#9F1239]";
+  return favorable ? "text-[var(--cifra-good)]" : "text-[var(--cifra-bad)]";
 }
 
 /**
@@ -107,7 +109,7 @@ export function EstadoOperativoCard({ periodo }: EstadoOperativoCardProps) {
             <FileText className="h-4 w-4" />
           </span>
           <div>
-            <h3 className="font-serif text-lg font-medium text-foreground">{t("resultados.operativo.title")}</h3>
+            <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.operativo.title")}</h3>
             <p className="text-sm text-muted-foreground">{error ?? t("resultados.operativo.empty")}</p>
           </div>
         </div>
@@ -127,9 +129,12 @@ export function EstadoOperativoCard({ periodo }: EstadoOperativoCardProps) {
 
       <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="font-serif text-xl font-medium text-foreground">{t("resultados.operativo.title")}</h3>
-            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("resultados.operativo.help")}</p>
+          <div className="flex items-start gap-2">
+            <div>
+              <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.title")}</h3>
+              <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("resultados.operativo.help")}</p>
+            </div>
+            <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.estadoOperativo} label={t("resultados.operativo.title")} />
           </div>
           <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
             {modes.map((option) => (
@@ -227,8 +232,8 @@ function EstadoRow({
       className={cn(
         "border-t border-border/40",
         isTotal && "border-t-2 border-t-foreground/40 font-semibold",
-        isResult && "bg-[#E8F8F5]/50 font-semibold",
-        isBottomLine && "bg-[#E8F8F5]/70",
+        isResult && "bg-[var(--cifra-good-soft)]/50 font-semibold",
+        isBottomLine && "bg-[var(--cifra-good-soft)]/70",
         onAudit && "cursor-pointer transition-colors hover:bg-secondary/60",
       )}
       onClick={onAudit ?? undefined}
@@ -238,11 +243,11 @@ function EstadoRow({
         className={cn(
           "py-2 pr-3 text-foreground",
           isSub && "pl-6 text-muted-foreground",
-          isBottomLine && "underline decoration-double decoration-[#2ECC71] underline-offset-4",
+          isBottomLine && "underline decoration-double decoration-[var(--cifra-good)] underline-offset-4",
         )}
       >
         {isBottomLine ? (
-          <span className="inline-flex items-center rounded-full bg-[#2ECC71]/15 px-2 py-0.5 text-foreground">{label}</span>
+          <span className="inline-flex items-center rounded-full bg-[var(--cifra-good)]/15 px-2 py-0.5 text-foreground">{label}</span>
         ) : (
           <span className="inline-flex items-center gap-1.5">
             {label}

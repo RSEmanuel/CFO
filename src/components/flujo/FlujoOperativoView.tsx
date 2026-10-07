@@ -25,9 +25,9 @@ import {
   YAxis,
 } from "recharts";
 
-const COLOR_ENTRADAS = "#10b981";
-const COLOR_SALIDAS = "#ef4444";
-const COLOR_SALDO = "#0f172a";
+const COLOR_ENTRADAS = "var(--cifra-good)";
+const COLOR_SALIDAS = "var(--cifra-bad)";
+const COLOR_SALDO = "var(--cifra-ink)";
 
 const TOOLTIP_STYLE = {
   background: CHART_VARS.card,
@@ -73,7 +73,7 @@ function KpiCard({
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={label} /> : null}
       </div>
       <p
-        className={`mt-1 font-serif text-2xl font-medium ${
+        className={`mt-1 font-sans text-2xl font-medium ${
           tone === "up" ? "text-category-marginsFg" : tone === "down" ? "text-category-solvencyFg" : "text-foreground"
         }`}
       >
@@ -175,13 +175,13 @@ export function FlujoOperativoTablero({
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-2">
-          <h3 className="font-serif text-lg font-medium text-foreground">
-            {t("flujo.operativo.tab")} · {data.periodo}
+          <h3 className="font-sans text-lg font-medium text-foreground">
+            {t("flujo.tabs.diaria")} · {data.periodo}
           </h3>
           <span className="text-sm text-muted-foreground">{t("flujo.operativo.help")}</span>
         </div>
         <div className="flex items-center gap-2">
-          <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.operativo.tab")} />
+          <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.tabs.diaria")} />
           <span className="text-xs text-muted-foreground">
             {t("flujo.operativo.accountsCovered", {
               count: data.cuentas.length,
@@ -250,7 +250,7 @@ export function FlujoOperativoTablero({
               stroke={COLOR_SALDO}
               strokeWidth={2.5}
               dot={false}
-              activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "#ffffff", strokeWidth: 2 }}
+              activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "var(--cifra-brand-contrast)", strokeWidth: 2 }}
             />
           </ComposedChart>
         </ResponsiveContainer>
@@ -358,5 +358,65 @@ export function FlujoOperativoTableroCard({ periodo, units }: { periodo: string;
   if (error || !data?.hasData) {
     return null;
   }
+  return <FlujoOperativoTablero data={data} units={units} />;
+}
+
+/** KPIs de tesorería del mes, sin el gráfico diario. */
+export function FlujoResumenKpis({ periodo }: { periodo: string }) {
+  const { t } = useLocale();
+  const { data, loading } = useFlujoOperativo(periodo);
+
+  if (loading) {
+    return <div className="h-24 animate-pulse rounded-card bg-secondary" />;
+  }
+  if (!data?.hasData) {
+    return null;
+  }
+
+  return (
+    <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <KpiCard
+        label={t("flujo.operativo.inflows")}
+        value={formatMxn(data.totales.entradas)}
+        tone="up"
+        favoriteId="kpi-flujo-entradas"
+      />
+      <KpiCard
+        label={t("flujo.operativo.outflows")}
+        value={formatMxn(data.totales.salidas)}
+        tone="down"
+        favoriteId="kpi-flujo-salidas"
+      />
+      <KpiCard
+        label={t("flujo.operativo.netFlow")}
+        value={formatMxn(data.totales.neto)}
+        tone={data.totales.neto >= 0 ? "up" : "down"}
+        favoriteId="kpi-flujo-neto"
+      />
+      <KpiCard
+        label={t("flujo.operativo.endingCash")}
+        value={formatMxn(data.saldoFinal)}
+        favoriteId="kpi-flujo-caja"
+      />
+    </div>
+  );
+}
+
+/** Movimientos diarios de caja: entradas contra salidas, sin los KPI de resumen. */
+export function FlujoDinamicaDiariaView({ periodo, units }: { periodo: string; units: DisplayUnits }) {
+  const { t } = useLocale();
+  const { data, loading, error } = useFlujoOperativo(periodo);
+
+  if (loading) return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
+  if (error) return <DataEmptyState title={t("flujo.loadError")} message={error} />;
+  if (!data?.hasData) {
+    return (
+      <DataEmptyState
+        title={t("flujo.operativo.emptyTitle")}
+        message={t("flujo.operativo.emptyMessage")}
+      />
+    );
+  }
+
   return <FlujoOperativoTablero data={data} units={units} />;
 }

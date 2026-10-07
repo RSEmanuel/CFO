@@ -84,7 +84,7 @@ export function BudgetDriversForm({
     <div className="rounded-card border border-border bg-secondary/40 p-4">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h4 className="font-serif text-base font-medium text-foreground">
+          <h4 className="font-sans text-base font-medium text-foreground">
             {t("resultados.drivers.title")}
           </h4>
           <p className="mt-0.5 text-xs text-muted-foreground">{t("resultados.drivers.help")}</p>

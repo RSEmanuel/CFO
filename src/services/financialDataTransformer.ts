@@ -326,12 +326,12 @@ export function buildIncomeBreakdown(
   return groupSlicesBelowShare(topBreakdownSlices(sumBreakdown(selected, "Ingreso"), topN));
 }
 
-export type DestacadosRubroKey = "ingreso" | "costo" | "gasto" | "ebitda";
+export type DestacadosRubroKey = "ingreso" | "costo" | "gasto" | "utilidad" | "ebitda";
 
 export type DestacadosRubro = {
   key: DestacadosRubroKey;
   title: string;
-  value: number;
+  value: number | null;
   deltaPct: number | null;
   inverted: boolean;
 };
@@ -457,7 +457,7 @@ export function getDestacadosPeriodTotals(
 }
 
 function toRubros(current: RubroTotals, prior: RubroTotals | null): DestacadosRubro[] {
-  const defs: Array<{ key: DestacadosRubroKey; title: string; inverted: boolean }> = [
+  const defs: Array<{ key: Exclude<DestacadosRubroKey, "utilidad">; title: string; inverted: boolean }> = [
     { key: "ingreso", title: "Ingreso", inverted: false },
     { key: "costo", title: "Costo", inverted: true },
     { key: "gasto", title: "Gasto", inverted: true },

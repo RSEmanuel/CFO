@@ -113,7 +113,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                   <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                     {t("polizas.audit.title")} · {periodoLabel(target.anio, target.periodo, locale)}
                   </p>
-                  <DialogPrimitive.Title className="mt-1 truncate font-serif text-xl font-medium text-foreground">
+                  <DialogPrimitive.Title className="mt-1 truncate font-sans text-xl font-medium text-foreground">
                     <span className="financial-nums mr-2 text-clay">{target.codigoCuenta}</span>
                     {target.nombreCuenta}
                   </DialogPrimitive.Title>

@@ -146,10 +146,10 @@ test("buildPosicionTree: 1200/1202 van a activo LP y el cuadre A = P + C se mant
   assert.equal(activoCp?.values["2026"], 100);
   assert.equal(activoLp?.values["2026"], 10);
   assert.equal(activo?.values["2026"], 110);
-  // A = P + C → 110 = 60 + 50: el nodo de control existe y vale 0
+  // A = P + C → 110 = 60 + 50: el nodo de control muestra Pasivo + Capital
   const control = tree.find((node) => node.id === "epf:control");
   assert.ok(control, "el nodo de control A = P + C debe existir cuando la identidad cuadra");
-  assert.equal(control.values["2026"], 0);
+  assert.equal(control.values["2026"], 110);
 });
 
 test("capitalGroupOf: prefijos NIF del catálogo Compac, catch-all y overrides por tenant", () => {
@@ -236,10 +236,10 @@ test("buildPosicionTree: estructura NIF del capital en signo ECONÓMICO y cuadre
   assert.ok(ytd);
   assert.equal(ytd.values["2026"], 33);
   assert.equal(ytd.labelKey, "posicionFinanciera.structure.resultadoEjercicio");
-  // Cuadre con los valores MOSTRADOS: A = 100 = P 40 + C 60 → control 0
+  // Cuadre con los valores MOSTRADOS: A = 100 = P 40 + C 60 → la fila muestra P + C
   const control = tree.find((node) => node.id === "epf:control");
   assert.ok(control, "con la presentación económica la identidad cuadra y muestra el control");
-  assert.equal(control.values["2026"], 0);
+  assert.equal(control.values["2026"], 100);
 });
 
 test("buildPosicionTree: cuenta 3xxx de resultado del ejercicio sin duplicar el YTD del PyG", () => {
@@ -261,7 +261,7 @@ test("buildPosicionTree: cuenta 3xxx de resultado del ejercicio sin duplicar el 
   assert.equal(capital?.values["2025"], 33);
   const control = tree.find((node) => node.id === "epf:control");
   assert.ok(control);
-  assert.equal(control.values["2025"], 0);
+  assert.equal(control.values["2025"], 73);
 });
 
 test("capitalContableNif: déficit patrimonial real jul-2026 (convención Compac)", () => {

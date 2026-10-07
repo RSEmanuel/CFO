@@ -146,7 +146,7 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
                 type="checkbox"
                 checked={excluirTraspasos}
                 onChange={(event) => setExcluirTraspasos(event.target.checked)}
-                className="h-4 w-4 accent-[#4F6F52]"
+                className="h-4 w-4 accent-[var(--cifra-brand)]"
               />
               {t("flujo.efectivo.excluirTraspasos")}
             </label>

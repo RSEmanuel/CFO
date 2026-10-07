@@ -174,7 +174,7 @@ export function MetricsCatalog() {
               </>
             ) : (
               <div className="space-y-4">
-                <h3 className="font-serif text-xl font-medium">{t("metrics.favorites")}</h3>
+                <h3 className="font-sans text-xl font-medium">{t("metrics.favorites")}</h3>
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                   {favoriteMetricIds.map((id) => {
                     const catalog = catalogByKey.get(id);

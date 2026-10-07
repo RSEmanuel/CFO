@@ -5,24 +5,23 @@ import {
   ResultadosFilterBar,
   type ResultadosFilters,
 } from "@/components/resultados/resultados-filter-bar";
-import { ChartErrorBoundary } from "@/components/chart-error-boundary";
+import { TendenciaIngresosCostosChart } from "@/components/dashboard/TendenciaIngresosCostosChart";
 import { EstadoOperativoCard } from "@/components/resultados/EstadoOperativoCard";
-import { RifAuditoriaView } from "@/components/resultados/RifAuditoriaView";
 import { ResultadosCategoryView } from "@/components/resultados/ResultadosCategoryView";
 import { DestacadosRubroCard, rubroTitleKey } from "@/components/resultados/DestacadosRubroCard";
 import { EstadoResultadosView } from "@/components/resultados/EstadoResultadosView";
-import { ResultadosWaterfallChart } from "@/components/resultados/ResultadosWaterfallChart";
 import { ResultadosPresupuestoView } from "@/components/resultados/ResultadosPresupuestoView";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataEmptyState } from "@/components/data-empty-state";
-import { DataOriginBadge } from "@/components/data-origin-badge";
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useBudgetProjection } from "@/hooks/use-budget-projection";
+import { useEstadoOperativo } from "@/hooks/use-estado-operativo";
 import { useResultados } from "@/hooks/use-resultados";
 import { cn } from "@/lib/utils";
 import { buildStackedSeries, getDestacadosKpis, type ResultadosCategoryName } from "@/services/financialDataTransformer";
+import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
 import { downloadPaqueteDelMesPdf } from "@/services/resultadosPaquetePdf";
 import { FileText } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -34,7 +33,6 @@ const RESULTADOS_TABS = [
   { value: "gasto", labelKey: "resultados.tabExpense" },
   { value: "estado-resultados", labelKey: "resultados.tabPl" },
   { value: "operativo", labelKey: "resultados.tabOperativo" },
-  { value: "otras", labelKey: "resultados.tabRifAuditoria" },
   { value: "presupuesto", labelKey: "resultados.tabBudget" },
 ] as const;
 
@@ -45,6 +43,8 @@ const CATEGORY_TABS: Record<string, ResultadosCategoryName> = {
   costo: "Costo",
   gasto: "Gasto",
 };
+
+const ESTADO_RUBRO_ORDER = ["ingreso", "costo", "gasto", "utilidad", "ebitda"] as const;
 
 export function ResultadosPage() {
   const { t, locale, formatDate } = useLocale();
@@ -59,7 +59,7 @@ export function ResultadosPage() {
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("tab");
-    if (fromUrl === "destacados" || fromUrl === "resultados") {
+    if (fromUrl === "destacados" || fromUrl === "resultados" || fromUrl === "otras") {
       setTab(DEFAULT_RESULTADOS_TAB);
       const url = new URL(window.location.href);
       url.searchParams.set("tab", DEFAULT_RESULTADOS_TAB);
@@ -88,6 +88,19 @@ export function ResultadosPage() {
   }, [data, filters]);
 
   const kpis = useMemo(() => getDestacadosKpis(data?.series ?? [], filters), [data?.series, filters]);
+  const cardPeriod = filters.periodo || data?.availablePeriods.at(-1) || activePeriod || "";
+  const priorShift = comparableShift(kpis.contextLabel);
+  const priorPeriod = priorShift == null ? cardPeriod : shiftPeriodo(cardPeriod, priorShift);
+  const { data: estadoActual } = useEstadoOperativo(cardPeriod);
+  const { data: estadoPrior } = useEstadoOperativo(priorPeriod);
+  const estadoRubros = useMemo(() => {
+    const utilidad = buildUtilidadRubro(estadoActual, estadoPrior, kpis.contextLabel);
+    return ESTADO_RUBRO_ORDER.flatMap((key) => {
+      if (key === "utilidad") return [utilidad];
+      const rubro = kpis.rubros.find((item) => item.key === key);
+      return rubro ? [rubro] : [];
+    });
+  }, [estadoActual, estadoPrior, kpis]);
 
   const empresa =
     tenants.find((tenant) => tenant.id === tenantId)?.name ??
@@ -119,7 +132,7 @@ export function ResultadosPage() {
         contextLabel: kpis.contextLabel,
         rubros: kpis.rubros.map((rubro) => ({
           title: t(rubroTitleKey(rubro.key)),
-          value: rubro.value,
+          value: rubro.value ?? 0,
           deltaPct: rubro.deltaPct,
         })),
       });
@@ -207,24 +220,10 @@ export function ResultadosPage() {
                   <FileText className="h-3.5 w-3.5" />
                   {t("resultados.budgetPackage")}
                 </Button>
-                <DataOriginBadge origin={data.periodOrigins[effectivePeriod]} />
               </div>
             }
           />
         </div>
-
-        {periodHasData ? (
-          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            {kpis.rubros.map((rubro) => (
-              <DestacadosRubroCard
-                key={rubro.key}
-                rubro={rubro}
-                units={filters.units}
-                contextLabel={kpis.contextLabel}
-              />
-            ))}
-          </div>
-        ) : null}
 
         {!periodHasData ? (
           <div className="mt-4">
@@ -240,7 +239,19 @@ export function ResultadosPage() {
             return (
               <TabsContent key={item.value} value={item.value} className="mt-4">
                 {item.value === "estado-resultados" ? (
-                  <EstadoResultadosView periodo={effectivePeriod} />
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+                      {estadoRubros.map((rubro) => (
+                        <DestacadosRubroCard
+                          key={rubro.key}
+                          rubro={rubro}
+                          units={filters.units}
+                          contextLabel={kpis.contextLabel}
+                        />
+                      ))}
+                    </div>
+                    <EstadoResultadosView periodo={effectivePeriod} />
+                  </div>
                 ) : item.value === "presupuesto" ? (
                   <ResultadosPresupuestoView
                     filters={filters}
@@ -251,19 +262,13 @@ export function ResultadosPage() {
                   />
                 ) : item.value === "operativo" ? (
                   <div className="space-y-6">
-                    <ChartErrorBoundary
-                      fallback={
-                        <section className="rounded-card border border-border bg-card p-6 text-sm text-muted-foreground shadow-[var(--shadow-card)]">
-                          {t("resultados.waterfallError")}
-                        </section>
-                      }
-                    >
-                      <ResultadosWaterfallChart filters={filters} rows={data.series} />
-                    </ChartErrorBoundary>
+                    <TendenciaIngresosCostosChart
+                      rows={data.series}
+                      units={filters.units}
+                      endPeriod={effectivePeriod}
+                    />
                     <EstadoOperativoCard periodo={effectivePeriod} />
                   </div>
-                ) : item.value === "otras" ? (
-                  <RifAuditoriaView periodo={effectivePeriod} />
                 ) : category && series ? (
                   <ResultadosCategoryView
                     category={category}

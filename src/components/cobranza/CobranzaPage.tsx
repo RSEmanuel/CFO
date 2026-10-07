@@ -5,7 +5,6 @@ import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
 import { ConcentracionRiesgoSection } from "@/components/cobranza/ConcentracionRiesgoSection";
 import { DataEmptyState } from "@/components/data-empty-state";
-import { DataOriginBadge } from "@/components/data-origin-badge";
 import { HeroBarChart } from "@/components/charts/HeroBarChart";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -132,34 +131,29 @@ export function CobranzaPage() {
         <TabsContent value="antiguedad" className="mt-4">
       <div className="space-y-4">
       {error ? <DataEmptyState title={t("cobranza.loadError")} message={error} /> : null}
-      {asOf && data ? (
-      <div className="flex justify-end">
-        <DataOriginBadge origin={data.periodOrigins[asOf.slice(0, 7)]} />
-      </div>
-      ) : null}
       {model && asOf ? (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-lg text-foreground">{t("cobranza.pendingInvoices")}</p>
+          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.pendingInvoices")}</p>
           <p className="text-xs text-muted-foreground">{t("cobranza.outstanding")}</p>
           <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
             {formatAxisTick(model.cxcAbierta, "m")}
           </p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-lg text-foreground">{t("cobranza.averageDays")}</p>
+          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.averageDays")}</p>
           <p className="text-xs text-muted-foreground">{t("cobranza.averageDaysHelp")}</p>
           <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">{t("cobranza.days", { value: model.dso })}</p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-lg text-foreground">{t("cobranza.over60")}</p>
+          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.over60")}</p>
           <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
             {model.pctMayor60.toFixed(1)}%
           </p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-serif text-lg text-foreground">{t("cobranza.topClient")}</p>
-          <p className="mt-4 font-serif text-2xl font-semibold tracking-tight text-foreground">
+          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.topClient")}</p>
+          <p className="mt-4 font-sans text-2xl font-semibold tracking-tight text-foreground">
             {model.topCliente.nombre} · {model.topCliente.pct.toFixed(0)}%
           </p>
         </article>
@@ -172,7 +166,7 @@ export function CobranzaPage() {
         <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h2 className="font-serif text-lg font-medium text-foreground">{t("cobranza.agingSchedule")}</h2>
+              <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.agingSchedule")}</h2>
               <p className="text-xs text-muted-foreground">{t("cobranza.agingScheduleHelp")}</p>
             </div>
             <div className="flex items-center gap-2">
@@ -232,7 +226,7 @@ export function CobranzaPage() {
               <tbody>
                 {antiguedad.terceros.map((row) => (
                   <tr key={row.tercero} className="border-b border-beige-deep last:border-0">
-                    <td className="py-3 font-serif text-base text-foreground">{row.tercero}</td>
+                    <td className="py-3 font-sans text-base text-foreground">{row.tercero}</td>
                     <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
                     <td className="financial-nums py-3 text-right text-foreground">{Math.max(0, row.diasVencidos)}</td>
                     <td className="py-3 text-right text-muted-foreground">{bucketLabel(row.bucket)}</td>
@@ -247,7 +241,7 @@ export function CobranzaPage() {
       {model ? (
       <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="font-serif text-lg font-medium text-foreground">{t("cobranza.balancesByClient")}</h2>
+          <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.balancesByClient")}</h2>
           <ExportMenu onDownload={exportClientes} />
         </div>
         <div className="overflow-x-auto">
@@ -263,7 +257,7 @@ export function CobranzaPage() {
             <tbody>
               {model.clientes.map((row) => (
                 <tr key={row.cliente} className="border-b border-beige-deep last:border-0">
-                  <td className="py-3 font-serif text-base text-foreground">{row.cliente}</td>
+                  <td className="py-3 font-sans text-base text-foreground">{row.cliente}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{row.dias}</td>
                   <td className="py-3 text-right text-muted-foreground">{row.bucket}</td>

@@ -5,7 +5,6 @@ import {
   type ControlWidgetContext,
 } from "@/components/control/favorite-widget-renderer";
 import { DataEmptyState } from "@/components/data-empty-state";
-import { DataOriginBadge } from "@/components/data-origin-badge";
 import { CatalogFavoritesSection } from "@/components/metrics/favorite-metrics-grid";
 import {
   INITIAL_RESULTADOS_FILTERS,
@@ -64,8 +63,8 @@ function ControlBody({
   const favorites = useFavorites();
   const kpis = useMemo(() => getDestacadosKpis(rows, filters), [rows, filters]);
   const context: ControlWidgetContext = useMemo(
-    () => ({ periodo: filters.periodo, units: filters.units, rows, kpis }),
-    [filters.periodo, filters.units, rows, kpis],
+    () => ({ periodo: filters.periodo, units: filters.units, rows, kpis, filters }),
+    [filters, rows, kpis],
   );
 
   if (!hasAnyFavorites(favorites)) {
@@ -78,7 +77,7 @@ function ControlBody({
         if (category === "METRICAS") {
           return hasCatalogFavorites(favorites) ? (
             <section key={category} className="space-y-4">
-              <h2 className="font-serif text-xl font-medium text-foreground">
+              <h2 className="font-sans text-xl font-medium text-foreground">
                 {t(FAVORITES_CATEGORY_LABEL_KEYS[category])}
               </h2>
               <CatalogFavoritesSection filters={filters} />
@@ -92,7 +91,7 @@ function ControlBody({
         }
         return (
           <section key={category} className="space-y-4">
-            <h2 className="font-serif text-xl font-medium text-foreground">
+            <h2 className="font-sans text-xl font-medium text-foreground">
               {t(FAVORITES_CATEGORY_LABEL_KEYS[category])}
             </h2>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -160,7 +159,6 @@ export function ControlPage() {
             selectPeriod(next.periodo);
           }
         }}
-        trailing={data ? <DataOriginBadge origin={data.periodOrigins[effectivePeriod]} /> : null}
       />
 
       <DashboardDataProvider>

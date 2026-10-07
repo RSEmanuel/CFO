@@ -567,9 +567,9 @@ export function buildPosicionTree(
   });
 
   const roots = [activoNode, pasivoNode, capitalNode];
-  // Con la presentación económica la identidad se verifica directo sobre los
-  // valores mostrados: A = P + C (el control es A − P − C). Se conserva la
-  // segunda forma por robustez ante datos sin convención detectable.
+  // La fila de control muestra Pasivo + Capital (los valores ya presentados),
+  // no el residuo del cuadre. Solo se incluye cuando A = P + C (o A = −(P + C)
+  // si la convención de signo no se pudo normalizar).
   const identityHolds = yearKeys.every((year) => {
     const activo = activoNode.values[year] ?? 0;
     const pasivo = pasivoNode.values[year] ?? 0;
@@ -583,14 +583,12 @@ export function buildPosicionTree(
   if (identityHolds) {
     const controlValues = emptyValues(yearKeys);
     for (const year of yearKeys) {
-      const activo = activoNode.values[year];
-      const pasivoMasCapital = round2((pasivoNode.values[year] ?? 0) + (capitalNode.values[year] ?? 0));
-      if (activo == null) {
+      const pasivo = pasivoNode.values[year];
+      const cap = capitalNode.values[year];
+      if (pasivo == null && cap == null) {
         controlValues[year] = null;
       } else {
-        controlValues[year] = nearlyEqual(activo, pasivoMasCapital)
-          ? round2(activo - pasivoMasCapital)
-          : round2(activo + pasivoMasCapital);
+        controlValues[year] = round2((pasivo ?? 0) + (cap ?? 0));
       }
     }
     roots.push({

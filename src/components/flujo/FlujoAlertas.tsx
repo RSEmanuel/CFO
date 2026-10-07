@@ -4,7 +4,7 @@ import { buildFlujoAlertas, type FlujoMensual } from "@/services/flujoTransforme
 import { useLocale } from "@/context/LocaleContext";
 import { useMemo } from "react";
 
-const ESPRESSO = "#1A1915";
+const ESPRESSO = "var(--cifra-ink)";
 
 export function FlujoAlertas({ periodo, rows }: { periodo: string; rows: FlujoMensual[] }) {
   const { t } = useLocale();

@@ -39,7 +39,7 @@ export function CobranzaAgingChart() {
   return (
     <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="font-serif text-lg font-medium text-foreground">{t("cobranza.aging")}</h2>
+        <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.aging")}</h2>
         <div className="flex items-center gap-1">
           <FavoriteStarButton widgetId="chart-cobranza-aging" label={t("cobranza.aging")} />
           <ChartDownloadButton

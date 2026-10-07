@@ -36,7 +36,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 
-const ESPRESSO = "#1A1915";
+const ESPRESSO = "var(--cifra-ink)";
 
 const TOOLTIP_STYLE = {
   background: CHART.card,
@@ -93,7 +93,7 @@ function ParetoTooltip({
   if (!point) return null;
   return (
     <div style={TOOLTIP_STYLE} className="px-3 py-2 text-xs">
-      <p className="font-serif text-sm text-foreground">{point.entityName}</p>
+      <p className="font-sans text-sm text-foreground">{point.entityName}</p>
       <p className="financial-nums mt-1 text-foreground">
         {formatMoney(point.monto, moneda)} · {point.pctIndividual.toFixed(1)}%
       </p>
@@ -117,7 +117,7 @@ function KpiCard({
 }) {
   return (
     <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <p className="font-serif text-lg text-foreground">{label}</p>
+      <p className="font-sans text-lg font-bold text-foreground">{label}</p>
       <p className="text-xs text-muted-foreground">{help}</p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
         <p className="financial-nums text-3xl font-semibold tracking-tight text-foreground">{value}</p>
@@ -139,7 +139,7 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
     <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="font-serif text-lg font-medium text-foreground">
+          <h2 className="font-sans text-lg font-medium text-foreground">
             {t("cobranza.concentracion.chartTitle")}
           </h2>
           <p className="text-xs text-muted-foreground">{t("cobranza.concentracion.chartHelp")}</p>
@@ -352,7 +352,7 @@ export function ConcentracionRiesgoSection() {
 
       <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-serif text-lg font-medium text-foreground">
+          <h2 className="font-sans text-lg font-medium text-foreground">
             {t("cobranza.concentracion.tablaTitle")}
           </h2>
           <div className="flex items-center gap-3">
@@ -393,7 +393,7 @@ export function ConcentracionRiesgoSection() {
                         })
                       }
                       title={t("polizas.audit.drillHint")}
-                      className="font-serif text-base text-foreground underline-offset-4 hover:text-clay hover:underline"
+                      className="font-sans text-base text-foreground underline-offset-4 hover:text-clay hover:underline"
                     >
                       {row.entityName}
                     </button>

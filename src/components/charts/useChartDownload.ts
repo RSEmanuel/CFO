@@ -55,7 +55,7 @@ export function useChartDownload({
 
     try {
       const dataUrl = await toPng(target, {
-        backgroundColor: "#FFFEFB",
+        backgroundColor: "#F1F3FB",
         pixelRatio: 2,
       });
       const anchor = document.createElement("a");

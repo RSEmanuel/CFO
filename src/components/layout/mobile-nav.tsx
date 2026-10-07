@@ -29,7 +29,12 @@ export function MobileNav() {
           </Button>
         </SheetTrigger>
         <SheetContent className="w-[280px] border-beige-deep bg-chrome">
-          <p className="mb-6 text-sm font-semibold uppercase tracking-[0.2em] text-clay">{t("common.appName")}</p>
+          <div className="mb-6">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/cifra-lockup.svg" alt={t("common.appName")} className="h-8 w-auto dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/cifra-lockup-dark.svg" alt={t("common.appName")} className="hidden h-8 w-auto dark:block" />
+          </div>
           <nav className="flex flex-col gap-1">
             {items.map((item) => {
               const Icon = item.icon;

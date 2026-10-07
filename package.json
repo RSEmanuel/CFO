@@ -1,5 +1,5 @@
 {
-  "name": "cfo-virtual",
+  "name": "cifra",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -22,7 +22,7 @@
     "test:polizas": "tsx --test src/lib/parsers/contpaq-polizas-parser.test.ts",
     "test:origin": "tsx --test src/services/periodOrigins.test.ts",
     "test:i18n": "tsx --test src/i18n/messages.test.ts",
-    "test:resultados": "tsx --test src/services/resultadosService.test.ts src/services/resultadosSankey.test.ts src/services/resultadosWaterfall.test.ts",
+    "test:resultados": "tsx --test src/services/resultadosService.test.ts src/services/erWaterfall.test.ts",
     "test:ingreso-mix": "tsx --test src/services/ingresoMix.test.ts",
     "test:top5-cogs": "tsx --test src/services/resultadosTop5.test.ts src/services/cogsDesglose.test.ts src/services/gastoOpex.test.ts",
     "test:estado-operativo": "tsx --test src/services/estadoOperativo.test.ts",
@@ -81,6 +81,8 @@
     "@types/pg": "^8.11.10",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.35",
     "prisma": "^7.2.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"

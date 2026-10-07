@@ -53,7 +53,7 @@ export function ModuleOverview({
         />
         <MetricCard
           favoriteId="metric:overview:cash-runway"
-          title="Cash Runway"
+          title="Meses de respiro"
           value={fmtDays(flujo?.cashRunwayDias)}
           loading={loading}
           currentNumeric={flujo?.cashRunwayDias}

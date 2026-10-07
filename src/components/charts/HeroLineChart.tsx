@@ -36,7 +36,7 @@ const TOOLTIP_STYLE = {
   boxShadow: "0 4px 16px rgb(40 30 20 / 0.08)",
 } as const;
 
-const POINT_LABEL_FILL = "#7c2d12";
+const POINT_LABEL_FILL = "var(--cifra-bad)";
 
 function seriesNumbers(data: HeroLineDatum[], totalKey: string): Array<number | null> {
   return data.map((datum) => {
@@ -245,7 +245,7 @@ function IncomePointLabel({
       fill={POINT_LABEL_FILL}
       fontSize={12}
       fontWeight={600}
-      stroke="#fff"
+      stroke="var(--cifra-brand-contrast)"
       strokeWidth={3}
       paintOrder="stroke fill"
       style={{ pointerEvents: "none" }}

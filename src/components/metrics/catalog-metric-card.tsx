@@ -6,11 +6,11 @@ import {
   isImprovement,
 } from "@/components/metrics/catalog-presenter";
 import { FavoriteStar } from "@/components/favorites/favorite-star";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { InfoDialog } from "@/components/ui/info-dialog";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/context/LocaleContext";
 import type { CatalogMetric } from "@/services/financialEngine";
-import { ArrowDownRight, ArrowUpRight, Info, Minus } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
 type CatalogMetricCardProps = {
   metric: CatalogMetric;
@@ -36,11 +36,11 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
             {t(`metrics.categories.${metric.category}`)}
           </span>
           <FavoriteStar kind="metric" id={metric.key} label={t(`metrics.${metric.key}.name`)} />
-          <MetricInfoTooltip metricKey={metric.key} />
+          <MetricInfoDialog metricKey={metric.key} />
         </div>
       </div>
 
-      <h3 className="mt-5 min-h-12 font-serif text-lg font-medium leading-snug text-foreground">
+      <h3 className="mt-5 min-h-12 font-sans text-lg font-medium leading-snug text-foreground">
         {t(`metrics.${metric.key}.question`)}
       </h3>
 
@@ -82,27 +82,16 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
   );
 }
 
-function MetricInfoTooltip({ metricKey }: { metricKey: string }) {
+function MetricInfoDialog({ metricKey }: { metricKey: string }) {
   const { t } = useLocale();
   const help = t(`metrics.${metricKey}.help`);
   if (help.startsWith("metrics.")) return null;
 
   return (
-    <TooltipProvider delayDuration={150}>
-      <Tooltip delayDuration={150}>
-        <TooltipTrigger asChild>
-          <button
-            type="button"
-            aria-label={t("metrics.infoAriaLabel")}
-            className="rounded-full p-1 text-muted-foreground/70 transition hover:bg-card/80 hover:text-foreground"
-          >
-            <Info className="h-4 w-4" />
-          </button>
-        </TooltipTrigger>
-        <TooltipContent side="top" className="max-w-[280px] whitespace-normal text-left leading-snug">
-          {help}
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <InfoDialog
+      title={t(`metrics.${metricKey}.question`)}
+      body={help}
+      ariaLabel={t("metrics.infoAriaLabel")}
+    />
   );
 }

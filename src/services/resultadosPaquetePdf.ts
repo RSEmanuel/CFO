@@ -51,7 +51,7 @@ export function buildPaqueteDelMesPdf(input: PaquetePdfInput): jsPDF {
     day: "numeric",
   });
   const labels = input.labels ?? {
-    brand: "CFO Virtual",
+    brand: "Cifra",
     period: `Periodo: ${input.periodo}`,
     date: `Fecha: ${dateLabel}`,
     packageTitle: "Paquete del mes",

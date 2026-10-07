@@ -40,10 +40,13 @@ export default function LoginPage() {
     <main className="flex min-h-screen w-full min-w-0 flex-col items-stretch gap-8 overflow-x-hidden bg-background p-5 sm:p-10 lg:flex-row lg:gap-0">
       <section className="flex min-h-[360px] w-full min-w-0 flex-col justify-between overflow-hidden rounded-panel border border-foreground/[0.08] bg-beige p-8 sm:p-12 lg:min-h-[820px] lg:w-[748px] lg:shrink-0 lg:px-16 lg:py-[60px]">
         <div className="flex flex-col gap-[26px]">
-          <p className="text-[19px] font-semibold uppercase leading-none tracking-[0.22em] text-clay">
-            {t("common.appName")}
-          </p>
-          <h1 className="max-w-[620px] break-words font-serif text-[40px] font-normal leading-[1.1] tracking-[-0.021em] text-foreground sm:text-balance sm:text-[48px]">
+          <div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/cifra-lockup.svg" alt={t("common.appName")} className="h-9 w-auto dark:hidden" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/assets/cifra-lockup-dark.svg" alt={t("common.appName")} className="hidden h-9 w-auto dark:block" />
+          </div>
+          <h1 className="max-w-[620px] break-words font-sans text-[40px] font-normal leading-[1.1] tracking-[-0.021em] text-foreground sm:text-balance sm:text-[48px]">
             {t("auth.headlineLead")}
             <span className="text-clay underline decoration-clay-hover decoration-2 underline-offset-[7px]">
               {t("auth.clarity")}
@@ -82,14 +85,14 @@ export default function LoginPage() {
               <span>{t("auth.previewFigures")}</span>
             </div>
             {[
-              [t("auth.previewIncome"), "48,920,415", ""],
-              [t("auth.previewCogs"), "(31,142,880)", "muted"],
-              [t("auth.previewGrossProfit"), "17,777,535", "strong"],
-              [t("auth.previewGrossMargin"), "36.3%", "muted"],
+              [t("auth.previewIncome"), "—", ""],
+              [t("auth.previewCogs"), "—", "muted"],
+              [t("auth.previewGrossProfit"), "—", "strong"],
+              [t("auth.previewGrossMargin"), "—", "muted"],
             ].map(([label, value, tone]) => (
               <div key={label} className="flex items-baseline justify-between border-t border-beige-deep py-[13px]">
                 <span
-                  className={`font-serif text-lg ${
+                  className={`font-sans text-lg ${
                     tone === "muted" ? "text-muted-foreground" : "text-foreground"
                   } ${tone === "strong" ? "font-medium" : ""}`}
                 >
@@ -114,7 +117,7 @@ export default function LoginPage() {
       <section className="flex min-w-0 flex-1 items-center justify-center py-4 lg:py-0">
         <div className="flex w-full min-w-0 max-w-[400px] flex-col gap-6 rounded-card border border-beige-deep bg-card p-8 shadow-[var(--shadow-card)] sm:p-10">
           <div className="flex flex-col gap-2">
-            <h2 className="font-serif text-[26px] font-normal tracking-[-0.01em] text-foreground">
+            <h2 className="font-sans text-[26px] font-normal tracking-[-0.01em] text-foreground">
               {t("auth.title")}
             </h2>
             <p className="text-sm leading-[1.5] text-muted-foreground">

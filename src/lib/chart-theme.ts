@@ -1,45 +1,70 @@
 export const CHART = {
-  clay: "#ff692d",
-  clayHover: "#e85d27",
-  coral: "#9F1239",
-  sand: "#B08442",
-  olive: "#4F6F52",
-  slate: "#ff692d",
-  mute: "#777573",
-  beigeDeep: "#dcd9d6",
-  canvas: "#ffffff",
-  card: "#FFFFFF",
+  clay: "var(--cifra-brand)",
+  clayHover: "var(--cifra-brand)",
+  coral: "var(--cifra-bad)",
+  sand: "var(--cifra-warn)",
+  olive: "var(--cifra-good)",
+  slate: "var(--cifra-brand)",
+  mute: "var(--cifra-ink-3)",
+  beigeDeep: "var(--cifra-line)",
+  canvas: "var(--cifra-paper)",
+  card: "var(--cifra-surface)",
 } as const;
 
 export const CHART_SERIES = [CHART.clay, CHART.clayHover, CHART.sand, CHART.olive, CHART.mute];
 
-/** Top 5 Destacados: líder terracota, pizarra, oliva, piedra, verde. */
-export const TOP5_SERIES = ["#C25E38", "#334155", "#4d7c0f", "#78716c", "#15803d"] as const;
+/**
+ * Top 5: pasos de cobalto y tinta con contraste entre vecinos.
+ * Mezclas de tokens (no hex nuevo) para que las franjas apiladas no se confundan.
+ */
+export const TOP5_SERIES = [
+  "var(--cifra-brand)",
+  "var(--cifra-ink)",
+  "color-mix(in srgb, var(--cifra-brand) 50%, var(--cifra-paper))",
+  "color-mix(in srgb, var(--cifra-brand) 55%, var(--cifra-ink))",
+  "var(--cifra-ink-3)",
+] as const;
 
-export const TOP5_RESTO = "#cbd5e1";
+export const TOP5_RESTO = "color-mix(in srgb, var(--cifra-ink-3) 45%, var(--cifra-paper))";
 
-/** Mix 100% COGS: directo (gris azulado), GIF (ámbar), utilidad (esmeralda). */
+/** Mix 100% COGS: directo (tinta), GIF (grafito), utilidad (cobalto). */
 export const COGS_STACK = {
-  directo: "#4A6670",
-  indirecto: "#F59E0B",
-  utilidad: "#2ECC71",
+  directo: "var(--cifra-ink)",
+  indirecto: "var(--cifra-ink-3)",
+  utilidad: "var(--cifra-brand)",
 } as const;
 
 /**
- * Split comercial del OPEX (tab Gasto): venta verde seco, admin pizarra
- * azulada, otros (6301 D&A + demás 6xxx) ámbar seco. Lo comparten la barra de
+ * Split comercial del OPEX (tab Gasto): venta tinta, admin grafito,
+ * otros (6301 D&A + demás 6xxx) línea. Lo comparten la barra de
  * split del hero y el treemap (las hojas del treemap son tintes de estos).
  */
 export const OPEX_SPLIT = {
-  venta: "#4F6F52",
-  admin: "#4A6670",
-  otros: "#C4A35A",
+  venta: "var(--cifra-ink)",
+  admin: "var(--cifra-ink-3)",
+  otros: "var(--cifra-line)",
 } as const;
 
 export const CHART_AXIS = {
   stroke: CHART.beigeDeep,
   tick: CHART.mute,
 } as const;
+
+/**
+ * ECharts pinta en canvas y `addColorStop` no acepta `var(--token)`.
+ * Lee el valor computado del token para conservar claro/oscuro sin hex en el código.
+ */
+export function canvasColor(color: string): string {
+  if (typeof document === "undefined") {
+    return color;
+  }
+  const token = /^var\((--[\w-]+)\)$/.exec(color.trim());
+  if (!token) {
+    return color;
+  }
+  const value = getComputedStyle(document.documentElement).getPropertyValue(token[1]).trim();
+  return value || color;
+}
 
 /** Canvas, card, ejes y texto que siguen light/dark vía CSS vars (no hex). */
 export const CHART_VARS = {

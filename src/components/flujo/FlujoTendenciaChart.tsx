@@ -27,7 +27,7 @@ export function FlujoTendenciaChart({
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div className="flex flex-wrap items-baseline gap-2">
-          <h3 className="font-serif text-lg font-medium text-foreground">{t("flujo.netCashFlow")}</h3>
+          <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.netCashFlow")}</h3>
           <span className="text-sm text-muted-foreground">{t("flujo.monthlyTrend")}</span>
         </div>
         <ChartDownloadButton
@@ -55,7 +55,7 @@ export function FlujoTendenciaChart({
               "inline-block h-2 w-2 shrink-0 rounded-full",
               model.insight.favorable ? "" : "bg-desfavorable",
             )}
-            style={model.insight.favorable ? { backgroundColor: "#4F6F52" } : undefined}
+            style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
             aria-hidden
           />
           <p className="min-w-0 flex-1">{insightText}</p>
