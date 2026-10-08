@@ -56,6 +56,8 @@ export function ResultadosPage() {
     periodo: "",
   });
   const [downloadPending, setDownloadPending] = useState(false);
+  // Hasta leer ?tab= de la URL no se monta ninguna pestaña, para no pedir las gráficas de «Ingreso» de más.
+  const [tabReady, setTabReady] = useState(false);
 
   useEffect(() => {
     const fromUrl = new URLSearchParams(window.location.search).get("tab");
@@ -67,6 +69,7 @@ export function ResultadosPage() {
     } else if (fromUrl && RESULTADOS_TABS.some((item) => item.value === fromUrl)) {
       setTab(fromUrl as (typeof RESULTADOS_TABS)[number]["value"]);
     }
+    setTabReady(true);
   }, []);
   useEffect(() => {
     setFilters((current) => ({ ...current, periodo: activePeriod ?? "" }));
@@ -91,8 +94,8 @@ export function ResultadosPage() {
   const cardPeriod = filters.periodo || data?.availablePeriods.at(-1) || activePeriod || "";
   const priorShift = comparableShift(kpis.contextLabel);
   const priorPeriod = priorShift == null ? cardPeriod : shiftPeriodo(cardPeriod, priorShift);
-  const { data: estadoActual } = useEstadoOperativo(cardPeriod);
-  const { data: estadoPrior } = useEstadoOperativo(priorPeriod);
+  const { data: estadoActual } = useEstadoOperativo(cardPeriod, tab === "estado-resultados");
+  const { data: estadoPrior } = useEstadoOperativo(priorPeriod, tab === "estado-resultados");
   const estadoRubros = useMemo(() => {
     const utilidad = buildUtilidadRubro(estadoActual, estadoPrior, kpis.contextLabel);
     return ESTADO_RUBRO_ORDER.flatMap((key) => {
@@ -232,7 +235,7 @@ export function ResultadosPage() {
               message={t("resultados.emptyPeriodMessage")}
             />
           </div>
-        ) : (
+        ) : !tabReady ? null : (
           RESULTADOS_TABS.map((item) => {
             const category = CATEGORY_TABS[item.value];
             const series = category ? seriesByCategory[category] : null;

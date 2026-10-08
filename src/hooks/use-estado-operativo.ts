@@ -4,9 +4,10 @@ import { useSession } from "@/context/SessionContext";
 import { useApiData, useApiErrorMessage } from "@/lib/api-cache";
 import type { EstadoOperativoPayload } from "@/services/estadoOperativoService";
 
-export function useEstadoOperativo(periodo: string) {
+/** `enabled=false` no pide nada: la pestaña que lo usa aún no está abierta. */
+export function useEstadoOperativo(periodo: string, enabled = true) {
   const { tenantId } = useSession();
-  const key = tenantId
+  const key = tenantId && enabled && periodo
     ? `/api/metrics/estado-operativo?tenantId=${encodeURIComponent(tenantId)}&periodo=${encodeURIComponent(periodo)}`
     : null;
   const { data, error, loading } = useApiData<EstadoOperativoPayload | null>(key);

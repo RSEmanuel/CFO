@@ -1,5 +1,6 @@
 import { jsonSuccess } from "@/auth/http";
 import { assertTenantAccess } from "@/auth/rbac";
+import { cachedForTenant } from "@/lib/serverCache";
 import { withAuth } from "@/middleware/auth";
 import { getResultados } from "@/services/resultadosService";
 
@@ -9,5 +10,5 @@ export const GET = withAuth(async (request, auth) => {
   const { searchParams } = new URL(request.url);
   const tenantId = searchParams.get("tenantId") ?? auth.tenantId;
   assertTenantAccess(auth, tenantId);
-  return jsonSuccess(await getResultados(tenantId));
+  return jsonSuccess(await cachedForTenant(tenantId, "resultados", () => getResultados(tenantId)));
 });

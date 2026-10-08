@@ -1,4 +1,5 @@
 import { prisma, requireCurrentPrismaClient } from "@/lib/prisma";
+import { invalidateTenantCache } from "@/lib/serverCache";
 import type { MasterWorkbook } from "@/services/ingestionTypes";
 
 const CREATE_MANY_CHUNK = 800;
@@ -212,6 +213,7 @@ export class PrismaIngestionRepository implements IngestionRepository {
         });
       }
     }, { maxWait: 15_000, timeout: 60_000 });
+    invalidateTenantCache(tenantId);
   }
 }
 

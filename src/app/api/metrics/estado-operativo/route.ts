@@ -1,5 +1,6 @@
 import { jsonSuccess } from "@/auth/http";
 import { assertTenantAccess } from "@/auth/rbac";
+import { cachedForTenant } from "@/lib/serverCache";
 import { withAuth } from "@/middleware/auth";
 import { getEstadoOperativo } from "@/services/estadoOperativoService";
 
@@ -8,5 +9,7 @@ export const GET = withAuth(async (request, auth) => {
   const tenantId = params.get("tenantId") ?? auth.tenantId;
   assertTenantAccess(auth, tenantId);
   const periodo = params.get("periodo") ?? "";
-  return jsonSuccess(await getEstadoOperativo(tenantId, periodo));
+  return jsonSuccess(
+    await cachedForTenant(tenantId, `estado-operativo|${periodo}`, () => getEstadoOperativo(tenantId, periodo)),
+  );
 });

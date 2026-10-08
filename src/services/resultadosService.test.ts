@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { INITIAL_RESULTADOS_FILTERS } from "@/components/resultados/resultados-filter-bar";
 import { buildResultadosSeries } from "@/services/resultadosLedger";
+import { RESULTADOS_CATEGORIAS, RESULTADOS_ROW_SELECT } from "@/services/resultadosService";
 import {
   buildIncomeBreakdown,
   buildStackedSeries,
@@ -340,5 +341,27 @@ describe("análisis vertical", () => {
     assert.equal(verticalPct(250, 0), null);
     assert.equal(verticalPct(null, 1_000), null);
     assert.equal(verticalPct(undefined, 1_000), null);
+  });
+});
+
+describe("lectura recortada de resultados", () => {
+  const completa = [
+    { anio: 2026, periodo: 6, idCuenta: "4001", nombreCuenta: "Ventas", categoriaMaestra: "Ingreso", debe: 5, haber: 905, depreciacionAmortizacion: false, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+    { anio: 2026, periodo: 6, idCuenta: "1001", nombreCuenta: "Bancos", categoriaMaestra: "Activo", debe: 70, haber: 0, depreciacionAmortizacion: false, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+    { anio: 2026, periodo: 7, idCuenta: "4001", nombreCuenta: "Ventas", categoriaMaestra: "Ingreso", debe: 10, haber: 1010, depreciacionAmortizacion: false, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+    { anio: 2026, periodo: 7, idCuenta: "5001", nombreCuenta: "Costo", categoriaMaestra: "COGS", debe: 400, haber: 0, depreciacionAmortizacion: false, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+    { anio: 2026, periodo: 7, idCuenta: "6002", nombreCuenta: "Depreciación", categoriaMaestra: "OpEx", debe: 50, haber: 0, depreciacionAmortizacion: true, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+    { anio: 2026, periodo: 7, idCuenta: "2001", nombreCuenta: "Proveedores", categoriaMaestra: "Pasivo", debe: 0, haber: 300, depreciacionAmortizacion: false, saldoInicial: 1, saldoFinal: 2, montoPresupuestado: 3 },
+  ];
+
+  it("una consulta recortada (columnas y categorías) da los mismos totales que leer todo", () => {
+    const keys = Object.keys(RESULTADOS_ROW_SELECT);
+    const recortada = completa
+      .filter((row) => (RESULTADOS_CATEGORIAS as readonly string[]).includes(row.categoriaMaestra))
+      .map((row) => Object.fromEntries(keys.map((key) => [key, (row as Record<string, unknown>)[key]])));
+    const full = buildResultadosSeries(completa);
+    const small = buildResultadosSeries(recortada as Parameters<typeof buildResultadosSeries>[0]);
+    assert.deepEqual(small.series, full.series);
+    assert.deepEqual(small.breakdown, full.breakdown);
   });
 });

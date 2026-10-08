@@ -1,6 +1,7 @@
 import { AppError } from "@/auth/errors";
 import { jsonSuccess } from "@/auth/http";
 import { assertTenantAccess } from "@/auth/rbac";
+import { cachedForTenant } from "@/lib/serverCache";
 import { withAuth } from "@/middleware/auth";
 import { getPosicionFinanciera } from "@/services/posicionFinancieraService";
 
@@ -34,6 +35,8 @@ export const GET = withAuth(async (request, auth) => {
     throw new AppError("VALIDATION_ERROR", "period (o periodo) debe ser un entero.", 400);
   }
 
-  const payload = await getPosicionFinanciera(tenantId, year, period);
+  const payload = await cachedForTenant(tenantId, `posicion-financiera|${year ?? ""}|${period ?? ""}`, () =>
+    getPosicionFinanciera(tenantId, year, period),
+  );
   return jsonSuccess(payload);
 });

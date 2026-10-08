@@ -20,7 +20,7 @@ const globalForPrisma = globalThis as unknown as {
  * `npm run dev`.
  */
 const DEFAULT_POOL_MAX = 4;
-const REQUIRED_DELEGATES = ["budgetAssumption", "auxiliarMovimiento", "auxiliarCuentaResumen", "poliza", "polizaMovimiento"] as const;
+const REQUIRED_DELEGATES = ["budgetAssumption", "auxiliarMovimiento", "auxiliarCuentaResumen", "poliza", "polizaMovimiento", "cuentaCatalogo"] as const;
 
 function resolvePoolMax(): number {
   const configured = Number(process.env.DATABASE_POOL_MAX);

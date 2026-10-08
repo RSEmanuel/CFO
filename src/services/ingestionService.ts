@@ -1,5 +1,6 @@
 import { AppError } from "@/auth/errors";
 import { prisma } from "@/lib/prisma";
+import { invalidateTenantCache } from "@/lib/serverCache";
 import { collectQualityIssues } from "@/services/financialValidations";
 import { mapToMasterWorkbook } from "@/services/ingest/applyMapping";
 import { resolveBatchPeriod } from "@/services/ingest/batchPolicy";
@@ -211,6 +212,7 @@ export async function ingestMasterTemplate(input: IngestUploadInput): Promise<In
   }
 
   await persistWorkbook(input.tenantId, input.periodo, input.anio, workbook);
+  invalidateTenantCache(input.tenantId);
 
   const counts = {
     balanza: workbook.balanza.length,
