@@ -611,6 +611,26 @@ function calculatedValues(
   return Object.fromEntries(yearKeys.map((year) => [year, compute(year)]));
 }
 
+export type AlignedMonths = {
+  /** Meses del año elegido que este año sí tiene: son los que se suman. */
+  months: number[];
+  /** Meses del año elegido que a este año le faltan: no se cuentan ni se inventan. */
+  missing: number[];
+};
+
+/**
+ * Meses que suma un año en el Estado de resultados: los mismos números de mes
+ * que tiene el año elegido, y solo los que existen en este año.
+ */
+export function alignResultadosMonths(selectedMonths: number[], availableMonths: number[]): AlignedMonths {
+  const available = new Set(availableMonths);
+  const wanted = [...new Set(selectedMonths)].sort((a, b) => a - b);
+  return {
+    months: wanted.filter((month) => available.has(month)),
+    missing: wanted.filter((month) => !available.has(month)),
+  };
+}
+
 export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, yearKeys: string[]): StatementNode[] {
   const lines = mergeBalanceRows(rowsByYear, yearKeys, pnlMovement);
   const ingresos = lines.filter((line) => line.categoriaMaestra === "Ingreso");
@@ -732,6 +752,76 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
   };
 
   return [ingresosNode, costosNode, utilidadBruta, gastosOpNode, ebitNode, daNode, finNode, taxNode, utilidadNeta];
+}
+
+/** Primer segmento de la cuenta: la cuenta de mayor (6101-0001-0000-0000 → 6101). */
+export function mayorSegment(idCuenta: string): string {
+  return idCuenta.split(/[-.]/)[0] ?? idCuenta;
+}
+
+function isMayorCode(idCuenta: string): boolean {
+  const [, ...rest] = idCuenta.split(/[-.]/);
+  return rest.length > 0 && rest.every((segment) => /^0+$/.test(segment));
+}
+
+function leafCodes(node: StatementNode): string[] {
+  if (!node.children?.length) {
+    return node.code ? [node.code] : [];
+  }
+  return node.children.flatMap(leafCodes);
+}
+
+/**
+ * Deja bajo cada rubro del Estado de resultados solo una fila por cuenta de
+ * mayor, con la suma de sus subcuentas; los rubros y los totales calculados no
+ * cambian. Si la balanza trae la cuenta de mayor, se usa su nombre; si no,
+ * `fallbackLabel` (sin inventar nombres). El código de la fila sirve para
+ * auditar pólizas solo si todas las subcuentas de esa mayor caen en el rubro.
+ */
+export function collapseToMayorAccounts(
+  nodes: StatementNode[],
+  yearKeys: string[],
+  fallbackLabel: (segment: string) => string,
+): StatementNode[] {
+  const rubros = nodes.filter((node) => node.kind === "group" && node.id.startsWith("pyg:"));
+  const rubrosBySegment = new Map<string, Set<string>>();
+  for (const rubro of rubros) {
+    for (const code of (rubro.children ?? []).flatMap(leafCodes)) {
+      const segment = mayorSegment(code);
+      const owners = rubrosBySegment.get(segment) ?? new Set<string>();
+      owners.add(rubro.id);
+      rubrosBySegment.set(segment, owners);
+    }
+  }
+
+  return nodes.map((node) => {
+    if (!rubros.includes(node) || !node.children?.length) {
+      return node;
+    }
+    const bySegment = new Map<string, StatementNode[]>();
+    for (const child of node.children) {
+      const segment = mayorSegment(child.code ?? child.id);
+      const list = bySegment.get(segment) ?? [];
+      list.push(child);
+      bySegment.set(segment, list);
+    }
+    const children: StatementNode[] = [...bySegment.entries()]
+      .sort(([a], [b]) => a.localeCompare(b, "es"))
+      .map(([segment, members]) => {
+        const real = members.find((member) => member.code && isMayorCode(member.code));
+        const auditable = (rubrosBySegment.get(segment)?.size ?? 0) === 1;
+        return {
+          id: `${node.id}:mayor:${segment}`,
+          label: real?.label ?? fallbackLabel(segment),
+          kind: "account" as const,
+          code: auditable ? segment : undefined,
+          outflow: node.outflow,
+          values: sumChildValues(members, yearKeys),
+          polarity: node.polarity,
+        };
+      });
+    return { ...node, children };
+  });
 }
 
 function metricNode(metric: CatalogMetric, yearKeys: string[], values: Record<string, number | null>): StatementNode {
@@ -881,6 +971,8 @@ export type PosicionFinancieraPayload = {
   period: number;
   years: number[];
   closePeriodByYear: Record<string, number | null>;
+  /** Meses que suma cada columna del Estado de resultados (los del año elegido). */
+  resultadosMonthsByYear: Record<string, AlignedMonths>;
   availableYears: number[];
   availablePeriods: number[];
   hasBalanza: boolean;

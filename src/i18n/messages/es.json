@@ -535,7 +535,7 @@
     "titleRatios": "Razones Financieras",
     "titleTrial": "Balanza de Comprobación",
     "positionHint": "Saldos de cierre del último periodo de cada año. Pasivo y Capital se presentan en signo económico (positivo = a favor); un Capital negativo es déficit patrimonial y la identidad A = P + C se lee directo en el árbol.",
-    "resultsHint": "Flujo acumulado (YTD) al último periodo de cada año. Costos y gastos se muestran entre paréntesis.",
+    "resultsHint": "Cada año suma los mismos meses del año elegido. Un mes que falta en un año anterior no se cuenta ni se inventa. Costos y gastos se muestran entre paréntesis.",
     "ratiosHint": "Ratios del motor financiero al cierre de cada año. N/D cuando el denominador es cero o el capital contable es negativo (déficit: el ratio no es significativo).",
     "trialHint": "Movimientos del periodo seleccionado. Los totales de cargos y abonos se muestran aunque no cuadren.",
     "emptyTable": "No hay balanza para este periodo. Carga datos en Ingesta.",
@@ -636,7 +636,13 @@
         "roe": "Cuánto rinden los recursos que pusieron los dueños.",
         "dso": "Cuántos días tardas, en promedio, en cobrar a tus clientes."
       }
-    }
+    },
+    "resultsSameMonths": "Comparado con los mismos meses: cada año suma {range}.",
+    "resultsMonthRange": "de {from} a {to}",
+    "resultsMonthOnly": "solo {month}",
+    "resultsYearNoData": "{year} no tiene datos de esos meses, por eso queda vacío.",
+    "resultsYearMissing": "A {year} le faltan {months}; su suma no los incluye.",
+    "mayorAccount": "Cuenta de mayor {code}"
   },
   "flujo": {
     "emptyTitle": "Flujo de efectivo aún no disponible",

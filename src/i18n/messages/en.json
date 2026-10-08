@@ -535,7 +535,7 @@
     "titleRatios": "Financial Ratios",
     "titleTrial": "Trial Balance",
     "positionHint": "Closing balances for the latest period of each year. Liabilities and Equity are shown in economic sign (positive = in your favor); negative Equity is an equity deficit and A = L + E reads directly from the tree.",
-    "resultsHint": "Year-to-date flow through the latest period of each year. Costs and expenses appear in parentheses.",
+    "resultsHint": "Each year adds up the same months as the selected year. A month missing in a prior year is neither counted nor filled in. Costs and expenses appear in parentheses.",
     "ratiosHint": "Financial-engine ratios at each year end. N/A when the denominator is zero or equity is negative (deficit: the ratio is not meaningful).",
     "trialHint": "Movements for the selected period. Total debits and credits appear even when they do not balance.",
     "emptyTable": "No trial balance exists for this period. Upload data in Ingest.",
@@ -636,7 +636,13 @@
         "roe": "How much return the owners' money is producing.",
         "dso": "How many days, on average, customers take to pay you."
       }
-    }
+    },
+    "resultsSameMonths": "Compared over the same months: each year adds up {range}.",
+    "resultsMonthRange": "{from} through {to}",
+    "resultsMonthOnly": "only {month}",
+    "resultsYearNoData": "{year} has no data for those months, so it is empty.",
+    "resultsYearMissing": "{year} is missing {months}; its total leaves them out.",
+    "mayorAccount": "Control account {code}"
   },
   "flujo": {
     "emptyTitle": "Cash flow not available yet",

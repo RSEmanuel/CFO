@@ -18,6 +18,7 @@ import { CogsDesgloseCard } from "@/components/resultados/CogsDesgloseCard";
 import { DestacadosRubroCard } from "@/components/resultados/DestacadosRubroCard";
 import { EbitdaEbitTtmChart } from "@/components/resultados/EbitdaEbitTtmChart";
 import { ErWaterfallChart } from "@/components/resultados/ErWaterfallChart";
+import { resultadosMonthsSentence } from "@/components/resultados/resultados-months-sentence";
 import { EstadoOperativoCard } from "@/components/resultados/EstadoOperativoCard";
 import { GastoControlFavorite } from "@/components/resultados/GastoControlCard";
 import { GastoOpexSeriesFavorite } from "@/components/resultados/GastoOpexView";
@@ -41,7 +42,7 @@ import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKp
 import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import type { DisplayUnits } from "@/services/money";
-import { yearColumns } from "@/services/posicionFinanciera";
+import { collapseToMayorAccounts, yearColumns } from "@/services/posicionFinanciera";
 import { useMemo, type ReactNode } from "react";
 
 /** Datos globales que el Panel de Control hereda de sus filtros (periodo/unidades). */
@@ -63,7 +64,7 @@ const POSICION_FAVORITE_IDS: Record<PosicionStatementKey, string> = {
 
 /** Estado financiero auto-fetch (año de corte resuelto por la API). */
 function PosicionStatementFavorite({ statement }: { statement: PosicionStatementKey }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { data, loading, error, refetch } = usePosicionFinanciera(null, null);
   const columns = useMemo(() => (data ? yearColumns(data.years) : []), [data]);
   const revenueBase = useMemo(() => {
@@ -79,7 +80,9 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
     statement === "posicion"
       ? data?.statements.posicion ?? []
       : statement === "resultados"
-        ? data?.statements.resultados ?? []
+        ? collapseToMayorAccounts(data?.statements.resultados ?? [], (data?.years ?? []).map(String), (code) =>
+            t("posicionFinanciera.mayorAccount", { code }),
+          )
         : data?.statements.razones ?? [];
 
   return (
@@ -98,6 +101,7 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
             ? t("posicionFinanciera.resultsHint")
             : t("posicionFinanciera.ratiosHint")
       }
+      subtitle={statement === "resultados" ? resultadosMonthsSentence(data, t, locale) : undefined}
       nodes={nodes}
       columns={columns}
       numberMode={statement === "razones" ? "ratio" : "money"}

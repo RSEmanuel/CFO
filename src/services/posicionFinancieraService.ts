@@ -7,10 +7,12 @@ import { resolveAccountRoles } from "@/services/ingresoMixService";
 import { loadPeriodData, snapshotFromLoaded } from "@/services/metricsService";
 import { getLedgerPeriods } from "@/services/ledgerPeriodService";
 import {
+  alignResultadosMonths,
   buildBalanzaTree,
   buildPosicionTree,
   buildRazonesTree,
   buildResultadosTree,
+  type AlignedMonths,
   type PosicionFinancieraPayload,
 } from "@/services/posicionFinanciera";
 
@@ -85,6 +87,7 @@ export async function getPosicionFinanciera(
       period: periodParam ?? 12,
       years: yearParam ? [yearParam, yearParam - 1, yearParam - 2] : [],
       closePeriodByYear: {},
+      resultadosMonthsByYear: {},
       availableYears: [],
       availablePeriods: [],
       hasBalanza: false,
@@ -128,6 +131,12 @@ export async function getPosicionFinanciera(
     throw new AppError("VALIDATION_ERROR", "El periodo debe ser un entero entre 1 y 12.", 400);
   }
 
+  // Estado de resultados: el año elegido suma sus meses reales hasta su cierre y
+  // cada año anterior suma solo esos mismos números de mes (sin rellenar faltantes).
+  const selectedCierre = closePeriodByYear[yearKey(resolvedYear)];
+  const selectedMonths = availablePeriods.filter((month) => selectedCierre != null && month <= selectedCierre);
+  const resultadosMonthsByYear: Record<string, AlignedMonths> = {};
+
   const epfByYear: Record<string, BalanzaPnL[]> = {};
   const pygByYear: Record<string, BalanzaPnL[]> = {};
   await Promise.all(
@@ -137,11 +146,27 @@ export async function getPosicionFinanciera(
       if (cierre == null) {
         epfByYear[key] = [];
         pygByYear[key] = [];
+        resultadosMonthsByYear[key] = { months: [], missing: selectedMonths };
         return;
       }
+      const monthRows =
+        anio === resolvedYear
+          ? null
+          : await prisma.balanzaPnL.findMany({
+              where: { tenantId, anio },
+              distinct: ["periodo"],
+              select: { periodo: true },
+            });
+      const aligned =
+        monthRows == null
+          ? { months: selectedMonths, missing: [] }
+          : alignResultadosMonths(selectedMonths, monthRows.map((row) => row.periodo));
+      resultadosMonthsByYear[key] = aligned;
       const [cierreRows, ytdRows] = await Promise.all([
         prisma.balanzaPnL.findMany({ where: { tenantId, anio, periodo: cierre } }),
-        prisma.balanzaPnL.findMany({ where: { tenantId, anio, periodo: { lte: cierre } } }),
+        aligned.months.length > 0
+          ? prisma.balanzaPnL.findMany({ where: { tenantId, anio, periodo: { in: aligned.months } } })
+          : Promise.resolve([]),
       ]);
       epfByYear[key] = cierreRows;
       pygByYear[key] = ytdRows;
@@ -171,6 +196,7 @@ export async function getPosicionFinanciera(
     period,
     years,
     closePeriodByYear,
+    resultadosMonthsByYear,
     availableYears,
     availablePeriods,
     hasBalanza: availableYears.length > 0,

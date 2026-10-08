@@ -32,6 +32,8 @@ type NumberMode = "money" | "ratio";
 type StatementTreeTableProps = {
   title: string;
   titleHint: string;
+  /** Frase visible bajo el título; si no viene, el encabezado queda igual. */
+  subtitle?: string;
   nodes: StatementNode[];
   columns: StatementColumn[];
   numberMode: NumberMode;
@@ -105,6 +107,7 @@ function formatVerticalPct(pct: number | null): string {
 export function StatementTreeTable({
   title,
   titleHint,
+  subtitle,
   nodes,
   columns,
   numberMode,
@@ -203,17 +206,20 @@ export function StatementTreeTable({
     <TooltipProvider>
       <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="font-sans text-xl font-medium text-foreground">{title}</h2>
-            {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <button type="button" className="touch-hit text-muted-foreground hover:text-clay" aria-label={t("posicionFinanciera.information")}>
-                  <Info className="h-4 w-4" />
-                </button>
-              </TooltipTrigger>
-              <TooltipContent className="max-w-xs">{titleHint}</TooltipContent>
-            </Tooltip>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h2 className="font-sans text-xl font-medium text-foreground">{title}</h2>
+              {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button type="button" className="touch-hit text-muted-foreground hover:text-clay" aria-label={t("posicionFinanciera.information")}>
+                    <Info className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">{titleHint}</TooltipContent>
+              </Tooltip>
+            </div>
+            {subtitle ? <p className="mt-1 max-w-2xl font-sans text-sm text-muted-foreground">{subtitle}</p> : null}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full border border-border bg-secondary px-2.5 py-1 text-[11px] font-medium text-muted-foreground">

@@ -1,12 +1,13 @@
 "use client";
 
 import { ErWaterfallChart } from "@/components/resultados/ErWaterfallChart";
+import { resultadosMonthsSentence } from "@/components/resultados/resultados-months-sentence";
 import { StatementTreeTable } from "@/components/posicion-financiera/StatementTreeTable";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
 import { usePosicionFinanciera } from "@/hooks/use-posicion-financiera";
-import { yearColumns } from "@/services/posicionFinanciera";
+import { collapseToMayorAccounts, yearColumns } from "@/services/posicionFinanciera";
 import { useEffect, useMemo, useState } from "react";
 
 type EstadoResultadosViewProps = {
@@ -14,7 +15,7 @@ type EstadoResultadosViewProps = {
 };
 
 export function EstadoResultadosView({ periodo }: EstadoResultadosViewProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { anio } = useSession();
   const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
 
@@ -42,6 +43,15 @@ export function EstadoResultadosView({ periodo }: EstadoResultadosViewProps) {
     const tree = data?.statements.resultados ?? [];
     return tree.find((node) => node.id === "pyg:ingresos")?.values;
   }, [data]);
+  // La tabla lista solo cuentas de mayor; la cascada sigue usando el árbol completo.
+  const tableNodes = useMemo(
+    () =>
+      collapseToMayorAccounts(data?.statements.resultados ?? [], (data?.years ?? []).map(String), (code) =>
+        t("posicionFinanciera.mayorAccount", { code }),
+      ),
+    [data, t],
+  );
+  const monthsSentence = useMemo(() => resultadosMonthsSentence(data, t, locale), [data, t, locale]);
   const empty = Boolean(data && !data.hasBalanza);
   const resetKey = `estado-resultados-${data?.year ?? year ?? ""}-${data?.period ?? ""}`;
 
@@ -63,7 +73,8 @@ export function EstadoResultadosView({ periodo }: EstadoResultadosViewProps) {
       <StatementTreeTable
         title={t("posicionFinanciera.titleResults")}
         titleHint={t("posicionFinanciera.resultsHint")}
-        nodes={data?.statements.resultados ?? []}
+        subtitle={monthsSentence}
+        nodes={tableNodes}
         columns={columns}
         numberMode="money"
         showYoY
