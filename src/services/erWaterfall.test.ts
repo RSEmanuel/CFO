@@ -6,6 +6,7 @@ import {
   buildErWaterfall,
   extractErWaterfallInput,
   toErWaterfallRows,
+  waterfallTone,
   type ErWaterfallInput,
 } from "./erWaterfall";
 
@@ -151,5 +152,42 @@ describe("toErWaterfallRows", () => {
     assert.equal(byId.da, undefined);
     assert.equal(byId.financieros.base, 1_830_000 - 70_000);
     assert.equal(byId.impuestos.base, 1_760_000 - 50_000);
+  });
+});
+
+describe("colores de la cascada", () => {
+  it("ingresos en verde, costos y gastos en rojo y utilidad positiva en azul", () => {
+    const model = buildErWaterfall(input());
+    assert.ok(model);
+    const byId = Object.fromEntries(toErWaterfallRows(model).map((row) => [row.id, row]));
+    assert.equal(byId.ingresos.tone, "gain");
+    assert.equal(byId.costos.tone, "loss");
+    assert.equal(byId.opex.tone, "loss");
+    assert.equal(byId.utilidadBruta.tone, "profit");
+    assert.equal(byId.ebit.tone, "profit");
+    assert.equal(byId.utilidadNeta.tone, "profit");
+    assert.equal(byId.utilidadNeta.negative, false);
+  });
+
+  it("una utilidad neta negativa conserva su signo y se marca en rojo", () => {
+    const model = buildErWaterfall(
+      input({ ebit: -200_000, utilidadBruta: 1_170_000, opex: 1_370_000, utilidadNeta: -822_604 }),
+    );
+    assert.ok(model);
+    const byId = Object.fromEntries(toErWaterfallRows(model).map((row) => [row.id, row]));
+    assert.equal(byId.utilidadNeta.value, -822_604);
+    assert.equal(byId.utilidadNeta.negative, true);
+    assert.equal(byId.utilidadNeta.tone, "loss");
+    assert.equal(byId.utilidadNeta.base, -822_604);
+    assert.equal(byId.utilidadNeta.amount, 822_604);
+    assert.equal(byId.ebit.value, -200_000);
+    assert.equal(byId.ebit.tone, "loss");
+    assert.equal(byId.utilidadBruta.tone, "profit");
+  });
+
+  it("un paso de resta con monto negativo suma al resultado", () => {
+    assert.equal(waterfallTone("decrease", -70_000), "gain");
+    assert.equal(waterfallTone("increase", -10), "loss");
+    assert.equal(waterfallTone("total", 0), "profit");
   });
 });

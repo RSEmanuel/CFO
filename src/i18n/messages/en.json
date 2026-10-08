@@ -603,8 +603,8 @@
       },
       "legend": {
         "increase": "Revenue",
-        "decrease": "Costs and expenses",
-        "total": "Subtotal / total"
+        "decrease": "Costs, expenses or loss",
+        "total": "Profit or positive total"
       }
     },
     "gauges": {

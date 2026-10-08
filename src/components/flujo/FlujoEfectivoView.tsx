@@ -7,7 +7,7 @@ import { FlujoEfectivoSankey } from "@/components/flujo/FlujoEfectivoSankey";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoEfectivo } from "@/hooks/use-flujo-efectivo";
-import { CHART } from "@/lib/chart-theme";
+import { CHART, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import type { FlujoEfectivoPeriodo, FlujoLinea } from "@/services/flujoEfectivo";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { useMemo, useState } from "react";
@@ -46,8 +46,13 @@ function FlujoEfectivoWaterfallFallback({
     },
     { name: t("flujo.efectivo.saldoFinal"), base: 0, amount: data.saldoFinal, kind: "total" },
   ];
-  const colorOf = (kind: string) =>
-    kind === "increase" ? CHART.olive : kind === "decrease" ? CHART.coral : CHART.clay;
+  // Entra dinero en verde, sale en rojo; un saldo negativo también va en rojo.
+  const colorOf = (kind: string, amount: number) =>
+    kind === "increase"
+      ? WATERFALL_TONE.gain
+      : kind === "decrease" || amount < 0
+        ? WATERFALL_TONE.loss
+        : WATERFALL_TONE.profit;
   return (
     <ResponsiveContainer width="100%" height={380}>
       <BarChart data={rows} margin={{ top: 16, right: 24, bottom: 8, left: 8 }}>
@@ -68,13 +73,20 @@ function FlujoEfectivoWaterfallFallback({
         <Tooltip
           cursor={{ fill: "rgba(26,25,21,0.04)" }}
           formatter={(value, name) =>
-            name === "amount" ? [formatMxn(Number(value)), t("flujo.efectivo.monto")] : null
+            name === "amount"
+              ? [
+                  <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(Number(value), "inherit") }}>
+                    {formatMxn(Number(value))}
+                  </span>,
+                  t("flujo.efectivo.monto"),
+                ]
+              : null
           }
         />
         <Bar dataKey="base" stackId="wf" fill="transparent" isAnimationActive={false} />
         <Bar dataKey="amount" stackId="wf" radius={[6, 6, 0, 0]} isAnimationActive={false}>
           {rows.map((row) => (
-            <Cell key={row.kind + row.name} fill={colorOf(row.kind)} />
+            <Cell key={row.kind + row.name} fill={colorOf(row.kind, row.amount)} />
           ))}
         </Bar>
       </BarChart>

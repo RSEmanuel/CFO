@@ -15,6 +15,12 @@ export const ER_WATERFALL_NODE_IDS = {
 
 export type ErWaterfallKind = "increase" | "decrease" | "subtotal" | "total";
 
+/**
+ * Lectura del color de cada barra: `gain` suma al resultado (verde), `loss`
+ * resta o es pérdida (rojo) y `profit` es un subtotal o total positivo (azul).
+ */
+export type WaterfallTone = "gain" | "loss" | "profit";
+
 export type ErWaterfallStepId = keyof typeof ER_WATERFALL_NODE_IDS;
 
 export type ErWaterfallInput = Record<ErWaterfallStepId, number | null>;
@@ -37,6 +43,9 @@ export type ErWaterfallRow = {
   value: number;
   base: number;
   amount: number;
+  tone: WaterfallTone;
+  /** El monto con su signo es menor que cero: la barra y su cifra van en rojo. */
+  negative: boolean;
 };
 
 const STEP_ORDER: ErWaterfallStepId[] = [
@@ -62,6 +71,17 @@ const STEP_KIND: Record<ErWaterfallStepId, ErWaterfallKind> = {
   impuestos: "decrease",
   utilidadNeta: "total",
 };
+
+/** Tono de un paso de cascada según su tipo y el signo de su monto. */
+export function waterfallTone(kind: ErWaterfallKind, value: number): WaterfallTone {
+  if (kind === "increase") {
+    return value < 0 ? "loss" : "gain";
+  }
+  if (kind === "decrease") {
+    return value < 0 ? "gain" : "loss";
+  }
+  return value < 0 ? "loss" : "profit";
+}
 
 function isFiniteNumber(value: number): boolean {
   return Number.isFinite(value);
@@ -126,6 +146,8 @@ export function toErWaterfallRows(model: ErWaterfallModel): ErWaterfallRow[] {
         value: step.value,
         base,
         amount: step.value,
+        tone: waterfallTone(step.kind, step.value),
+        negative: step.value < 0,
       });
       continue;
     }
@@ -140,6 +162,8 @@ export function toErWaterfallRows(model: ErWaterfallModel): ErWaterfallRow[] {
         value: step.value,
         base,
         amount: step.value,
+        tone: waterfallTone(step.kind, step.value),
+        negative: step.value < 0,
       });
       continue;
     }
@@ -153,6 +177,8 @@ export function toErWaterfallRows(model: ErWaterfallModel): ErWaterfallRow[] {
       value: step.value,
       base,
       amount: Math.abs(step.value),
+      tone: waterfallTone(step.kind, step.value),
+      negative: step.value < 0,
     });
   }
 

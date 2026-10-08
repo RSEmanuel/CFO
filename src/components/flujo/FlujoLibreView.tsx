@@ -4,7 +4,7 @@ import { CifraMark } from "@/components/brand/CifraMark";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoLibre } from "@/hooks/use-flujo-libre";
-import { CHART, CHART_AXIS } from "@/lib/chart-theme";
+import { CHART, CHART_AXIS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import type { FlujoLibreKind, FlujoLibreStep } from "@/services/flujoLibre";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { useMemo } from "react";
@@ -25,15 +25,20 @@ type ChartRow = {
   amount: number;
 };
 
-function kindColor(kind: FlujoLibreKind): string {
-  if (kind === "increase") {
-    return "var(--cifra-good)";
+/** Entra dinero en verde, sale en rojo; el total va en azul o en rojo si es negativo. */
+function kindColor(kind: FlujoLibreKind, signed: number): string {
+  if (kind === "total") {
+    return signed < 0 ? WATERFALL_TONE.loss : WATERFALL_TONE.profit;
   }
-  if (kind === "decrease") {
-    return "var(--cifra-bad)";
-  }
-  return "var(--cifra-ink)";
+  return signed < 0 ? WATERFALL_TONE.loss : WATERFALL_TONE.gain;
 }
+
+type LibreLabelGeom = {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  index?: number;
+};
 
 function toChartRows(steps: FlujoLibreStep[], t: (key: string) => string): ChartRow[] {
   let running = 0;
@@ -136,22 +141,37 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
               formatter={(value, _name, item) => {
                 const payload = item?.payload as { signed?: number } | undefined;
                 const signed = typeof payload?.signed === "number" ? payload.signed : Number(value);
-                return [formatMxn(signed), t("flujo.efectivo.monto")];
+                return [
+                  <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(signed, "inherit") }}>
+                    {formatMxn(signed)}
+                  </span>,
+                  t("flujo.efectivo.monto"),
+                ];
               }}
             />
             <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={72} />
             <Bar dataKey="amount" stackId="wf" radius={[4, 4, 0, 0]} maxBarSize={72} isAnimationActive={false}>
               {rows.map((row) => (
-                <Cell key={row.label} fill={kindColor(row.kind)} />
+                <Cell key={row.label} fill={kindColor(row.kind, row.signed)} />
               ))}
               <LabelList
                 position="top"
-                fill="var(--cifra-ink-2)"
-                fontSize={11}
-                fontFamily="var(--font-mono)"
-                valueAccessor={(entry: { payload?: ChartRow }) => {
-                  const signed = entry.payload?.signed;
-                  return typeof signed === "number" ? formatAxisTick(signed, units) : "";
+                content={({ x, y, width, index }: LibreLabelGeom) => {
+                  const row = index == null ? undefined : rows[index];
+                  if (!row) return null;
+                  return (
+                    <text
+                      x={Number(x ?? 0) + Number(width ?? 0) / 2}
+                      y={Number(y ?? 0) - 6}
+                      textAnchor="middle"
+                      fill={waterfallFigureColor(row.signed, "var(--cifra-ink-2)")}
+                      fontSize={11}
+                      fontFamily="var(--font-mono)"
+                      className="financial-nums"
+                    >
+                      {row.signed < 0 ? `-${formatAxisTick(-row.signed, units)}` : formatAxisTick(row.signed, units)}
+                    </text>
+                  );
                 }}
               />
             </Bar>

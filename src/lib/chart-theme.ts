@@ -45,6 +45,21 @@ export const OPEX_SPLIT = {
   otros: "var(--cifra-line)",
 } as const;
 
+/**
+ * Cascadas: verde suma al resultado o entra dinero, rojo resta, sale dinero o es
+ * pérdida, azul es utilidad o saldo positivo. Uso de señal sobre una cifra real.
+ */
+export const WATERFALL_TONE = {
+  gain: "var(--cifra-good)",
+  loss: "var(--cifra-bad)",
+  profit: "var(--cifra-brand)",
+} as const;
+
+/** Color de una cifra impresa en una cascada: roja si es negativa. */
+export function waterfallFigureColor(value: number, fallback: string): string {
+  return value < 0 ? WATERFALL_TONE.loss : fallback;
+}
+
 export const CHART_AXIS = {
   stroke: CHART.beigeDeep,
   tick: CHART.mute,

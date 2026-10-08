@@ -3,12 +3,11 @@
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
-import { CHART_VARS } from "@/lib/chart-theme";
+import { CHART_VARS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import {
   buildErWaterfall,
   extractErWaterfallInput,
   toErWaterfallRows,
-  type ErWaterfallKind,
 } from "@/services/erWaterfall";
 import { formatCompactAxis, formatMxn } from "@/services/money";
 import type { StatementNode } from "@/services/posicionFinanciera";
@@ -23,20 +22,6 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-
-/** Semántica ingreso/costo (misma paleta local que Ingresos vs costos). */
-const FILL_FAVORABLE = "var(--cifra-good)";
-const FILL_UNFAVORABLE = "var(--cifra-bad)";
-
-function stepFill(kind: ErWaterfallKind): string {
-  if (kind === "increase") {
-    return FILL_FAVORABLE;
-  }
-  if (kind === "decrease") {
-    return FILL_UNFAVORABLE;
-  }
-  return CHART_VARS.text;
-}
 
 function splitAxisLabel(label: string): string[] {
   const words = label.trim().split(/\s+/).filter(Boolean);
@@ -91,9 +76,42 @@ function WaterfallTooltip({
   return (
     <div className="rounded-control border border-border bg-card px-3 py-2 text-sm shadow-[var(--shadow-card)]">
       <p className="text-muted-foreground">{row.label}</p>
-      <p className="financial-nums mt-0.5 font-medium text-foreground">{formatMxn(row.value)}</p>
+      <p
+        className="financial-nums mt-0.5 font-medium text-foreground"
+        style={row.negative ? { color: WATERFALL_TONE.loss } : undefined}
+      >
+        {formatMxn(row.value)}
+      </p>
       <p className="mt-1 text-[11px] text-muted-foreground">{t("posicionFinanciera.waterfall.amount")}</p>
     </div>
+  );
+}
+
+type LabelGeom = {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  index?: number;
+};
+
+/** Cifra sobre cada barra con su signo; roja cuando es negativa. */
+function WaterfallValueLabel({ x, y, width, index, rows }: LabelGeom & { rows: ChartRow[] }) {
+  const row = index == null ? undefined : rows[index];
+  if (!row) {
+    return null;
+  }
+  return (
+    <text
+      x={Number(x ?? 0) + Number(width ?? 0) / 2}
+      y={Number(y ?? 0) - 6}
+      textAnchor="middle"
+      fill={waterfallFigureColor(row.value, CHART_VARS.text)}
+      fontSize={11}
+      fontWeight={600}
+      className="financial-nums"
+    >
+      {row.value < 0 ? `-${formatCompactAxis(-row.value)}` : formatCompactAxis(row.value)}
+    </text>
   );
 }
 
@@ -164,17 +182,11 @@ export function ErWaterfallChart({ nodes, yearKey, loading, empty }: ErWaterfall
                   <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={64} />
                   <Bar dataKey="amount" stackId="wf" radius={[4, 4, 0, 0]} maxBarSize={64}>
                     {data.map((row) => (
-                      <Cell key={row.id} fill={stepFill(row.kind)} />
+                      <Cell key={row.id} fill={WATERFALL_TONE[row.tone]} />
                     ))}
                     <LabelList
                       position="top"
-                      fill={CHART_VARS.text}
-                      fontSize={11}
-                      fontWeight={600}
-                      valueAccessor={(entry) => {
-                        const payload = (entry.payload ?? {}) as { value?: number };
-                        return typeof payload.value === "number" ? formatCompactAxis(payload.value) : "";
-                      }}
+                      content={(props) => <WaterfallValueLabel {...(props as LabelGeom)} rows={data} />}
                     />
                   </Bar>
                 </BarChart>
@@ -182,15 +194,15 @@ export function ErWaterfallChart({ nodes, yearKey, loading, empty }: ErWaterfall
             </div>
             <ul className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-foreground">
               <li className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: FILL_FAVORABLE }} />
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: WATERFALL_TONE.gain }} />
                 {t("posicionFinanciera.waterfall.legend.increase")}
               </li>
               <li className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: FILL_UNFAVORABLE }} />
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: WATERFALL_TONE.loss }} />
                 {t("posicionFinanciera.waterfall.legend.decrease")}
               </li>
               <li className="flex items-center gap-2">
-                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: CHART_VARS.text }} />
+                <span className="inline-block h-2.5 w-2.5 rounded-sm" style={{ background: WATERFALL_TONE.profit }} />
                 {t("posicionFinanciera.waterfall.legend.total")}
               </li>
             </ul>

@@ -603,8 +603,8 @@
       },
       "legend": {
         "increase": "Ingresos",
-        "decrease": "Costos y gastos",
-        "total": "Subtotal / total"
+        "decrease": "Costos, gastos o pérdida",
+        "total": "Utilidad o total positivo"
       }
     },
     "gauges": {

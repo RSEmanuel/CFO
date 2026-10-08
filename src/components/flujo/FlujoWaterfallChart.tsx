@@ -3,7 +3,7 @@
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
-import { CHART, CHART_AXIS } from "@/lib/chart-theme";
+import { CHART, CHART_AXIS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
 import {
   buildFlujoWaterfall,
@@ -24,10 +24,6 @@ import {
   YAxis,
 } from "recharts";
 
-const ESPRESSO = "var(--cifra-ink)";
-const INCREASE = "var(--cifra-good)";
-const DECREASE = "var(--cifra-bad)";
-
 const TOOLTIP_STYLE = {
   background: CHART.card,
   borderRadius: 10,
@@ -40,25 +36,35 @@ const WINDOW_OPTIONS: Array<{ value: FlujoWaterfallWindow; labelKey: string }> =
   { value: "quarter", labelKey: "filters.quarter" },
 ];
 
-function kindColor(kind: FlujoWaterfallStep["kind"]): string {
+/** Entra dinero en verde, sale en rojo; el saldo va en azul o en rojo si es negativo. */
+function kindColor(kind: FlujoWaterfallStep["kind"], value: number): string {
   if (kind === "increase") {
-    return INCREASE;
+    return value < 0 ? WATERFALL_TONE.loss : WATERFALL_TONE.gain;
   }
   if (kind === "decrease") {
-    return DECREASE;
+    return value < 0 ? WATERFALL_TONE.gain : WATERFALL_TONE.loss;
   }
-  return ESPRESSO;
+  return value < 0 ? WATERFALL_TONE.loss : WATERFALL_TONE.profit;
 }
 
 function formatOneDecimal(value: number, units: DisplayUnits): string {
+  const sign = value < 0 ? "-" : "";
+  const abs = Math.abs(value);
   if (units === "k") {
-    return `$${(value / 1_000).toFixed(1)}K`;
+    return `${sign}$${(abs / 1_000).toFixed(1)}K`;
   }
   if (units === "m") {
-    return `$${(value / 1_000_000).toFixed(1)}M`;
+    return `${sign}$${(abs / 1_000_000).toFixed(1)}M`;
   }
-  return `$${(value / 1_000_000_000).toFixed(1)}B`;
+  return `${sign}$${(abs / 1_000_000_000).toFixed(1)}B`;
 }
+
+type FlujoLabelGeom = {
+  x?: number | string;
+  y?: number | string;
+  width?: number | string;
+  index?: number;
+};
 
 function toChartRows(steps: FlujoWaterfallStep[], t: (key: string) => string) {
   let running = 0;
@@ -157,21 +163,36 @@ export function FlujoWaterfallChart({
               formatter={(value, _name, item) => {
                 const payload = item?.payload as { value?: number } | undefined;
                 const raw = typeof payload?.value === "number" ? payload.value : Number(value);
-                return [formatOneDecimal(raw, units), t("pdf.amount")];
+                return [
+                  <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(raw, "inherit") }}>
+                    {formatOneDecimal(raw, units)}
+                  </span>,
+                  t("pdf.amount"),
+                ];
               }}
             />
             <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={64} />
             <Bar dataKey="amount" stackId="wf" name={t("pdf.amount")} radius={[4, 4, 0, 0]} maxBarSize={64}>
               {data.map((row) => (
-                <Cell key={row.label} fill={kindColor(row.kind)} />
+                <Cell key={row.label} fill={kindColor(row.kind, row.value)} />
               ))}
               <LabelList
                 position="top"
-                fill={CHART_AXIS.tick}
-                fontSize={11}
-                valueAccessor={(entry) => {
-                  const payload = (entry.payload ?? {}) as { value?: number };
-                  return typeof payload.value === "number" ? formatOneDecimal(payload.value, units) : "";
+                content={({ x, y, width, index }: FlujoLabelGeom) => {
+                  const row = index == null ? undefined : data[index];
+                  if (!row) return null;
+                  return (
+                    <text
+                      x={Number(x ?? 0) + Number(width ?? 0) / 2}
+                      y={Number(y ?? 0) - 6}
+                      textAnchor="middle"
+                      fill={waterfallFigureColor(row.value, CHART_AXIS.tick)}
+                      fontSize={11}
+                      className="financial-nums"
+                    >
+                      {formatOneDecimal(row.value, units)}
+                    </text>
+                  );
                 }}
               />
             </Bar>
