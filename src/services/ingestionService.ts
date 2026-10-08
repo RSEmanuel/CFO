@@ -490,6 +490,9 @@ async function commitIngestFilesInternal(input: {
       mapped.workbook.polizas.length;
     warnings.push(...mapped.warnings);
     merged.balanza.push(...mapped.workbook.balanza);
+    if (mapped.workbook.cuentasCatalogo?.length) {
+      merged.cuentasCatalogo = [...(merged.cuentasCatalogo ?? []), ...mapped.workbook.cuentasCatalogo];
+    }
     merged.ventas.push(...mapped.workbook.ventas);
     merged.egresos.push(...mapped.workbook.egresos);
     merged.tesoreria.push(...mapped.workbook.tesoreria);

@@ -208,6 +208,48 @@ describe("ingest detect/map", () => {
     assert.equal(ventas?.categoriaMaestra, "Ingreso");
     assert.equal(ventas?.saldoInicial, 0);
     assert.equal(ventas?.saldoFinal, -100);
+    assert.deepEqual(mapped.workbook.cuentasCatalogo, [
+      { idCuenta: "1102-0000-0000-0000", nombreCuenta: "BANCOS" },
+    ]);
+  });
+
+  it("guarda el nombre de la cuenta de mayor sin sumar su monto", async () => {
+    const buf = await bufferOf((wb) => {
+      const sheet = wb.addWorksheet("Balanza de Comprobación");
+      sheet.addRow(["Empresa Demo"]);
+      sheet.addRow(["Balanza de comprobación al 31/Jul/2026"]);
+      sheet.addRow([]);
+      sheet.addRow(["C u e n t a", "N o m b r e", "Saldos Iniciales", "Saldos Iniciales", "", "", "Saldos Actuales", "Saldos Actuales"]);
+      sheet.addRow(["", "", "Deudor", "Acreedor", "Cargos", "Abonos", "Deudor", "Acreedor"]);
+      sheet.addRow([]);
+      sheet.addRow(["6101-0000-0000-0000", "GASTOS GENERALES", 0, 0, 150, 0, 150, 0]);
+      sheet.addRow(["6101-0001-0000-0000", "Sueldos y Salarios", 0, 0, 100, 0, 100, 0]);
+      sheet.addRow(["6101-0002-0000-0000", "Compensaciones", 0, 0, 50, 0, 50, 0]);
+      sheet.addRow(["4101-0000-0000-0000", "4101-0000-0000-0000", 0, 0, 0, 200, 0, 200]);
+      sheet.addRow(["4101-0001-0001-0000", "Ventas", 0, 0, 0, 200, 0, 200]);
+    });
+    const mapped = await mapToMasterWorkbook({
+      buffer: buf,
+      filename: "balanza.xlsx",
+      documentType: "balanza",
+      sourceSystem: "compac",
+      sheetName: "Balanza de Comprobación",
+      profile: COMPAC_BALANZA_PROFILE,
+      periodo: 7,
+      anio: 2026,
+    });
+    assert.deepEqual(
+      mapped.workbook.balanza.map((row) => row.idCuenta),
+      ["6101-0001-0000-0000", "6101-0002-0000-0000", "4101-0001-0001-0000"],
+    );
+    const gastos = mapped.workbook.balanza
+      .filter((row) => row.idCuenta.startsWith("6101"))
+      .reduce((sum, row) => sum + row.debe, 0);
+    assert.equal(gastos, 150);
+    // La fila sin nombre real (el nombre es el mismo código) no entra al catálogo.
+    assert.deepEqual(mapped.workbook.cuentasCatalogo, [
+      { idCuenta: "6101-0000-0000-0000", nombreCuenta: "GASTOS GENERALES" },
+    ]);
   });
 
   it("documento desconocido no es persistible", async () => {

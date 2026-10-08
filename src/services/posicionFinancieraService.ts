@@ -9,6 +9,8 @@ import { getLedgerPeriods } from "@/services/ledgerPeriodService";
 import {
   alignResultadosMonths,
   buildBalanzaTree,
+  isMayorCode,
+  mayorSegment,
   buildPosicionTree,
   buildRazonesTree,
   buildResultadosTree,
@@ -88,6 +90,7 @@ export async function getPosicionFinanciera(
       years: yearParam ? [yearParam, yearParam - 1, yearParam - 2] : [],
       closePeriodByYear: {},
       resultadosMonthsByYear: {},
+      mayorNames: {},
       availableYears: [],
       availablePeriods: [],
       hasBalanza: false,
@@ -184,6 +187,17 @@ export async function getPosicionFinanciera(
     }),
   );
 
+  const catalogo = await prisma.cuentaCatalogo.findMany({
+    where: { tenantId },
+    select: { idCuenta: true, nombreCuenta: true },
+  });
+  const mayorNames: Record<string, string> = {};
+  for (const cuenta of catalogo) {
+    if (isMayorCode(cuenta.idCuenta) && cuenta.nombreCuenta.trim()) {
+      mayorNames[mayorSegment(cuenta.idCuenta)] = cuenta.nombreCuenta.trim();
+    }
+  }
+
   const balanzaRows = await prisma.balanzaPnL.findMany({
     where: { tenantId, anio: resolvedYear, periodo: period },
     orderBy: { idCuenta: "asc" },
@@ -197,6 +211,7 @@ export async function getPosicionFinanciera(
     years,
     closePeriodByYear,
     resultadosMonthsByYear,
+    mayorNames,
     availableYears,
     availablePeriods,
     hasBalanza: availableYears.length > 0,

@@ -150,8 +150,16 @@ export type PolizaMovimientoRow = {
   anio: number;
 };
 
+/** Cuenta que la balanza trae pero no se guarda con montos (p. ej. cuenta de mayor en Compac). */
+export type CuentaCatalogoRow = {
+  idCuenta: string;
+  nombreCuenta: string;
+};
+
 export type MasterWorkbook = {
   balanza: BalanzaRow[];
+  /** Nombres de las cuentas de mayor que la balanza leafOnly descarta de los montos. */
+  cuentasCatalogo?: CuentaCatalogoRow[];
   ventas: VentaRow[];
   egresos: EgresoRow[];
   tesoreria: TesoreriaRow[];

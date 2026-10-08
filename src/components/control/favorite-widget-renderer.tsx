@@ -82,6 +82,7 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
       : statement === "resultados"
         ? collapseToMayorAccounts(data?.statements.resultados ?? [], (data?.years ?? []).map(String), (code) =>
             t("posicionFinanciera.mayorAccount", { code }),
+            data?.mayorNames,
           )
         : data?.statements.razones ?? [];
 

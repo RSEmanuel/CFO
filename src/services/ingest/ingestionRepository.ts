@@ -47,6 +47,17 @@ export class PrismaIngestionRepository implements IngestionRepository {
       requireCurrentPrismaClient();
     }
     await prisma.$transaction(async (tx) => {
+      const catalogo = workbook.cuentasCatalogo ?? [];
+      if (catalogo.length > 0) {
+        // Solo nombres: si la cuenta ya estaba, se actualiza su nombre con el del archivo nuevo.
+        await tx.cuentaCatalogo.deleteMany({
+          where: { tenantId, idCuenta: { in: catalogo.map((row) => row.idCuenta) } },
+        });
+        await createManyInChunks(
+          (data) => tx.cuentaCatalogo.createMany({ data }),
+          catalogo.map((row) => ({ tenantId, idCuenta: row.idCuenta, nombreCuenta: row.nombreCuenta })),
+        );
+      }
       if (workbook.balanza.length > 0) {
         await tx.balanzaPnL.deleteMany({ where: { tenantId, periodo, anio } });
         await tx.balanzaPnL.createMany({

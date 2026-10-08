@@ -48,6 +48,7 @@ export function EstadoResultadosView({ periodo }: EstadoResultadosViewProps) {
     () =>
       collapseToMayorAccounts(data?.statements.resultados ?? [], (data?.years ?? []).map(String), (code) =>
         t("posicionFinanciera.mayorAccount", { code }),
+        data?.mayorNames,
       ),
     [data, t],
   );

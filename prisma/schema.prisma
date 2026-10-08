@@ -70,6 +70,7 @@ model Tenant {
   tesoreriaFlujoDetalles TesoreriaFlujoDetalle[]
   auxiliarMovimientos   AuxiliarMovimiento[]
   auxiliarCuentaResumenes AuxiliarCuentaResumen[]
+  cuentasCatalogo       CuentaCatalogo[]
   polizas               Poliza[]
   polizaMovimientos     PolizaMovimiento[]
   ingestMappingProfiles IngestMappingProfile[]
@@ -322,6 +323,23 @@ model AuxiliarCuentaResumen {
   @@unique([tenantId, anio, periodo, moneda, idCuenta])
   @@index([tenantId, anio, periodo])
   @@map("auxiliar_cuenta_resumen")
+}
+
+/// Nombre de las cuentas que la balanza trae pero no se guardan con montos:
+/// las cuentas de mayor de un perfil leafOnly (Compac). Solo código y nombre,
+/// así que nunca entran a las sumas.
+model CuentaCatalogo {
+  id           String   @id @default(cuid())
+  tenantId     String
+  idCuenta     String
+  nombreCuenta String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([tenantId, idCuenta])
+  @@map("cuentas_catalogo")
 }
 
 model BudgetAssumption {

@@ -759,9 +759,22 @@ export function mayorSegment(idCuenta: string): string {
   return idCuenta.split(/[-.]/)[0] ?? idCuenta;
 }
 
-function isMayorCode(idCuenta: string): boolean {
+export function isMayorCode(idCuenta: string): boolean {
   const [, ...rest] = idCuenta.split(/[-.]/);
   return rest.length > 0 && rest.every((segment) => /^0+$/.test(segment));
+}
+
+/** Nombre de cada cuenta de mayor que venga como fila en cualquier parte del árbol. */
+function mayorLabels(nodes: StatementNode[]): Map<string, string> {
+  const labels = new Map<string, string>();
+  const visit = (node: StatementNode) => {
+    if (node.code && isMayorCode(node.code) && node.label.trim()) {
+      labels.set(mayorSegment(node.code), node.label);
+    }
+    node.children?.forEach(visit);
+  };
+  nodes.forEach(visit);
+  return labels;
 }
 
 function leafCodes(node: StatementNode): string[] {
@@ -774,16 +787,20 @@ function leafCodes(node: StatementNode): string[] {
 /**
  * Deja bajo cada rubro del Estado de resultados solo una fila por cuenta de
  * mayor, con la suma de sus subcuentas; los rubros y los totales calculados no
- * cambian. Si la balanza trae la cuenta de mayor, se usa su nombre; si no,
- * `fallbackLabel` (sin inventar nombres). El código de la fila sirve para
+ * cambian. El nombre sale de la fila de la cuenta de mayor si viene en el árbol,
+ * o de `knownNames` (nombres que la balanza trae y la importación guarda en el
+ * catálogo); si no hay ninguno, `fallbackLabel`. Nunca se inventa ni se toma el
+ * nombre de una subcuenta. El código de la fila sirve para
  * auditar pólizas solo si todas las subcuentas de esa mayor caen en el rubro.
  */
 export function collapseToMayorAccounts(
   nodes: StatementNode[],
   yearKeys: string[],
   fallbackLabel: (segment: string) => string,
+  knownNames: Record<string, string> = {},
 ): StatementNode[] {
   const rubros = nodes.filter((node) => node.kind === "group" && node.id.startsWith("pyg:"));
+  const labels = new Map([...Object.entries(knownNames), ...mayorLabels(nodes)]);
   const rubrosBySegment = new Map<string, Set<string>>();
   for (const rubro of rubros) {
     for (const code of (rubro.children ?? []).flatMap(leafCodes)) {
@@ -808,11 +825,10 @@ export function collapseToMayorAccounts(
     const children: StatementNode[] = [...bySegment.entries()]
       .sort(([a], [b]) => a.localeCompare(b, "es"))
       .map(([segment, members]) => {
-        const real = members.find((member) => member.code && isMayorCode(member.code));
         const auditable = (rubrosBySegment.get(segment)?.size ?? 0) === 1;
         return {
           id: `${node.id}:mayor:${segment}`,
-          label: real?.label ?? fallbackLabel(segment),
+          label: labels.get(segment) ?? fallbackLabel(segment),
           kind: "account" as const,
           code: auditable ? segment : undefined,
           outflow: node.outflow,
@@ -973,6 +989,8 @@ export type PosicionFinancieraPayload = {
   closePeriodByYear: Record<string, number | null>;
   /** Meses que suma cada columna del Estado de resultados (los del año elegido). */
   resultadosMonthsByYear: Record<string, AlignedMonths>;
+  /** Nombre de cada cuenta de mayor según la balanza subida, por primer segmento (6101 → nombre). */
+  mayorNames: Record<string, string>;
   availableYears: number[];
   availablePeriods: number[];
   hasBalanza: boolean;

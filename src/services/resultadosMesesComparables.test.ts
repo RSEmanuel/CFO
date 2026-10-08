@@ -114,3 +114,96 @@ describe("Estado de resultados solo con cuentas de mayor", () => {
     assert.equal(byId(collapsed, "pyg:ub"), byId(tree, "pyg:ub"));
   });
 });
+
+describe("nombre de la cuenta de mayor", () => {
+  function opex(idCuenta: string, nombreCuenta: string, debe: number): BalanzaPnL {
+    return {
+      idCuenta,
+      nombreCuenta,
+      categoriaMaestra: "OpEx",
+      saldoInicial: 0,
+      debe,
+      haber: 0,
+      saldoFinal: 0,
+      depreciacionAmortizacion: false,
+      periodo: 1,
+      anio: 2026,
+    } as unknown as BalanzaPnL;
+  }
+  const fallback = (segment: string) => `Cuenta de mayor ${segment}`;
+  const childrenOf = (nodes: ReturnType<typeof buildResultadosTree>, id: string) =>
+    nodes.find((node) => node.id === id)?.children ?? [];
+
+  it("si la balanza trae la cuenta de mayor, muestra su nombre y no el genérico", () => {
+    const tree = buildResultadosTree(
+      {
+        "2026": [
+          opex("6101-0000-0000-0000", "GASTOS GENERALES", 0),
+          opex("6101-0001-0000-0000", "SUELDOS", 100),
+          opex("6101-0002-0000-0000", "HONORARIOS", 50),
+        ],
+      },
+      ["2026"],
+    );
+    const rows = childrenOf(collapseToMayorAccounts(tree, ["2026"], fallback), "pyg:gastos-op");
+    assert.deepEqual(
+      rows.map((row) => [row.label, row.values["2026"]]),
+      [["GASTOS GENERALES", 150]],
+    );
+  });
+
+  it("usa el nombre de la mayor aunque la fila esté en otro rubro", () => {
+    const tree = buildResultadosTree(
+      {
+        "2026": [
+          opex("6101-0000-0000-0000", "GASTOS GENERALES", 0),
+          opex("6101-0001-0000-0000", "SUELDOS", 100),
+          opex("6101-0009-0000-0000", "INTERESES BANCARIOS", 20),
+        ],
+      },
+      ["2026"],
+    );
+    const collapsed = collapseToMayorAccounts(tree, ["2026"], fallback);
+    assert.equal(childrenOf(collapsed, "pyg:fin")[0]?.label, "GASTOS GENERALES");
+    assert.equal(childrenOf(collapsed, "pyg:fin")[0]?.values["2026"], 20);
+  });
+
+  it("sin fila de mayor no toma el nombre de una subcuenta: usa el genérico", () => {
+    const tree = buildResultadosTree(
+      { "2026": [opex("6101-0001-0000-0000", "SUELDOS", 100), opex("6101-0002-0000-0000", "HONORARIOS", 50)] },
+      ["2026"],
+    );
+    const rows = childrenOf(collapseToMayorAccounts(tree, ["2026"], fallback), "pyg:gastos-op");
+    assert.deepEqual(rows.map((row) => row.label), ["Cuenta de mayor 6101"]);
+  });
+});
+
+describe("nombre de mayor guardado por la importación", () => {
+  function opex(idCuenta: string, nombreCuenta: string, debe: number): BalanzaPnL {
+    return {
+      idCuenta,
+      nombreCuenta,
+      categoriaMaestra: "OpEx",
+      saldoInicial: 0,
+      debe,
+      haber: 0,
+      saldoFinal: 0,
+      depreciacionAmortizacion: false,
+      periodo: 1,
+      anio: 2026,
+    } as unknown as BalanzaPnL;
+  }
+
+  it("usa el nombre del catálogo de la balanza para la cuenta de mayor", () => {
+    const tree = buildResultadosTree(
+      { "2026": [opex("6101-0001-0000-0000", "Sueldos y Salarios", 100), opex("6101-0002-0000-0000", "Compensaciones", 50)] },
+      ["2026"],
+    );
+    const collapsed = collapseToMayorAccounts(tree, ["2026"], (code) => `Cuenta de mayor ${code}`, {
+      "6101": "GASTOS GENERALES",
+    });
+    const rows = collapsed.find((node) => node.id === "pyg:gastos-op")?.children ?? [];
+    assert.deepEqual(rows.map((row) => [row.label, row.values["2026"]]), [["GASTOS GENERALES", 150]]);
+  });
+});
+

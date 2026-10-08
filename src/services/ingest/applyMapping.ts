@@ -7,7 +7,7 @@ import { parseAuxiliarCuentasSheet } from "@/services/ingest/parseAuxiliarCuenta
 import { parseFlujoEfectivoSheet } from "@/services/ingest/parseFlujoEfectivo";
 import { parseContpaqPolizas } from "@/lib/parsers/contpaq-polizas-parser";
 import type { ColumnMap, MappingProfileShape } from "@/services/ingest/types";
-import type { BalanzaRow, MasterWorkbook, QualityIssue } from "@/services/ingestionTypes";
+import type { BalanzaRow, CuentaCatalogoRow, MasterWorkbook, QualityIssue } from "@/services/ingestionTypes";
 import { parseMasterWorkbook } from "@/services/workbookParser";
 
 function emptyWorkbook(): MasterWorkbook {
@@ -61,7 +61,7 @@ function parseBalanzaSheet(
   profile: MappingProfileShape,
   periodo: number,
   anio: number,
-): BalanzaRow[] {
+): { balanza: BalanzaRow[]; cuentasCatalogo: CuentaCatalogoRow[] } {
   const headers = headerMap(worksheet, profile.headerRow);
   const col = (field: keyof ColumnMap | string) =>
     resolveColumn(headers, profile.columnMap[field] ?? []);
@@ -70,7 +70,7 @@ function parseBalanzaSheet(
   const debeCol = col("debe");
   const haberCol = col("haber");
   if (!idCol || !nameCol || !debeCol || !haberCol) {
-    return [];
+    return { balanza: [], cuentasCatalogo: [] };
   }
   const iniDeudor = col("saldoInicialDeudor");
   const iniAcreedor = col("saldoInicialAcreedor");
@@ -136,10 +136,21 @@ function parseBalanzaSheet(
   });
 
   if (!profile.accountPrefixRules?.leafOnly) {
-    return parsed;
+    return { balanza: parsed, cuentasCatalogo: [] };
   }
+  // Las cuentas de mayor no se guardan con montos (sus subcuentas ya los suman),
+  // pero su nombre sí: es el que muestra el Estado de resultados.
   const leaves = selectLeafCodes(parsed.map((row) => row.idCuenta));
-  return parsed.filter((row) => leaves.has(row.idCuenta));
+  const cuentasCatalogo = new Map<string, CuentaCatalogoRow>();
+  for (const row of parsed) {
+    if (!leaves.has(row.idCuenta) && row.nombreCuenta.trim() && row.nombreCuenta !== row.idCuenta) {
+      cuentasCatalogo.set(row.idCuenta, { idCuenta: row.idCuenta, nombreCuenta: row.nombreCuenta.trim() });
+    }
+  }
+  return {
+    balanza: parsed.filter((row) => leaves.has(row.idCuenta)),
+    cuentasCatalogo: [...cuentasCatalogo.values()],
+  };
 }
 
 export async function mapToMasterWorkbook(input: {
@@ -292,7 +303,7 @@ export async function mapToMasterWorkbook(input: {
     return { workbook: emptyWorkbook(), warnings };
   }
 
-  const balanza = parseBalanzaSheet(worksheet, input.profile, input.periodo, input.anio);
+  const { balanza, cuentasCatalogo } = parseBalanzaSheet(worksheet, input.profile, input.periodo, input.anio);
   if (balanza.length === 0) {
     warnings.push({
       rule: "PARSEO",
@@ -319,7 +330,7 @@ export async function mapToMasterWorkbook(input: {
     });
   }
 
-  return { workbook: { ...emptyWorkbook(), balanza }, warnings };
+  return { workbook: { ...emptyWorkbook(), balanza, cuentasCatalogo }, warnings };
 }
 
 export function profileFromRecord(row: {
