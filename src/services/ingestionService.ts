@@ -1,6 +1,7 @@
 import { AppError } from "@/auth/errors";
 import { prisma } from "@/lib/prisma";
 import { invalidateTenantCache } from "@/lib/serverCache";
+import { catalogoPendiente } from "@/services/ingest/catalogoPendiente";
 import { collectQualityIssues } from "@/services/financialValidations";
 import { mapToMasterWorkbook } from "@/services/ingest/applyMapping";
 import { resolveBatchPeriod } from "@/services/ingest/batchPolicy";
@@ -585,7 +586,18 @@ async function commitIngestFilesInternal(input: {
         include: { batch: true },
       })
     : null;
-  if (previous) {
+  // Un archivo ya confirmado se salta solo si sus nombres de cuenta de mayor también quedaron guardados;
+  // si no (carga anterior al catálogo), se vuelve a guardar para completarlos.
+  const catalogoFaltante = previous && merged.cuentasCatalogo?.length
+    ? catalogoPendiente(
+        merged.cuentasCatalogo,
+        await prisma.cuentaCatalogo.findMany({
+          where: { tenantId: input.tenantId, idCuenta: { in: merged.cuentasCatalogo.map((fila) => fila.idCuenta) } },
+          select: { idCuenta: true, nombreCuenta: true },
+        }),
+      )
+    : [];
+  if (previous && catalogoFaltante.length === 0) {
     return {
       tenantId: input.tenantId,
       periodo,

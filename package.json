@@ -14,7 +14,7 @@
     "db:export": "tsx scripts/export-data.ts",
     "db:import": "tsx scripts/import-data.ts",
     "test:forecast": "tsx --test src/services/forecast/budgetProjection.test.ts src/services/resultadosPresupuesto.test.ts",
-    "test:ingest": "tsx --test src/services/ingest/ingest.test.ts",
+    "test:ingest": "tsx --test src/services/ingest/ingest.test.ts src/services/ingest/catalogoMayor.test.ts",
     "test:flujo": "tsx --test src/services/ingest/flujoEfectivo.test.ts src/services/flujoSankey.test.ts",
     "test:flujo-operativo": "tsx --test src/services/flujoOperativo.test.ts",
     "test:auxiliar": "tsx --test src/services/ingest/parseAuxiliarCuentas.test.ts",
