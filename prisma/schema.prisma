@@ -50,6 +50,13 @@ enum IngestAuditStatus {
   REJECTED
 }
 
+enum AdminAuditAction {
+  USER_CREATED
+  USER_DEACTIVATED
+  USER_REACTIVATED
+  ROLE_CHANGED
+}
+
 enum FlujoDireccion {
   ingreso
   egreso
@@ -77,6 +84,7 @@ model Tenant {
   ingestBatches         IngestBatch[]
   ingestFileAudits      IngestFileAudit[]
   budgetAssumptions     BudgetAssumption[]
+  adminAuditLogs        AdminAuditLog[]
 
   @@index([rfc])
   @@map("tenants")
@@ -449,4 +457,25 @@ model IngestFileAudit {
   @@index([tenantId, sha256])
   @@index([tenantId, status])
   @@map("ingest_file_audits")
+}
+
+/// Bitácora de cambios de administración (altas, bajas de acceso y cambios de rol).
+/// Guarda el correo de quien actuó y de la persona afectada tal como eran en ese
+/// momento. Nunca guarda contraseñas.
+model AdminAuditLog {
+  id           String           @id @default(cuid())
+  tenantId     String
+  action       AdminAuditAction
+  actorUserId  String
+  actorEmail   String
+  targetUserId String
+  targetEmail  String
+  fromRole     UserRole?
+  toRole       UserRole?
+  createdAt    DateTime         @default(now())
+
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@index([tenantId, createdAt])
+  @@map("admin_audit_logs")
 }

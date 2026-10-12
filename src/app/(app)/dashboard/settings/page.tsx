@@ -10,7 +10,8 @@ import { ApiError, apiRequest } from "@/lib/api";
 import { type TenantOption } from "@/lib/session-types";
 import { monthLabelKey } from "@/i18n/format";
 import type { Locale } from "@/i18n/config";
-import { EMPTY_COMPAC_TENANT, EMPTY_COMPAC_USERS } from "@/services/tenants/constants";
+import { EMPTY_COMPAC_TENANT } from "@/services/tenants/constants";
+import { USER_ADMIN_ROLES } from "@/auth/rbac";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -18,7 +19,7 @@ import { cn } from "@/lib/utils";
 export default function SettingsPage() {
   const { user, tenants, tenantId, anio, periodo, periodView, refreshMe, setTenantId } = useSession();
   const { locale, setLocale, t } = useLocale();
-  const canManage = user?.role === "ADMIN" || user?.role === "CFO_PARTNER";
+  const canManage = Boolean(user && USER_ADMIN_ROLES.includes(user.role));
   const empresa = tenants.find((item) => item.id === tenantId)?.name ?? user?.tenant.name ?? "—";
   const corte =
     periodView === "ytd"
@@ -28,10 +29,6 @@ export default function SettingsPage() {
   const [companyName, setCompanyName] = useState<string>(EMPTY_COMPAC_TENANT.name);
   const [companyRfc, setCompanyRfc] = useState<string>(EMPTY_COMPAC_TENANT.rfc);
   const [creatingCompany, setCreatingCompany] = useState(false);
-  const [userEmail, setUserEmail] = useState<string>(EMPTY_COMPAC_USERS.partnerEmail);
-  const [userPassword, setUserPassword] = useState("DevMode123!");
-  const [userRole, setUserRole] = useState<"CFO_PARTNER" | "CLIENT_VIEWER">("CFO_PARTNER");
-  const [creatingUser, setCreatingUser] = useState(false);
 
   async function onCreateCompany(event: FormEvent) {
     event.preventDefault();
@@ -51,37 +48,8 @@ export default function SettingsPage() {
     }
   }
 
-  async function onCreateUser(event: FormEvent) {
-    event.preventDefault();
-    if (!tenantId) {
-      toast.error(t("settings.selectCompanyFirst"));
-      return;
-    }
-    setCreatingUser(true);
-    try {
-      await apiRequest("/api/auth/register-user", {
-        method: "POST",
-        body: JSON.stringify({
-          email: userEmail,
-          password: userPassword,
-          role: userRole,
-          tenantId,
-        }),
-      });
-      toast.success(t("settings.userCreated", { email: userEmail, company: empresa }));
-    } catch (error) {
-      toast.error(error instanceof ApiError ? t(`errors.${error.code}`) : t("settings.userCreateFailed"));
-    } finally {
-      setCreatingUser(false);
-    }
-  }
-
   return (
     <div className="space-y-6">
-      <div>
-        <p className="text-lg font-bold tracking-tight text-clay">{t("nav.settings")}</p>
-        <p className="text-sm text-muted-foreground">{t("settings.intro")}</p>
-      </div>
       <Card>
         <CardHeader>
           <CardTitle>{t("settings.languageTitle")}</CardTitle>
@@ -137,93 +105,42 @@ export default function SettingsPage() {
             <span className="text-muted-foreground">{t("settings.cutoff")}: </span>
             {corte}
           </p>
-          <p className="text-muted-foreground">{t("settings.compacHint")}</p>
+          {canManage ? <p className="text-muted-foreground">{t("settings.compacHint")}</p> : null}
         </CardContent>
       </Card>
 
       {canManage ? (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("settings.newCompany")}</CardTitle>
-              <CardDescription>{t("settings.newCompanyHelp")}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={onCreateCompany}>
-                <div className="space-y-2">
-                  <Label htmlFor="tenant-name">{t("settings.name")}</Label>
-                  <Input
-                    id="tenant-name"
-                    value={companyName}
-                    onChange={(event) => setCompanyName(event.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="tenant-rfc">{t("settings.rfc")}</Label>
-                  <Input
-                    id="tenant-rfc"
-                    value={companyRfc}
-                    onChange={(event) => setCompanyRfc(event.target.value)}
-                    required
-                  />
-                </div>
-                <Button type="submit" disabled={creatingCompany}>
-                  {creatingCompany ? t("common.creating") : t("settings.createEmptyCompany")}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>{t("settings.userTitle")}</CardTitle>
-              <CardDescription>{t("settings.userHelp", { company: empresa })}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4" onSubmit={onCreateUser}>
-                <div className="space-y-2">
-                  <Label htmlFor="user-email">{t("settings.userEmail")}</Label>
-                  <Input
-                    id="user-email"
-                    type="email"
-                    value={userEmail}
-                    onChange={(event) => setUserEmail(event.target.value)}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="user-password">{t("settings.userPassword")}</Label>
-                  <Input
-                    id="user-password"
-                    type="password"
-                    value={userPassword}
-                    onChange={(event) => setUserPassword(event.target.value)}
-                    minLength={8}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="user-role">{t("settings.userRole")}</Label>
-                  <select
-                    id="user-role"
-                    className="flex h-10 w-full rounded-control border border-input bg-background px-3 py-2 text-sm"
-                    value={userRole}
-                    onChange={(event) =>
-                      setUserRole(event.target.value as "CFO_PARTNER" | "CLIENT_VIEWER")
-                    }
-                  >
-                    <option value="CFO_PARTNER">{t("common.roles.CFO_PARTNER")}</option>
-                    <option value="CLIENT_VIEWER">{t("common.roles.CLIENT_VIEWER")}</option>
-                  </select>
-                </div>
-                <Button type="submit" disabled={creatingUser || !tenantId}>
-                  {creatingUser ? t("common.creating") : t("settings.createUser")}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
-        </>
+        <Card>
+          <CardHeader>
+            <CardTitle>{t("settings.newCompany")}</CardTitle>
+            <CardDescription>{t("settings.newCompanyHelp")}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form className="space-y-4" onSubmit={onCreateCompany}>
+              <div className="space-y-2">
+                <Label htmlFor="tenant-name">{t("settings.name")}</Label>
+                <Input
+                  id="tenant-name"
+                  value={companyName}
+                  onChange={(event) => setCompanyName(event.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="tenant-rfc">{t("settings.rfc")}</Label>
+                <Input
+                  id="tenant-rfc"
+                  value={companyRfc}
+                  onChange={(event) => setCompanyRfc(event.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" disabled={creatingCompany}>
+                {creatingCompany ? t("common.creating") : t("settings.createEmptyCompany")}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       ) : null}
     </div>
   );

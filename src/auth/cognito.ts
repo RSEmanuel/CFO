@@ -4,7 +4,10 @@ import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDisableUserCommand,
+  AdminEnableUserCommand,
   AdminGetUserCommand,
+  AdminRemoveUserFromGroupCommand,
+  AdminUpdateUserAttributesCommand,
   CognitoIdentityProviderClient,
   InitiateAuthCommand,
   MessageActionType,
@@ -220,5 +223,53 @@ export async function disableCognitoUser(username: string): Promise<void> {
     );
   } catch (error) {
     console.error("No se pudo deshabilitar el usuario de Cognito tras un fallo de persistencia", error);
+  }
+}
+
+/** Encender o apagar el acceso en Cognito. A diferencia de disableCognitoUser, sí propaga el error. */
+export async function setCognitoUserEnabled(username: string, enabled: boolean): Promise<void> {
+  const { userPoolId } = getConfig();
+  const client = getClient();
+
+  try {
+    await client.send(
+      enabled
+        ? new AdminEnableUserCommand({ UserPoolId: userPoolId, Username: username })
+        : new AdminDisableUserCommand({ UserPoolId: userPoolId, Username: username }),
+    );
+  } catch (error) {
+    mapCognitoError(error);
+  }
+}
+
+/** Mueve al usuario al grupo del rol nuevo y actualiza custom:role. */
+export async function changeCognitoUserRole(
+  username: string,
+  fromRole: UserRole,
+  toRole: UserRole,
+): Promise<void> {
+  const { userPoolId } = getConfig();
+  const client = getClient();
+
+  try {
+    await client.send(
+      new AdminAddUserToGroupCommand({ UserPoolId: userPoolId, Username: username, GroupName: toRole }),
+    );
+    await client.send(
+      new AdminRemoveUserFromGroupCommand({
+        UserPoolId: userPoolId,
+        Username: username,
+        GroupName: fromRole,
+      }),
+    );
+    await client.send(
+      new AdminUpdateUserAttributesCommand({
+        UserPoolId: userPoolId,
+        Username: username,
+        UserAttributes: [{ Name: "custom:role", Value: toRole }],
+      }),
+    );
+  } catch (error) {
+    mapCognitoError(error);
   }
 }

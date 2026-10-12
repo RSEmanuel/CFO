@@ -36,9 +36,9 @@
       "12": "Diciembre"
     },
     "roles": {
-      "ADMIN": "Admin",
-      "CFO_PARTNER": "CFO partner",
-      "CLIENT_VIEWER": "Client viewer"
+      "ADMIN": "Administrador",
+      "CFO_PARTNER": "Socio que opera la empresa",
+      "CLIENT_VIEWER": "Quien solo consulta"
     },
     "and": "y"
   },
@@ -51,7 +51,8 @@
     "control": "Panel de Control",
     "ingest": "Ingesta",
     "simulator": "Simulador What-If",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "loadControl": "Control de cargas"
   },
   "auth": {
     "title": "Iniciar sesión",
@@ -100,15 +101,10 @@
     "createEmptyCompany": "Crear empresa vacía",
     "companyCreated": "Empresa creada: {name}. Selecciónala en el sidebar y usa corte julio 2026.",
     "companyCreateFailed": "No se pudo crear la empresa.",
-    "userTitle": "Usuario de esta empresa",
-    "userHelp": "Alta en la empresa seleccionada en el sidebar ({company}). Un CLIENT_VIEWER solo consulta y no entra a Ingesta.",
-    "userEmail": "Correo",
-    "userPassword": "Contraseña",
-    "userRole": "Rol",
-    "createUser": "Crear usuario",
-    "userCreated": "Usuario {email} ligado a {company}.",
-    "userCreateFailed": "No se pudo crear el usuario.",
-    "selectCompanyFirst": "Selecciona una empresa en el sidebar."
+    "selectCompanyFirst": "Selecciona una empresa en el sidebar.",
+    "tabsAria": "Secciones de Configuración",
+    "tabGeneral": "General",
+    "tabUsers": "Usuarios"
   },
   "filters": {
     "temporality": "Temporalidad",
@@ -1567,5 +1563,100 @@
     "forSystems": "Para sistemas",
     "sheetName": "Datos",
     "columns": "Columnas"
+  },
+  "users": {
+    "intro": "Quién puede entrar a {company} y qué puede hacer.",
+    "selectCompany": "Elige una empresa en el selector de arriba para ver a sus personas.",
+    "viewerOnly": "Esta sección es para administradores. Pide a tu administrador cualquier cambio de acceso.",
+    "loadFailed": "No pudimos cargar la lista de personas. Recarga la página para intentarlo de nuevo.",
+    "listTitle": "Personas de esta empresa",
+    "listHelp": "Quita el acceso o cambia el rol aquí. Tu propio acceso solo lo cambia otro administrador.",
+    "colPerson": "Persona",
+    "colRole": "Rol",
+    "colAccess": "¿Puede entrar hoy?",
+    "colSince": "Alta",
+    "colActions": "Acciones",
+    "accessYes": "Sí",
+    "accessNo": "No, acceso apagado",
+    "you": "Tú",
+    "turnOff": "Quitar acceso",
+    "turnOn": "Devolver acceso",
+    "roleSelectAria": "Rol de {email}",
+    "confirmOff": "¿Quitarle el acceso a {email}? Deja de entrar de inmediato.",
+    "confirmRole": "¿Cambiar el rol de {email} a «{role}»?",
+    "empty": "Nadie de esta empresa tiene acceso todavía. Agrega a la primera persona abajo.",
+    "staffTitle": "También pueden abrir esta empresa",
+    "staffHelp": "Administradores y socios dados de alta en otra empresa. Se administran desde su propia empresa.",
+    "staffHome": "Alta en {company}",
+    "addTitle": "Agregar a una persona",
+    "addHelp": "Solo necesitas su correo y qué podrá hacer en {company}.",
+    "email": "Correo",
+    "emailPlaceholder": "correo@ejemplo.com",
+    "role": "Rol",
+    "roleHelp": {
+      "ADMIN": "Puede todo, incluso agregar a otros administradores.",
+      "CFO_PARTNER": "Sube archivos, abre todas las empresas y agrega personas.",
+      "CLIENT_VIEWER": "Ve las cifras de su empresa. No sube archivos ni agrega personas."
+    },
+    "add": "Agregar persona",
+    "adding": "Agregando…",
+    "added": "Listo: {email} ya puede entrar a {company}.",
+    "tempTitle": "Contraseña temporal de {email}",
+    "tempHelp": "Cópiala ahora y compártela por un canal privado. No se vuelve a mostrar.",
+    "tempCopy": "Copiar",
+    "tempCopied": "Copiada",
+    "tempDone": "Ya la compartí",
+    "devNoPassword": "En este entorno de pruebas se entra solo con el correo. No hace falta contraseña.",
+    "roleChanged": "{email} ahora es: {role}.",
+    "accessOff": "{email} ya no puede entrar.",
+    "accessOn": "{email} puede volver a entrar.",
+    "saveFailed": "No se guardó el cambio. Inténtalo de nuevo.",
+    "errors": {
+      "SELF_CHANGE": "No puedes cambiar tu propio acceso ni tu rol. Pídeselo a otro administrador.",
+      "TARGET_ABOVE": "Solo un administrador puede cambiar a otro administrador. Pídeselo a uno.",
+      "ROLE_NOT_ALLOWED": "Tu rol no puede dar ese permiso. Pide a un administrador que lo haga.",
+      "CONFLICT": "Ese correo ya tiene acceso a Cifra. Búscalo en la lista o usa otro correo.",
+      "VALIDATION_ERROR": "Revisa el correo: no parece válido."
+    },
+    "auditTitle": "Cambios recientes",
+    "auditHelp": "Quién agregó personas, quitó accesos o cambió roles. Nunca se guardan contraseñas.",
+    "auditEmpty": "Aún no hay cambios registrados en esta empresa.",
+    "audit": {
+      "USER_CREATED": "{actor} agregó a {target} como {role}.",
+      "USER_DEACTIVATED": "{actor} le quitó el acceso a {target}.",
+      "USER_REACTIVATED": "{actor} le devolvió el acceso a {target}.",
+      "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to}."
+    }
+  },
+  "loads": {
+    "intro": "Cada archivo que se subió a {company}: quién, cuándo y si de verdad quedó en tus cifras.",
+    "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
+    "viewerOnly": "Esta sección es para quien sube archivos. Pide a tu administrador cualquier duda sobre las cargas.",
+    "loadFailed": "No pudimos leer el historial. Recarga la página para intentarlo de nuevo.",
+    "pendingAlert": "{count, plural, one {# archivo se revisó pero no se guardó y no está} other {# archivos se revisaron pero no se guardaron y no están}} en tus cifras. {count, plural, one {Vuelve a subirlo} other {Vuelve a subirlos}} en Ingesta y confirma el guardado.",
+    "goIngest": "Ir a Ingesta",
+    "totalFiles": "Archivos",
+    "totalSaved": "Guardados",
+    "totalPending": "Sin guardar",
+    "totalRejected": "Rechazados",
+    "tableTitle": "Archivos subidos",
+    "tableHelp": "Leídos, válidos y rechazados son los renglones que Cifra registró al revisar cada archivo.",
+    "colFile": "Archivo",
+    "colUploadedBy": "Subió y cuándo",
+    "colMonth": "Mes",
+    "colStatus": "¿Quedó guardado?",
+    "colRowsRead": "Leídos",
+    "colRowsAccepted": "Válidos",
+    "colRowsRejected": "Rechazados",
+    "state": {
+      "SAVED": "Guardado",
+      "REVIEWED_ONLY": "Solo revisado, no guardado",
+      "INTERRUPTED": "El guardado no terminó",
+      "REJECTED": "Rechazado, no se guardó"
+    },
+    "savedLater": "Se guardó después en otra carga",
+    "noMonth": "Sin mes",
+    "empty": "Todavía no se ha subido ningún archivo a esta empresa. Súbelo desde Ingesta.",
+    "truncated": "Se muestran los {count} archivos más recientes."
   }
 }

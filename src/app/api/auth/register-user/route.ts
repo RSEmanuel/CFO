@@ -8,7 +8,7 @@ export const POST = withAuth(
     const body: unknown = await request.json();
     const payload = registerUserSchema.parse(body);
     const user = await registerUser({
-      actorRole: auth.role,
+      actor: { userId: auth.userId, email: auth.email, role: auth.role },
       email: payload.email,
       password: payload.password,
       role: payload.role,

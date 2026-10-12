@@ -1,5 +1,5 @@
 import type { SessionUser } from "@/lib/session-types";
-import { BarChart3, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Sliders, Upload, Wallet } from "lucide-react";
+import { BarChart3, ClipboardCheck, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Sliders, Upload, Wallet } from "lucide-react";
 
 export type AppNavItem = {
   href: string;
@@ -19,6 +19,8 @@ export const PRIMARY_NAV: AppNavItem[] = [
   // Simulador What-If: herramienta analítica, junto al catálogo de métricas.
   { href: "/dashboard/simulator", labelKey: "nav.simulator", icon: Sliders },
   { href: "/ingesta", labelKey: "nav.ingest", icon: Upload, roles: ["ADMIN", "CFO_PARTNER"] },
+  // Control interno: historial de cargas, mismos roles que Ingesta.
+  { href: "/control-cargas", labelKey: "nav.loadControl", icon: ClipboardCheck, roles: ["ADMIN", "CFO_PARTNER"] },
 ];
 
 export const ACCOUNT_NAV: AppNavItem[] = [

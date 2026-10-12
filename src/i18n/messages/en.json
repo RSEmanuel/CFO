@@ -36,9 +36,9 @@
       "12": "December"
     },
     "roles": {
-      "ADMIN": "Admin",
-      "CFO_PARTNER": "CFO partner",
-      "CLIENT_VIEWER": "Client viewer"
+      "ADMIN": "Administrator",
+      "CFO_PARTNER": "Operating partner",
+      "CLIENT_VIEWER": "View only"
     },
     "and": "and"
   },
@@ -51,7 +51,8 @@
     "control": "Control Panel",
     "ingest": "Ingest",
     "simulator": "What-If Simulator",
-    "settings": "Settings"
+    "settings": "Settings",
+    "loadControl": "Load history"
   },
   "auth": {
     "title": "Sign in",
@@ -100,15 +101,10 @@
     "createEmptyCompany": "Create empty company",
     "companyCreated": "Company created: {name}. Select it in the sidebar and use the July 2026 cutoff.",
     "companyCreateFailed": "Could not create the company.",
-    "userTitle": "User for this company",
-    "userHelp": "Add a user to the company selected in the sidebar ({company}). A CLIENT_VIEWER can only view and cannot open Ingest.",
-    "userEmail": "Email",
-    "userPassword": "Password",
-    "userRole": "Role",
-    "createUser": "Create user",
-    "userCreated": "User {email} linked to {company}.",
-    "userCreateFailed": "Could not create the user.",
-    "selectCompanyFirst": "Select a company in the sidebar."
+    "selectCompanyFirst": "Select a company in the sidebar.",
+    "tabsAria": "Settings sections",
+    "tabGeneral": "General",
+    "tabUsers": "Users"
   },
   "filters": {
     "temporality": "Timeframe",
@@ -1567,5 +1563,100 @@
     "forSystems": "For systems",
     "sheetName": "Data",
     "columns": "Columns"
+  },
+  "users": {
+    "intro": "Who can sign in to {company} and what they can do.",
+    "selectCompany": "Pick a company in the selector above to see its people.",
+    "viewerOnly": "This section is for administrators. Ask your administrator for any access change.",
+    "loadFailed": "We couldn't load the people list. Reload the page to try again.",
+    "listTitle": "People in this company",
+    "listHelp": "Turn access off or change roles here. Only another administrator can change your own access.",
+    "colPerson": "Person",
+    "colRole": "Role",
+    "colAccess": "Can sign in today?",
+    "colSince": "Added",
+    "colActions": "Actions",
+    "accessYes": "Yes",
+    "accessNo": "No, access off",
+    "you": "You",
+    "turnOff": "Turn access off",
+    "turnOn": "Restore access",
+    "roleSelectAria": "Role for {email}",
+    "confirmOff": "Turn off access for {email}? They lose access immediately.",
+    "confirmRole": "Change {email}'s role to “{role}”?",
+    "empty": "Nobody in this company has access yet. Add the first person below.",
+    "staffTitle": "Can also open this company",
+    "staffHelp": "Administrators and partners registered in another company. Manage them from their own company.",
+    "staffHome": "Registered in {company}",
+    "addTitle": "Add a person",
+    "addHelp": "You only need their email and what they can do in {company}.",
+    "email": "Email",
+    "emailPlaceholder": "email@example.com",
+    "role": "Role",
+    "roleHelp": {
+      "ADMIN": "Can do everything, including adding other administrators.",
+      "CFO_PARTNER": "Uploads files, opens every company and adds people.",
+      "CLIENT_VIEWER": "Sees their company's numbers. Can't upload files or add people."
+    },
+    "add": "Add person",
+    "adding": "Adding…",
+    "added": "Done: {email} can now sign in to {company}.",
+    "tempTitle": "Temporary password for {email}",
+    "tempHelp": "Copy it now and share it privately. It won't be shown again.",
+    "tempCopy": "Copy",
+    "tempCopied": "Copied",
+    "tempDone": "I've shared it",
+    "devNoPassword": "In this test environment people sign in with their email only. No password needed.",
+    "roleChanged": "{email} is now: {role}.",
+    "accessOff": "{email} can no longer sign in.",
+    "accessOn": "{email} can sign in again.",
+    "saveFailed": "The change wasn't saved. Try again.",
+    "errors": {
+      "SELF_CHANGE": "You can't change your own access or role. Ask another administrator.",
+      "TARGET_ABOVE": "Only an administrator can change another administrator. Ask one.",
+      "ROLE_NOT_ALLOWED": "Your role can't grant that permission. Ask an administrator to do it.",
+      "CONFLICT": "That email already has access to Cifra. Find it in the list or use another email.",
+      "VALIDATION_ERROR": "Check the email: it doesn't look valid."
+    },
+    "auditTitle": "Recent changes",
+    "auditHelp": "Who added people, turned access off or changed roles. Passwords are never stored.",
+    "auditEmpty": "No changes recorded for this company yet.",
+    "audit": {
+      "USER_CREATED": "{actor} added {target} as {role}.",
+      "USER_DEACTIVATED": "{actor} turned off access for {target}.",
+      "USER_REACTIVATED": "{actor} restored access for {target}.",
+      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}."
+    }
+  },
+  "loads": {
+    "intro": "Every file uploaded to {company}: who, when and whether it actually made it into your numbers.",
+    "selectCompany": "Pick a company in the selector above to see its uploads.",
+    "viewerOnly": "This section is for people who upload files. Ask your administrator about any upload.",
+    "loadFailed": "We couldn't read the history. Reload the page to try again.",
+    "pendingAlert": "{count, plural, one {# file was reviewed but not saved and is} other {# files were reviewed but not saved and are}} not in your numbers. Upload {count, plural, one {it} other {them}} again in Ingest and confirm the save.",
+    "goIngest": "Go to Ingest",
+    "totalFiles": "Files",
+    "totalSaved": "Saved",
+    "totalPending": "Not saved",
+    "totalRejected": "Rejected",
+    "tableTitle": "Uploaded files",
+    "tableHelp": "Read, valid and rejected are the rows Cifra recorded when reviewing each file.",
+    "colFile": "File",
+    "colUploadedBy": "Uploaded by, when",
+    "colMonth": "Month",
+    "colStatus": "Saved?",
+    "colRowsRead": "Read",
+    "colRowsAccepted": "Valid",
+    "colRowsRejected": "Rejected",
+    "state": {
+      "SAVED": "Saved",
+      "REVIEWED_ONLY": "Reviewed only, not saved",
+      "INTERRUPTED": "Save didn't finish",
+      "REJECTED": "Rejected, not saved"
+    },
+    "savedLater": "Saved later in another upload",
+    "noMonth": "No month",
+    "empty": "No files have been uploaded to this company yet. Upload one from Ingest.",
+    "truncated": "Showing the {count} most recent files."
   }
 }

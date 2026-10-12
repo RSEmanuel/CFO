@@ -14,6 +14,7 @@ import { assertCanRegisterRole } from "@/auth/rbac";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
 import { planDevBypassLogin } from "@/auth/devBypass";
+import { generateTemporaryPassword } from "@/auth/temporaryPassword";
 
 export type PublicUser = {
   id: string;
@@ -131,14 +132,19 @@ export async function loginWithPassword(email: string, password: string): Promis
   };
 }
 
+export type RegisterUserResult = PublicUser & {
+  /** Solo cuando el servidor generó la contraseña. Se devuelve una vez y no se guarda. */
+  temporaryPassword: string | null;
+};
+
 export async function registerUser(input: {
-  actorRole: UserRole;
+  actor: { userId: string; email: string; role: UserRole };
   email: string;
-  password: string;
+  password?: string;
   role: UserRole;
   tenantId: string;
-}): Promise<PublicUser> {
-  assertCanRegisterRole(input.actorRole, input.role);
+}): Promise<RegisterUserResult> {
+  assertCanRegisterRole(input.actor.role, input.role);
 
   const tenant = await prisma.tenant.findUnique({
     where: { id: input.tenantId },
@@ -154,35 +160,46 @@ export async function registerUser(input: {
     throw new AppError("CONFLICT", "Ya existe un usuario con ese correo.", 409);
   }
 
-  if (isDevAuthBypassEnabled()) {
-    const created = await prisma.user.create({
-      data: {
-        email: input.email,
-        cognitoSub: buildDevCognitoSub(input.email),
-        role: input.role,
-        tenantId: input.tenantId,
-      },
+  const createWithAudit = (cognitoSub: string) =>
+    prisma.$transaction(async (tx) => {
+      const created = await tx.user.create({
+        data: {
+          email: input.email,
+          cognitoSub,
+          role: input.role,
+          tenantId: input.tenantId,
+        },
+      });
+      await tx.adminAuditLog.create({
+        data: {
+          tenantId: input.tenantId,
+          action: "USER_CREATED",
+          actorUserId: input.actor.userId,
+          actorEmail: input.actor.email,
+          targetUserId: created.id,
+          targetEmail: created.email,
+          toRole: created.role,
+        },
+      });
+      return created;
     });
-    return toPublicUser(created);
+
+  if (isDevAuthBypassEnabled()) {
+    const created = await createWithAudit(buildDevCognitoSub(input.email));
+    return { ...toPublicUser(created), temporaryPassword: null };
   }
 
+  const temporaryPassword = input.password ? null : generateTemporaryPassword();
   const cognitoUser = await adminCreateCognitoUser({
     email: input.email,
-    password: input.password,
+    password: input.password ?? (temporaryPassword as string),
     role: input.role,
     tenantId: input.tenantId,
   });
 
   try {
-    const created = await prisma.user.create({
-      data: {
-        email: input.email,
-        cognitoSub: cognitoUser.cognitoSub,
-        role: input.role,
-        tenantId: input.tenantId,
-      },
-    });
-    return toPublicUser(created);
+    const created = await createWithAudit(cognitoUser.cognitoSub);
+    return { ...toPublicUser(created), temporaryPassword };
   } catch (error) {
     await disableCognitoUser(cognitoUser.username);
     throw error;
