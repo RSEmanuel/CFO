@@ -610,9 +610,9 @@
       "netRevenue": "Net revenue",
       "costs": "Costs",
       "opex": "Operating expenses",
-      "da": "Depreciation and amortization",
+      "financialIncome": "Financial income",
       "financialExpense": "Financial expenses",
-      "tax": "Taxes",
+      "tax": "Income tax and profit sharing",
       "ratioLiquidity": "Liquidity",
       "ratioActivity": "Activity",
       "ratioProfitability": "Profitability",
@@ -632,9 +632,9 @@
         "utilidadBruta": "Gross profit",
         "opex": "Operating expenses",
         "ebit": "EBIT",
-        "da": "D&A",
+        "productosFinancieros": "Financial income",
         "financieros": "Financial expenses",
-        "impuestos": "Taxes",
+        "impuestos": "Income tax and profit sharing",
         "utilidadNeta": "Net income"
       },
       "legend": {

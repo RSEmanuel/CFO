@@ -17,10 +17,10 @@ function input(overrides: Partial<ErWaterfallInput> = {}): ErWaterfallInput {
     utilidadBruta: 3_200_000,
     opex: 1_370_000,
     ebit: 1_830_000,
-    da: 80_000,
+    productosFinancieros: 80_000,
     financieros: 70_000,
     impuestos: 50_000,
-    utilidadNeta: 1_630_000,
+    utilidadNeta: 1_790_000,
     ...overrides,
   };
 }
@@ -38,10 +38,10 @@ describe("extractErWaterfallInput", () => {
         node("pyg:ub", 60),
         node("pyg:gastos-op", 25),
         node("pyg:ebit", 35),
-        node("pyg:da", 4),
+        node("pyg:prodfin", 4),
         node("pyg:fin", 6),
         node("pyg:tax", 5),
-        node("pyg:un", 20),
+        node("pyg:un", 28),
       ],
       "2026",
     );
@@ -51,20 +51,20 @@ describe("extractErWaterfallInput", () => {
       utilidadBruta: 60,
       opex: 25,
       ebit: 35,
-      da: 4,
+      productosFinancieros: 4,
       financieros: 6,
       impuestos: 5,
-      utilidadNeta: 20,
+      utilidadNeta: 28,
     });
   });
 
   it("deja en null el paso sin dato y no anula el resto", () => {
     const extracted = extractErWaterfallInput(
-      [node("pyg:ingresos", 100), node("pyg:da", null), node("pyg:un", 20)],
+      [node("pyg:ingresos", 100), node("pyg:prodfin", null), node("pyg:un", 20)],
       "2026",
     );
     assert.equal(extracted?.ingresos, 100);
-    assert.equal(extracted?.da, null);
+    assert.equal(extracted?.productosFinancieros, null);
     assert.equal(extracted?.ebit, null);
     assert.equal(extracted?.utilidadNeta, 20);
   });
@@ -76,7 +76,7 @@ describe("extractErWaterfallInput", () => {
 });
 
 describe("buildErWaterfall", () => {
-  it("encadena ingresos hasta utilidad neta con D&A, financieros e impuestos", () => {
+  it("encadena ingresos hasta utilidad neta con productos y gastos financieros e impuestos", () => {
     const model = buildErWaterfall(input());
     assert.ok(model);
     assert.equal(model.utilidadBruta, (model.ingresos ?? 0) - (model.costos ?? 0));
@@ -84,7 +84,7 @@ describe("buildErWaterfall", () => {
     assert.ok(
       nearlyEqual(
         model.utilidadNeta ?? 0,
-        (model.ebit ?? 0) - (model.da ?? 0) - (model.financieros ?? 0) - (model.impuestos ?? 0),
+        (model.ebit ?? 0) + (model.productosFinancieros ?? 0) - (model.financieros ?? 0) - (model.impuestos ?? 0),
       ),
     );
     assert.deepEqual(
@@ -95,7 +95,7 @@ describe("buildErWaterfall", () => {
         ["utilidadBruta", "subtotal"],
         ["opex", "decrease"],
         ["ebit", "subtotal"],
-        ["da", "decrease"],
+        ["productosFinancieros", "increase"],
         ["financieros", "decrease"],
         ["impuestos", "decrease"],
         ["utilidadNeta", "total"],
@@ -104,7 +104,7 @@ describe("buildErWaterfall", () => {
   });
 
   it("omite un paso sin dato y conserva el orden de los demás", () => {
-    const model = buildErWaterfall(input({ da: null, financieros: null }));
+    const model = buildErWaterfall(input({ productosFinancieros: null, financieros: null }));
     assert.ok(model);
     assert.deepEqual(
       model.steps.map((step) => step.id),
@@ -137,19 +137,20 @@ describe("toErWaterfallRows", () => {
     assert.equal(byId.opex.base, 3_200_000 - 1_370_000);
     assert.equal(byId.ebit.base, 0);
     assert.equal(byId.ebit.amount, 1_830_000);
-    assert.equal(byId.da.base, 1_830_000 - 80_000);
-    assert.equal(byId.financieros.base, 1_750_000 - 70_000);
-    assert.equal(byId.impuestos.base, 1_680_000 - 50_000);
-    assert.equal(byId.utilidadNeta.amount, 1_630_000);
+    assert.equal(byId.productosFinancieros.base, 1_830_000);
+    assert.equal(byId.productosFinancieros.amount, 80_000);
+    assert.equal(byId.financieros.base, 1_910_000 - 70_000);
+    assert.equal(byId.impuestos.base, 1_840_000 - 50_000);
+    assert.equal(byId.utilidadNeta.amount, 1_790_000);
     assert.equal(byId.utilidadNeta.base, 0);
   });
 
-  it("si falta D&A, gastos financieros cuelgan del EBIT", () => {
-    const model = buildErWaterfall(input({ da: null }));
+  it("sin productos financieros, los gastos financieros cuelgan del EBIT", () => {
+    const model = buildErWaterfall(input({ productosFinancieros: null }));
     assert.ok(model);
     const rows = toErWaterfallRows(model);
     const byId = Object.fromEntries(rows.map((row) => [row.id, row]));
-    assert.equal(byId.da, undefined);
+    assert.equal(byId.productosFinancieros, undefined);
     assert.equal(byId.financieros.base, 1_830_000 - 70_000);
     assert.equal(byId.impuestos.base, 1_760_000 - 50_000);
   });

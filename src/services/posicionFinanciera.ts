@@ -1,13 +1,12 @@
 import type { BalanzaPnL } from "@/generated/prisma/client";
 import type { CatalogCategories, CatalogMetric, MetricUnit } from "@/services/financialEngine";
+import { classifyErCuenta, type ErClasificacion } from "@/services/estadoOperativo";
 import { matchesRole } from "@/services/ingest/accountRoles";
 import type { AccountRoleRule, AccountRoles } from "@/services/ingest/types";
 import {
   balanceSignConvention,
   isCurrentAsset,
   isCurrentLiability,
-  isFinancialExpenseAccount,
-  isIncomeTaxAccount,
   money,
   resultadoEjercicioYtd,
 } from "@/services/metricsLedger";
@@ -321,13 +320,6 @@ export function mergeBalanceRows(
   return [...byAccount.values()];
 }
 
-export function pnlMovement(row: BalanzaPnL): number {
-  if (row.categoriaMaestra === "Ingreso") {
-    return round2(money(row.haber) - money(row.debe));
-  }
-  return round2(money(row.debe) - money(row.haber));
-}
-
 export type CapitalGroupKey =
   | "capitalSocial"
   | "reservas"
@@ -631,43 +623,34 @@ export function alignResultadosMonths(selectedMonths: number[], availableMonths:
   };
 }
 
+/** Ventas y productos financieros son de naturaleza acreedora; el resto, deudora (como en computeErBuckets). */
+function erMovement(row: BalanzaPnL): number {
+  const clase = classifyErCuenta(row.idCuenta);
+  if (clase === "ventas" || clase === "productosFinancieros") {
+    return round2(money(row.haber) - money(row.debe));
+  }
+  return round2(money(row.debe) - money(row.haber));
+}
+
+/**
+ * Estado de resultados por rubro. Cada cuenta va al rubro que le da su número
+ * de cuenta con `classifyErCuenta`, la misma regla de `computeErBuckets`, para
+ * que cada subtotal de la tabla sea el del PyG canónico. Las cuentas de balance
+ * no tienen clase y no entran.
+ */
 export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, yearKeys: string[]): StatementNode[] {
-  const lines = mergeBalanceRows(rowsByYear, yearKeys, pnlMovement);
-  const ingresos = lines.filter((line) => line.categoriaMaestra === "Ingreso");
-  const costos = lines.filter((line) => line.categoriaMaestra === "COGS");
-  const da = lines.filter((line) => line.depreciacionAmortizacion);
-  // Como en impuestos: solo cuentas de resultados. El nombre de un banco, cliente o
-  // acreedor puede decir «financiero», y un producto financiero ya está en ingresos.
-  const financieros = lines.filter(
-    (line) =>
-      !line.depreciacionAmortizacion &&
-      isFinancialExpenseAccount(line.nombreCuenta) &&
-      (line.categoriaMaestra === "OpEx" || line.categoriaMaestra === "COGS"),
-  );
-  const impuestos = lines.filter(
-    (line) =>
-      !line.depreciacionAmortizacion &&
-      isIncomeTaxAccount(line.nombreCuenta) &&
-      (line.categoriaMaestra === "OpEx" || line.categoriaMaestra === "COGS"),
-  );
-  const opexOperativo = lines.filter((line) => {
-    if (line.categoriaMaestra !== "OpEx") {
-      return false;
-    }
-    if (line.depreciacionAmortizacion) {
-      return false;
-    }
-    if (isFinancialExpenseAccount(line.nombreCuenta) || isIncomeTaxAccount(line.nombreCuenta)) {
-      return false;
-    }
-    return true;
-  });
+  const lines = mergeBalanceRows(rowsByYear, yearKeys, erMovement);
+  const enClase = (...clases: ErClasificacion[]) =>
+    lines.filter((line) => {
+      const clase = classifyErCuenta(line.idCuenta);
+      return clase != null && clases.includes(clase);
+    });
 
   const ingresosNode = groupNode(
     "pyg:ingresos",
     "Ingresos netos",
     yearKeys,
-    buildPrefixForest(ingresos, yearKeys, { polarity: "higherIsBetter", idPrefix: "pyg:ing" }),
+    buildPrefixForest(enClase("ventas"), yearKeys, { polarity: "higherIsBetter", idPrefix: "pyg:ing" }),
     "higherIsBetter",
     { labelKey: "posicionFinanciera.structure.netRevenue" },
   );
@@ -675,7 +658,7 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
     "pyg:costos",
     "Costos",
     yearKeys,
-    buildPrefixForest(costos, yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:cogs" }),
+    buildPrefixForest(enClase("costo"), yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:cogs" }),
     "lowerIsBetter",
     { outflow: true, labelKey: "posicionFinanciera.structure.costs" },
   );
@@ -694,11 +677,16 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
     }),
     polarity: "higherIsBetter",
   };
+  // Incluye la depreciación contable (6301): el EBIT del PyG ya la descuenta.
   const gastosOpNode = groupNode(
     "pyg:gastos-op",
     "Gastos de operación",
     yearKeys,
-    buildPrefixForest(opexOperativo, yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:opex" }),
+    buildPrefixForest(enClase("gastosVenta", "gastosAdmin", "daContable", "otrosOperativos"), yearKeys, {
+      polarity: "lowerIsBetter",
+      outflow: true,
+      idPrefix: "pyg:opex",
+    }),
     "lowerIsBetter",
     { outflow: true, labelKey: "posicionFinanciera.structure.opex" },
   );
@@ -717,27 +705,27 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
     }),
     polarity: "higherIsBetter",
   };
-  const daNode = groupNode(
-    "pyg:da",
-    "Depreciación y amortización",
+  const prodFinNode = groupNode(
+    "pyg:prodfin",
+    "Productos financieros",
     yearKeys,
-    buildPrefixForest(da, yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:da" }),
-    "lowerIsBetter",
-    { outflow: true, labelKey: "posicionFinanciera.structure.da" },
+    buildPrefixForest(enClase("productosFinancieros"), yearKeys, { polarity: "higherIsBetter", idPrefix: "pyg:pfin" }),
+    "higherIsBetter",
+    { labelKey: "posicionFinanciera.structure.financialIncome" },
   );
   const finNode = groupNode(
     "pyg:fin",
     "Gastos financieros",
     yearKeys,
-    buildPrefixForest(financieros, yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:fin" }),
+    buildPrefixForest(enClase("gastosFinancieros"), yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:fin" }),
     "lowerIsBetter",
     { outflow: true, labelKey: "posicionFinanciera.structure.financialExpense" },
   );
   const taxNode = groupNode(
     "pyg:tax",
-    "Impuestos",
+    "ISR y PTU",
     yearKeys,
-    buildPrefixForest(impuestos, yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:tax" }),
+    buildPrefixForest(enClase("isr", "ptu"), yearKeys, { polarity: "lowerIsBetter", outflow: true, idPrefix: "pyg:tax" }),
     "lowerIsBetter",
     { outflow: true, labelKey: "posicionFinanciera.structure.tax" },
   );
@@ -748,15 +736,17 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
     kind: "total",
     values: calculatedValues(yearKeys, (year) => {
       const ebit = ebitNode.values[year];
-      if (ebit == null && daNode.values[year] == null && finNode.values[year] == null && taxNode.values[year] == null) {
+      if (ebit == null && prodFinNode.values[year] == null && finNode.values[year] == null && taxNode.values[year] == null) {
         return null;
       }
-      return round2((ebit ?? 0) - (daNode.values[year] ?? 0) - (finNode.values[year] ?? 0) - (taxNode.values[year] ?? 0));
+      return round2(
+        (ebit ?? 0) + (prodFinNode.values[year] ?? 0) - (finNode.values[year] ?? 0) - (taxNode.values[year] ?? 0),
+      );
     }),
     polarity: "higherIsBetter",
   };
 
-  return [ingresosNode, costosNode, utilidadBruta, gastosOpNode, ebitNode, daNode, finNode, taxNode, utilidadNeta];
+  return [ingresosNode, costosNode, utilidadBruta, gastosOpNode, ebitNode, prodFinNode, finNode, taxNode, utilidadNeta];
 }
 
 /** Primer segmento de la cuenta: la cuenta de mayor (6101-0001-0000-0000 → 6101). */

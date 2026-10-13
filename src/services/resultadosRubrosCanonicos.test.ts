@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import type { BalanzaPnL } from "@/generated/prisma/client";
+import { computeErBuckets } from "@/services/estadoOperativo";
 import { buildResultadosTree, type StatementNode } from "@/services/posicionFinanciera";
 
 /** Cifras evidentemente de ejemplo. */
@@ -31,7 +32,7 @@ function codigos(node: StatementNode | undefined): string[] {
   return node.children.flatMap(codigos);
 }
 
-describe("Gastos financieros del Estado de resultados", () => {
+describe("Rubros del Estado de resultados por número de cuenta", () => {
   const filas = [
     fila("4101-0001-0000-0000", "VENTAS EJEMPLO", "Ingreso", 0, 100),
     fila("7102-0010-0000-0000", "Otros productos financieros", "Ingreso", 0, 50),
@@ -49,12 +50,25 @@ describe("Gastos financieros del Estado de resultados", () => {
     assert.equal(fin?.values["2026"], 30);
   });
 
-  it("un producto financiero cuenta una sola vez, en ingresos", () => {
-    assert.equal(tree.find((node) => node.id === "pyg:ingresos")?.values["2026"], 150);
+  it("un producto financiero va a su propio rubro, no a ingresos ni a gastos", () => {
+    assert.equal(tree.find((node) => node.id === "pyg:ingresos")?.values["2026"], 100);
+    assert.deepEqual(codigos(tree.find((node) => node.id === "pyg:prodfin")), ["7102-0010-0000-0000"]);
+    assert.equal(tree.find((node) => node.id === "pyg:prodfin")?.values["2026"], 50);
     assert.ok(!codigos(fin).includes("7102-0010-0000-0000"));
   });
 
   it("la utilidad neta no cambia por movimientos de cuentas de balance", () => {
     assert.equal(tree.find((node) => node.id === "pyg:un")?.values["2026"], 120);
+  });
+
+  it("cada subtotal coincide con computeErBuckets", () => {
+    const er = computeErBuckets(filas.map((f) => ({ idCuenta: f.idCuenta, nombreCuenta: f.nombreCuenta, debe: Number(f.debe), haber: Number(f.haber) })));
+    const valor = (id: string) => tree.find((node) => node.id === id)?.values["2026"] ?? 0;
+    assert.equal(valor("pyg:ingresos"), er.ventas);
+    assert.equal(valor("pyg:ub"), er.utilidadBruta);
+    assert.equal(valor("pyg:ebit"), er.ebit);
+    assert.equal(valor("pyg:prodfin"), er.productosFinancieros);
+    assert.equal(valor("pyg:fin"), er.gastosFinancieros);
+    assert.equal(valor("pyg:un"), er.utilidadNeta);
   });
 });

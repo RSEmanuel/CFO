@@ -77,7 +77,7 @@ describe("Estado de resultados solo con cuentas de mayor", () => {
     gasto("6101-0001-0000-0000", "SUELDOS", 100),
     gasto("6101-0002-0000-0000", "HONORARIOS", 50),
     gasto("6201-0001-0000-0000", "RENTA", 30),
-    gasto("6101-0009-0000-0000", "INTERESES BANCARIOS", 20),
+    gasto("8101-0002-0000-0000", "INTERESES BANCARIOS", 20),
   ];
   const tree = buildResultadosTree({ "2026": rows }, ["2026"]);
   const collapsed = collapseToMayorAccounts(tree, ["2026"], (segment) => `Cuenta de mayor ${segment}`);
@@ -102,11 +102,12 @@ describe("Estado de resultados solo con cuentas de mayor", () => {
     assert.equal(byId(collapsed, "pyg:un")?.values["2026"], 800);
   });
 
-  it("solo audita la mayor completa; si se reparte entre rubros no abre pólizas ajenas", () => {
+  it("cada mayor cae completa en un rubro por su número de cuenta, así que se puede auditar", () => {
     const opex = byId(collapsed, "pyg:gastos-op");
     const fin = byId(collapsed, "pyg:fin");
     assert.equal(opex?.children?.find((child) => child.label.endsWith("6201"))?.code, "6201");
-    assert.equal(opex?.children?.find((child) => child.label.endsWith("6101"))?.code, undefined);
+    assert.equal(opex?.children?.find((child) => child.label.endsWith("6101"))?.code, "6101");
+    assert.equal(fin?.children?.[0]?.code, "8101");
     assert.equal(fin?.children?.[0]?.values["2026"], 20);
   });
 
@@ -152,7 +153,7 @@ describe("nombre de la cuenta de mayor", () => {
     );
   });
 
-  it("usa el nombre de la mayor aunque la fila esté en otro rubro", () => {
+  it("el rubro sale del número de cuenta, no del nombre: «intereses» en una 6101 sigue en gastos de operación", () => {
     const tree = buildResultadosTree(
       {
         "2026": [
@@ -164,8 +165,11 @@ describe("nombre de la cuenta de mayor", () => {
       ["2026"],
     );
     const collapsed = collapseToMayorAccounts(tree, ["2026"], fallback);
-    assert.equal(childrenOf(collapsed, "pyg:fin")[0]?.label, "GASTOS GENERALES");
-    assert.equal(childrenOf(collapsed, "pyg:fin")[0]?.values["2026"], 20);
+    assert.deepEqual(
+      childrenOf(collapsed, "pyg:gastos-op").map((row) => [row.label, row.values["2026"]]),
+      [["GASTOS GENERALES", 120]],
+    );
+    assert.deepEqual(childrenOf(collapsed, "pyg:fin"), []);
   });
 
   it("sin fila de mayor no toma el nombre de una subcuenta: usa el genérico", () => {
