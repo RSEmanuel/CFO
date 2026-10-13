@@ -18,6 +18,5 @@ Data_ejemplo/
 # Artefactos de build / dependencias
 node_modules
 .next
-src/generated
 dist
 *.log
