@@ -3,6 +3,8 @@ node_modules
 Data_ejemplo
 .env
 .env.local
+.env.production
+.env.production.local
 src/generated
 dist
 *.log
