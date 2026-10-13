@@ -1,6 +1,5 @@
 "use client";
 
-import { CifraMark } from "@/components/brand/CifraMark";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoLibre } from "@/hooks/use-flujo-libre";
@@ -59,29 +58,51 @@ function toChartRows(steps: FlujoLibreStep[], t: (key: string) => string): Chart
   });
 }
 
-function splitLabel(label: string): string[] {
+const TICK_FONT_SIZE = 11;
+const TICK_CHAR_WIDTH = 6.4;
+const TICK_LINE_HEIGHT = 13;
+const TICK_MAX_LINES = 5;
+
+/** Parte la etiqueta en renglones que caben en el ancho de su barra, para que no se encimen. */
+function wrapLabel(label: string, maxChars: number): string[] {
   const words = label.trim().split(/\s+/).filter(Boolean);
-  if (words.length <= 2) {
-    return [label];
+  const lines: string[] = [];
+  for (const word of words) {
+    const last = lines[lines.length - 1];
+    if (last && `${last} ${word}`.length <= maxChars) {
+      lines[lines.length - 1] = `${last} ${word}`;
+    } else {
+      lines.push(word);
+    }
   }
-  const mid = Math.ceil(words.length / 2);
-  return [words.slice(0, mid).join(" "), words.slice(mid).join(" ")];
+  if (lines.length > TICK_MAX_LINES) {
+    const kept = lines.slice(0, TICK_MAX_LINES);
+    kept[TICK_MAX_LINES - 1] = `${kept[TICK_MAX_LINES - 1]}…`;
+    return kept;
+  }
+  return lines;
 }
 
 function WaterfallXTick({
   x,
   y,
   payload,
+  width,
+  visibleTicksCount,
 }: {
   x?: number;
   y?: number;
   payload?: { value?: string };
+  width?: number;
+  visibleTicksCount?: number;
 }) {
-  const lines = splitLabel(String(payload?.value ?? ""));
+  const band = width && visibleTicksCount ? width / visibleTicksCount : 120;
+  const maxChars = Math.max(6, Math.floor((band - 6) / TICK_CHAR_WIDTH));
+  const lines = wrapLabel(String(payload?.value ?? ""), maxChars);
   return (
-    <text x={x} y={y} textAnchor="middle" fill="var(--cifra-ink-3)" fontSize={12} fontWeight={500}>
+    <text x={x} y={y} textAnchor="middle" fill="var(--cifra-ink-3)" fontSize={TICK_FONT_SIZE} fontWeight={500}>
       {lines.map((line, index) => (
-        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 14 : 15}>
+        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 14 : TICK_LINE_HEIGHT}>
           {line}
         </tspan>
       ))}
@@ -111,22 +132,19 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
 
   return (
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="mb-1 flex items-center gap-2">
-        <CifraMark state="estimated" size={18} className="text-muted-foreground" />
-        <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.libre.title")}</h3>
-      </div>
+      <h3 className="mb-1 font-sans text-lg font-medium text-foreground">{t("flujo.libre.title")}</h3>
       <p className="max-w-3xl text-sm text-muted-foreground">{t("flujo.libre.subtitle")}</p>
 
       <div className="mt-4 h-[440px] w-full min-w-0">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} margin={{ top: 28, right: 12, left: 8, bottom: 36 }}>
+          <BarChart data={rows} margin={{ top: 28, right: 12, left: 8, bottom: 8 }}>
             <XAxis
               dataKey="label"
               interval={0}
               tick={<WaterfallXTick />}
               axisLine={{ stroke: CHART_AXIS.stroke }}
               tickLine={false}
-              height={56}
+              height={14 + TICK_LINE_HEIGHT * TICK_MAX_LINES}
             />
             <YAxis
               width={72}
