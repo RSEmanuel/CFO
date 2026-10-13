@@ -636,8 +636,13 @@ export function buildResultadosTree(rowsByYear: Record<string, BalanzaPnL[]>, ye
   const ingresos = lines.filter((line) => line.categoriaMaestra === "Ingreso");
   const costos = lines.filter((line) => line.categoriaMaestra === "COGS");
   const da = lines.filter((line) => line.depreciacionAmortizacion);
+  // Como en impuestos: solo cuentas de resultados. El nombre de un banco, cliente o
+  // acreedor puede decir «financiero», y un producto financiero ya está en ingresos.
   const financieros = lines.filter(
-    (line) => !line.depreciacionAmortizacion && isFinancialExpenseAccount(line.nombreCuenta),
+    (line) =>
+      !line.depreciacionAmortizacion &&
+      isFinancialExpenseAccount(line.nombreCuenta) &&
+      (line.categoriaMaestra === "OpEx" || line.categoriaMaestra === "COGS"),
   );
   const impuestos = lines.filter(
     (line) =>
