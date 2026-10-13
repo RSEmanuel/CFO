@@ -18,6 +18,9 @@ import {
   ResourceNotFoundException,
   AuthFlowType,
   AdminSetUserPasswordCommand,
+  ChangePasswordCommand,
+  LimitExceededException,
+  TooManyRequestsException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { createHmac } from "crypto";
 
@@ -146,6 +149,47 @@ export async function initiatePasswordLogin(
       expiresIn: result.ExpiresIn ?? 3600,
     };
   } catch (error) {
+    mapCognitoError(error);
+  }
+}
+
+/**
+ * El usuario cambia su propia contraseña con su access token. No requiere
+ * permisos IAM: Cognito valida la contraseña actual contra el token.
+ */
+export async function changeOwnCognitoPassword(
+  accessToken: string,
+  currentPassword: string,
+  newPassword: string,
+): Promise<void> {
+  const client = getClient();
+
+  try {
+    await client.send(
+      new ChangePasswordCommand({
+        AccessToken: accessToken,
+        PreviousPassword: currentPassword,
+        ProposedPassword: newPassword,
+      }),
+    );
+  } catch (error) {
+    // NotAuthorized aquí significa contraseña actual incorrecta, no sesión inválida:
+    // se responde 400 para que el cliente no lo trate como sesión vencida.
+    if (error instanceof NotAuthorizedException) {
+      throw new AppError("VALIDATION_ERROR", "La contraseña actual no es correcta.", 400, {
+        reason: "currentPasswordWrong",
+      });
+    }
+    if (error instanceof InvalidPasswordException) {
+      throw new AppError("VALIDATION_ERROR", "La contraseña no cumple la política del User Pool.", 400, {
+        reason: "passwordPolicy",
+      });
+    }
+    if (error instanceof LimitExceededException || error instanceof TooManyRequestsException) {
+      throw new AppError("VALIDATION_ERROR", "Demasiados intentos. Espera unos minutos.", 429, {
+        reason: "tooManyAttempts",
+      });
+    }
     mapCognitoError(error);
   }
 }

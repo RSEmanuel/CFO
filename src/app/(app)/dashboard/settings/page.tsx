@@ -1,5 +1,6 @@
 "use client";
 
+import { ChangePasswordCard } from "@/components/settings/change-password-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -108,6 +109,8 @@ export default function SettingsPage() {
           {canManage ? <p className="text-muted-foreground">{t("settings.compacHint")}</p> : null}
         </CardContent>
       </Card>
+
+      <ChangePasswordCard />
 
       {canManage ? (
         <Card>

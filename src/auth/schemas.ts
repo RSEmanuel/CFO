@@ -6,6 +6,18 @@ export const loginSchema = z.object({
   password: z.string().min(1, "La contraseña es obligatoria."),
 });
 
+// Misma política que el User Pool: 8+ caracteres, mayúscula, minúscula y número.
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "La contraseña actual es obligatoria."),
+  newPassword: z
+    .string()
+    .min(8, "La contraseña debe tener al menos 8 caracteres.")
+    .max(256, "La contraseña es demasiado larga.")
+    .regex(/[A-Z]/, "La contraseña debe incluir una mayúscula.")
+    .regex(/[a-z]/, "La contraseña debe incluir una minúscula.")
+    .regex(/[0-9]/, "La contraseña debe incluir un número."),
+});
+
 export const registerUserSchema = z.object({
   email: z.string().trim().email("El correo no es válido."),
   // Opcional: si no llega, el servidor genera una temporal y la devuelve una sola vez.
