@@ -51,8 +51,10 @@ export type ProyeccionMes = {
 
 export type FlujoCaja = {
   desglose: FlujoDesglose;
-  cashRunwayDias: number | null;
-  cashRunwayProyectadoDias: number | null;
+  /** Tu caja (services/caja.ts): cuentas de caja y bancos de la balanza. */
+  caja: number | null;
+  /** Meses de respiro (#28): tu caja ÷ gasto mensual de operación. */
+  mesesDeRespiro: number | null;
   promedioMensualHistorico: FlujoDesglose;
   proyeccion: ProyeccionMes[];
 };
@@ -107,10 +109,11 @@ export type AgingBucket = {
  * cogs son los flujos del corte (mes o YTD); comprasPeriodo replica el COGS
  * porque la balanza no separa compras. */
 export type CccDetalle = {
-  dso: number;
-  dio: number;
-  dpo: number;
-  days: number;
+  /** null = sin dato (misma regla que el catálogo #30-#33): nunca un 0 falso. */
+  dso: number | null;
+  dio: number | null;
+  dpo: number | null;
+  days: number | null;
   cxc: MoneyLine;
   cxp: MoneyLine;
   inventario: MoneyLine;

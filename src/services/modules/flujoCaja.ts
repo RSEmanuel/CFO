@@ -1,7 +1,7 @@
 import type { FlujoCaja, FlujoDesglose, ProyeccionMes } from "@/services/metricsTypes";
+import type { CajaYRespiro } from "@/services/caja";
 import {
   averageMonthlyTreasury,
-  cashRunwayDays,
   groupTreasuryByPeriod,
   line,
   type TreasuryTotals,
@@ -23,7 +23,7 @@ function toDesglose(t: TreasuryTotals): FlujoDesglose {
 
 /**
  * Flujo del corte + proyección 3/6/12 a partir del promedio histórico 1..P.
- * El runway en tiempo real usa el burn del corte; el proyectado usa el burn promedio.
+ * Tu caja y meses de respiro vienen de la definición única (services/caja.ts).
  */
 export function buildFlujoCaja(input: {
   corte: TreasuryTotals;
@@ -31,23 +31,10 @@ export function buildFlujoCaja(input: {
   saldoCierre: number;
   mesesEnCorte: number;
   view: "mensual" | "ytd";
+  respiro: CajaYRespiro;
 }): FlujoCaja {
   const byPeriod = groupTreasuryByPeriod(input.historial);
   const promedio = averageMonthlyTreasury(byPeriod);
-
-  const runwayRealtime =
-    input.view === "mensual"
-      ? cashRunwayDays(input.corte.saldoFinal, input.corte.salidasOperativas)
-      : cashRunwayDays(
-          input.saldoCierre,
-          input.mesesEnCorte > 0 ? input.corte.salidasOperativas / input.mesesEnCorte : 0,
-        );
-
-  const burnProyectado = round2(
-    promedio.salidasOperativas + promedio.salidasCapex + promedio.servicioDeuda - promedio.entradasOperativas,
-  );
-  const cashRunwayProyectadoDias =
-    burnProyectado > 0.01 ? round2((input.saldoCierre / burnProyectado) * 30) : null;
 
   const netMonthly = round2(
     promedio.entradasOperativas - promedio.salidasOperativas - promedio.salidasCapex - promedio.servicioDeuda,
@@ -66,8 +53,8 @@ export function buildFlujoCaja(input: {
 
   return {
     desglose: toDesglose(input.corte),
-    cashRunwayDias: runwayRealtime,
-    cashRunwayProyectadoDias,
+    caja: input.respiro.cuentas > 0 ? input.respiro.caja : null,
+    mesesDeRespiro: input.respiro.mesesDeRespiro,
     promedioMensualHistorico: toDesglose(promedio),
     proyeccion,
   };

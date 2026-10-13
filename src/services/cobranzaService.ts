@@ -10,6 +10,9 @@ import {
   type CobranzaFactura,
   type CobranzaModel,
 } from "@/services/cobranzaTransformer";
+import { cccFromBalanza } from "@/services/capitalTrabajoCalcs";
+import { plazosComercialesFromCcc } from "@/services/cobranzaPlazosComerciales";
+import { resolveAccountRoles } from "@/services/ingresoMixService";
 import {
   getCommittedIngestPeriods,
   resolvePeriodOrigins,
@@ -31,15 +34,34 @@ function iso(date: Date): string {
   return date.toISOString().slice(0, 10);
 }
 
+/**
+ * Días de cobro con la definición única (B06): cccFromBalanza sobre la última
+ * balanza hasta la fecha de corte, igual que el catálogo #31 y Cartera.
+ */
+async function dsoDeBalanza(tenantId: string, asOf: string): Promise<number | null> {
+  const anio = Number(asOf.slice(0, 4));
+  const mes = Number(asOf.slice(5, 7));
+  const ultima = await prisma.balanzaPnL.findFirst({
+    where: { tenantId, OR: [{ anio: { lt: anio } }, { anio, periodo: { lte: mes } }] },
+    orderBy: [{ anio: "desc" }, { periodo: "desc" }],
+    select: { anio: true, periodo: true },
+  });
+  if (!ultima) {
+    return null;
+  }
+  const [balanzaMes, roles] = await Promise.all([
+    prisma.balanzaPnL.findMany({ where: { tenantId, anio: ultima.anio, periodo: ultima.periodo } }),
+    resolveAccountRoles(tenantId),
+  ]);
+  const plazos = plazosComercialesFromCcc(cccFromBalanza({ balanzaCierre: balanzaMes, balanzaMov: balanzaMes, roles }));
+  return plazos.dso == null ? null : Math.round(plazos.dso);
+}
+
 export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
-  const [ventas, ingresos, egresos, committedPeriods] = await Promise.all([
+  const [ventas, egresos, committedPeriods] = await Promise.all([
     prisma.auxiliarVentas.findMany({
       where: { tenantId },
       orderBy: { fechaEmision: "asc" },
-    }),
-    prisma.balanzaPnL.findMany({
-      where: { tenantId, categoriaMaestra: "Ingreso" },
-      orderBy: [{ anio: "desc" }, { periodo: "desc" }],
     }),
     prisma.auxiliarEgresos.findMany({
       where: { tenantId },
@@ -72,15 +94,7 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
     monto: toNumber(row.montoSubtotal) + toNumber(row.iva),
     cobrado: toNumber(row.montoCobrado),
   }));
-  const incomePeriods = Array.from(
-    new Set(ingresos.map((row) => `${row.anio}-${String(row.periodo).padStart(2, "0")}`)),
-  )
-    .filter((periodo) => periodo <= asOf.slice(0, 7))
-    .sort()
-    .slice(-12);
-  const ingresoTtm = ingresos
-    .filter((row) => incomePeriods.includes(`${row.anio}-${String(row.periodo).padStart(2, "0")}`))
-    .reduce((sum, row) => sum + toNumber(row.haber) - toNumber(row.debe), 0);
+  const dso = ventas.length > 0 ? await dsoDeBalanza(tenantId, asOf) : null;
 
   const documentosCxc: AntiguedadDocumento[] = facturas
     .map((factura) => ({
@@ -104,7 +118,7 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
     tenantId,
     hasData: true,
     asOf,
-    model: ventas.length > 0 ? buildCobranza(facturas, asOf, ingresoTtm) : null,
+    model: ventas.length > 0 ? buildCobranza(facturas, asOf, dso) : null,
     antiguedadCxc: ventas.length > 0 ? buildAntiguedad(documentosCxc, asOf) : null,
     antiguedadCxp: egresos.length > 0 ? buildAntiguedad(documentosCxp, asOf) : null,
     periodOrigins: resolvePeriodOrigins(auxiliarPeriods, committedPeriods),

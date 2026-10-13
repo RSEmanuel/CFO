@@ -7,8 +7,8 @@ import {
 } from "@/services/capitalTrabajoCalcs";
 import { computeErBuckets } from "@/services/estadoOperativo";
 import type { AccountRoles } from "@/services/ingest/types";
+import { cajaYRespiro } from "@/services/caja";
 import {
-  isCashAccount,
   isDividendAccount,
   isInventoryAccount,
   money,
@@ -42,8 +42,14 @@ export type PeriodSnapshot = {
   ocf: number;
   fcf: number;
   capex: number;
+  /** Tu caja (B06): saldo de caja y bancos de la balanza. Igual a cajaBancos. */
   saldoCaja: number;
+  /** Salidas operativas del reporte de tesorería (detalle de movimientos). */
   salidasOperativas: number;
+  /** Gasto mensual de operación (PyG oficial, promedio de hasta 3 meses). */
+  gastoMensual: number | null;
+  /** Meses de respiro (#28): tu caja ÷ gasto mensual. */
+  mesesDeRespiro: number | null;
   activoTotal: number;
   activoCirculante: number;
   pasivoCirculante: number;
@@ -76,6 +82,8 @@ export type PeriodSnapshot = {
 
 export type SnapshotDisponibilidad = {
   tesoreria: boolean;
+  /** La balanza trae cuentas de caja y bancos. */
+  caja?: boolean;
   inventario: boolean;
   dso: boolean;
   dpo: boolean;
@@ -87,7 +95,8 @@ export const CATALOG_ASSUMPTIONS: string[] = [
   "Los gastos financieros se toman del 8101 (ER); si no hay, se usa el servicio de deuda de tesorería.",
   "La deuda financiera sale del rol deudaFinanciera del perfil de ingesta (default Compac: 2106 + 2306 + 2359, pasivos con costo CP/LP) en valor absoluto, porque la balanza persiste pasivos con signo negativo; sin rol configurado se infiere por nombre (préstamo, crédito, deuda), también en valor absoluto.",
   "DSO/DPO/CCC se calculan desde la balanza: promedio (saldo inicial + final)/2 del rubro sobre ventas o COGS anualizados (×12 en vista mensual; ×12/meses en YTD), ×365 días. Sin rubro de inventario, DIO queda N/D y CCC = DSO − DPO.",
-  "Sin tesorería cargada, las métricas de flujo (#6, #7, #15, #22, #28, #29) quedan N/D en lugar de 0.",
+  "Tu caja es el saldo final de las cuentas de caja y bancos de la balanza (rol bancos + caja, por prefijo; por nombre solo si el catálogo no trae esos prefijos). Meses de respiro (#28) = tu caja ÷ gasto mensual de operación del PyG oficial (costo + gastos sin depreciación + gastos financieros + ISR y PTU), promedio de hasta 3 meses del año.",
+  "Sin tesorería cargada, las métricas de flujo (#6, #7, #15, #22, #29) quedan N/D en lugar de 0.",
   "El NWC (#21) es activo circulante − |pasivo circulante|: la balanza persiste pasivos con signo negativo y restar el valor absoluto evita que el capital de trabajo sume en vez de restar. Las razones de liquidez (#25–#27) usan |pasivo circulante| en el denominador (misma convención de magnitud).",
   "El patrimonio del snapshot es el capital contable NIF con signo económico: cuentas 3xxx + resultado del ejercicio YTD (misma fuente que el árbol B3). Con déficit (capital ≤ 0), los ratios sobre capital (#9 ROIC, #10 ROCE, #11 ROE, #15 Cash ROIC, #20 IC turnover, #36 apalancamiento, #48/#49) quedan N/D: no son significativos.",
   "El ROCE (#10) usa capital empleado = activo total − |pasivo circulante| y la razón de pasivos (#37) es |pasivo total| / activo total: misma convención de magnitud sobre pasivos persistidos en negativo.",
@@ -109,6 +118,8 @@ export function buildPeriodSnapshot(input: {
   balanza: BalanzaPnL[];
   tesoreria: TesoreriaFlujo[];
   accountRoles?: AccountRoles | null;
+  /** Meses del año hasta el periodo, para el ritmo de gasto de meses de respiro. */
+  balanzaHistorial?: BalanzaPnL[];
 }): PeriodSnapshot {
   // PyG canónico del ER Operativo: una sola aritmética (ventas netas sin
   // productos financieros, 8101 descontado una sola vez vía RIF, impuestos =
@@ -136,11 +147,13 @@ export function buildPeriodSnapshot(input: {
   const sga = round2(Math.max(er.totalOpex - er.da, 0));
 
   const activoTotal = sumSaldo(input.balanza, (fila) => fila.categoriaMaestra === "Activo", "saldoFinal");
-  const cajaBancos = sumSaldo(
-    input.balanza,
-    (fila) => fila.categoriaMaestra === "Activo" && isCashAccount(fila.idCuenta, fila.nombreCuenta),
-    "saldoFinal",
-  );
+  const respiro = cajaYRespiro({
+    periodo: input.periodo,
+    balanzaCierre: input.balanza,
+    balanzaHistorial: input.balanzaHistorial,
+    roles: input.accountRoles,
+  });
+  const cajaBancos = respiro.caja;
   // Deuda financiera: rol deudaFinanciera del perfil (2106 + 2306 + 2359 en
   // Compac), en valor absoluto. Fallback legado por nombre, también en
   // magnitud (misma convención: los pasivos se persisten en negativo).
@@ -203,8 +216,10 @@ export function buildPeriodSnapshot(input: {
     ocf,
     fcf: treasury.freeCashFlow,
     capex: treasury.salidasCapex,
-    saldoCaja: treasury.saldoFinal > 0.01 ? treasury.saldoFinal : cajaBancos,
+    saldoCaja: cajaBancos,
     salidasOperativas: treasury.salidasOperativas,
+    gastoMensual: respiro.gastoMensual,
+    mesesDeRespiro: respiro.mesesDeRespiro,
     activoTotal,
     activoCirculante: structure.activoCirculante,
     pasivoCirculante: structure.pasivoCirculante,
@@ -231,6 +246,7 @@ export function buildPeriodSnapshot(input: {
     wacc,
     disponibilidad: {
       tesoreria: input.tesoreria.length > 0,
+      caja: respiro.cuentas > 0,
       inventario: ccc.disponible.dio,
       dso: ccc.disponible.dso,
       dpo: ccc.disponible.dpo,

@@ -58,6 +58,9 @@ export type AccountRoles = {
   costos?: AccountRoleRule;
   gastos?: AccountRoleRule;
   bancos?: AccountRoleRule;
+  /** Caja chica y fondos fijos; junto con bancos forma "tu caja" (B06).
+   * Default: 1101/101 o nombre "caja". */
+  caja?: AccountRoleRule;
   /** Rubro de inventarios para DIO/CCC desde balanza (auditoría C1). En el
    * catálogo Compac no hay prefijo de inventario (111x son IVA/ISR/deudores),
    * así que el default resuelve por nombre; sin cuentas de inventario el DIO

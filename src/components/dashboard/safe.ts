@@ -22,6 +22,13 @@ export function fmtDays(value: number | null | undefined): string {
   return `${value.toFixed(0)} días`;
 }
 
+export function fmtMonths(value: number | null | undefined): string {
+  if (value == null || !Number.isFinite(value)) {
+    return "N/D";
+  }
+  return `${value.toFixed(1)} meses`;
+}
+
 export function fmtRatio(value: number | null | undefined): string {
   if (value == null || !Number.isFinite(value)) {
     return "N/D";

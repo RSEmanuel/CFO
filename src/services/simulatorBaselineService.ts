@@ -14,13 +14,11 @@ import type { SimulatorBaseline } from "@/services/simulatorEngine";
  * - DSO/DIO/DPO/CCC y bases anualizadas: `cccFromBalanza` con los mismos
  *   insumos que usa `buildPeriodSnapshot` (cierre = movimiento = balanza del
  *   mes) → idénticos al catálogo #30-#33.
- * - Deuda financiera y burn mensual: `buildPeriodSnapshot` vía
- *   `snapshotFromLoaded` (rol deudaFinanciera, tesorería del mes).
- * - Caja: `cajaBancos` de la balanza (suma de cuentas de efectivo, fuente
- *   auditable completa). El snapshot prefiere el saldo de tesorería cuando
- *   existe, pero el reporte de flujo ingestado puede ser parcial (jul-2026:
- *   $1.79M en tesorería vs $4.96M en balanza); el simulador ancla la caja a
- *   la balanza y el runway usa esa misma caja sobre el burn de tesorería.
+ * - Deuda financiera: `buildPeriodSnapshot` vía `snapshotFromLoaded`
+ *   (rol deudaFinanciera).
+ * - Caja y burn mensual: definición única de `services/caja.ts` (B06), la
+ *   misma del catálogo #28 y de Flujo: tu caja = cuentas de caja y bancos de
+ *   la balanza; burn = gasto mensual de operación del PyG oficial.
  * - Tasa efectiva REAL del periodo: impuestos (PTU+ISR) / EBT; 0 cuando no
  *   hubo provisión (el motor aplica entonces el fallback 30% del catálogo).
  * - Costo de deuda efectivo: gastos financieros del ER / deuda financiera,
@@ -37,7 +35,7 @@ export const SIMULATOR_BASELINE_ASSUMPTIONS: string[] = [
   "La línea base es 100% canónica: buckets del ER Operativo (computeErBuckets), DSO/DPO/DIO/CCC desde la balanza (cccFromBalanza) y deuda/caja/runway del snapshot del catálogo (buildPeriodSnapshot). El simulador no recomputa ninguna de estas cifras.",
   "La tasa efectiva reportada es la REAL del periodo (PTU+ISR / RAII). Si el periodo no provisionó impuestos (tasa 0%), el motor aplica el fallback del 30% del catálogo (mismo criterio que NOPAT) y lo etiqueta en la UI.",
   "El costo de deuda efectivo es gastos financieros del ER (8101) / deuda financiera del periodo (ratio mensual), la misma razón de la métrica #39; a diferencia del catálogo no cae al servicio de deuda de tesorería para preservar la identidad RIF = productos − gastos financieros.",
-  "La caja de la línea base sale de la balanza (cuentas de efectivo, fuente auditable completa): el reporte de tesorería puede cubrir solo los bancos principales. El cash runway conserva la definición del catálogo #28 (caja / salidas operativas del mes) con esa caja.",
+  "La caja y los meses de respiro de la línea base son los del catálogo #28 (services/caja.ts): cuentas de caja y bancos de la balanza ÷ gasto mensual de operación del PyG oficial (promedio de hasta 3 meses).",
   "La simulación corre en memoria sobre la línea base: ninguna corrida muta la base de datos.",
 ];
 
@@ -112,7 +110,7 @@ export async function getSimulatorBaseline(
     cogsAnualizado: ccc.cogsAnualizado,
     deudaFinanciera,
     caja: snapshot.cajaBancos,
-    salidasOperativas: snapshot.salidasOperativas,
+    salidasOperativas: snapshot.gastoMensual ?? 0,
     tasaEfectiva,
     costoDeudaMensual,
     assumptions: SIMULATOR_BASELINE_ASSUMPTIONS,

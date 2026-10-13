@@ -64,3 +64,32 @@ export function findRoleLeaves<T extends CuentaRow>(rows: T[], rule: AccountRole
   // Sin padres persistidos (leafOnly): las hojas matchean el rol directamente.
   return leaves.filter((leaf) => matchesRole(rule, leaf.idCuenta, leaf.nombreCuenta));
 }
+
+// Caja y bancos (B06): una sola regla para "tu caja" en todo el producto.
+// Primero por prefijo (rol bancos + caja 1101/101): así un cliente llamado
+// "BANCO X" o "CAJA POPULAR" en 1105 nunca cuenta como efectivo. Solo si el
+// catálogo no tiene esos prefijos (otro ERP sin roles configurados) se cae a
+// los nombres de cuenta, respetando la jerarquía de padres.
+export const CAJA_ROLE: AccountRoleRule = { prefixes: ["1101", "101"], nameTokens: ["caja"] };
+
+export function cashRule(roles?: AccountRoles | null): AccountRoleRule {
+  const bancos = roles?.bancos ?? DEFAULT_ACCOUNT_ROLES.bancos;
+  const caja = roles?.caja ?? CAJA_ROLE;
+  return {
+    prefixes: [...(bancos?.prefixes ?? []), ...caja.prefixes],
+    nameTokens: [...(bancos?.nameTokens ?? []), ...(caja.nameTokens ?? [])],
+  };
+}
+
+export function findCashLeaves<T extends CuentaRow>(rows: T[], roles?: AccountRoles | null): T[] {
+  const rule = cashRule(roles);
+  const leafSet = selectLeafCodes(rows.map((row) => row.idCuenta));
+  const porPrefijo = rows.filter((row) => leafSet.has(row.idCuenta) && matchesByPrefix(rule, row.idCuenta));
+  if (porPrefijo.length > 0) {
+    return porPrefijo;
+  }
+  const terceros = [roles?.clientes, roles?.proveedores].filter((r): r is AccountRoleRule => Boolean(r));
+  return findRoleLeaves(rows, { prefixes: [], nameTokens: rule.nameTokens }).filter(
+    (row) => !terceros.some((tercero) => matchesByPrefix(tercero, row.idCuenta)),
+  );
+}

@@ -120,6 +120,7 @@ export function isFinancialExpenseAccount(nombreCuenta: string): boolean {
   return FINANCIAL_PATTERN.test(normalizeText(nombreCuenta));
 }
 
+/** Legado (solo nombre): no usar para "tu caja"; la regla única es findCashLeaves (B06). */
 export function isCashAccount(idCuenta: string, nombreCuenta: string): boolean {
   return CASH_PATTERN.test(normalizeText(`${idCuenta} ${nombreCuenta}`));
 }

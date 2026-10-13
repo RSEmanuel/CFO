@@ -1,9 +1,8 @@
-import { matchesRole } from "@/services/ingest/accountRoles";
+import { findCashLeaves, matchesRole } from "@/services/ingest/accountRoles";
 import { selectLeafCodes } from "@/services/ingest/leafAccounts";
 import type { AccountRoles } from "@/services/ingest/types";
 import { computeErBuckets, type ErCuentaRow } from "@/services/estadoOperativo";
 import {
-  isCashAccount,
   isCurrentAsset,
   isCurrentLiability,
   isInventoryAccount,
@@ -76,21 +75,6 @@ const BUCKET_ORDER: FlujoLibreBucket[] = [
 ];
 
 const STEP_EPSILON = 0.5;
-
-function digitsOf(idCuenta: string): string {
-  return idCuenta.replace(/\D/g, "");
-}
-
-function isCash(idCuenta: string, nombreCuenta: string, roles: AccountRoles): boolean {
-  if (roles.bancos && matchesRole(roles.bancos, idCuenta, nombreCuenta)) {
-    return true;
-  }
-  if (isCashAccount(idCuenta, nombreCuenta)) {
-    return true;
-  }
-  const digits = digitsOf(idCuenta);
-  return digits.startsWith("1101") || digits.startsWith("101");
-}
 
 function isFinancingDebt(idCuenta: string, nombreCuenta: string, roles: AccountRoles): boolean {
   return Boolean(roles.deudaFinanciera && matchesRole(roles.deudaFinanciera, idCuenta, nombreCuenta));
@@ -166,13 +150,17 @@ export function buildFlujoLibre(input: {
   const actual = indexSaldos(input.saldosActual);
   const prior = indexSaldos(input.saldosAnterior);
   const leaves = selectLeafCodes([...new Set([...actual.keys(), ...prior.keys()])]);
+  // Misma regla de "tu caja" que el resto del producto (B06).
+  const cashCodes = new Set(
+    findCashLeaves([...new Map([...prior, ...actual]).values()], input.roles).map((row) => row.idCuenta),
+  );
 
   const grouped = new Map<FlujoLibreBucket, { cash: number; economic: number }>();
   for (const code of leaves) {
     const now = actual.get(code);
     const prev = prior.get(code);
     const nombre = now?.nombreCuenta || prev?.nombreCuenta || "";
-    if (isCash(code, nombre, input.roles)) {
+    if (cashCodes.has(code)) {
       continue;
     }
     const delta = round2((now?.saldoFinal ?? 0) - (prev?.saldoFinal ?? 0));

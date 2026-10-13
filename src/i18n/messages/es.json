@@ -719,7 +719,7 @@
     "cashIncreased": "El efectivo incrementó {amount}",
     "cashDecreased": "El efectivo decreció ({amount})",
     "alertsMessages": {
-      "lowRunway": "Tu caja ({caja}) alcanza para {meses} meses al ritmo de gasto de este mes. Renegocia plazos con proveedores o acelera la cobranza.",
+      "lowRunway": "Tu caja ({caja}) alcanza para {meses} meses de operación. Renegocia plazos con proveedores o acelera la cobranza.",
       "negativeTwoMonths": "En los últimos dos meses salió {monto} más de lo que entró. Recorta gastos o adelanta cobros.",
       "highCapex": "Las inversiones del mes ({capex}) se comen más de la mitad de lo que entró por la operación ({entradas}). Reagenda inversiones o busca financiamiento."
     },
@@ -735,7 +735,7 @@
       "inflows": "Entradas",
       "outflows": "Salidas",
       "netFlow": "Flujo neto",
-      "endingCash": "Caja al cierre",
+      "endingCash": "Bancos al cierre (auxiliares)",
       "cashBalance": "Saldo en Bancos",
       "dayBalance": "Saldo al cierre",
       "dayNetFlow": "Flujo Neto del Día",
@@ -759,7 +759,7 @@
     "efectivo": {
       "tab": "Flujo de efectivo",
       "mapaTitle": "Origen y Aplicación de Fondos",
-      "mapaHelp": "Dinámica de ingresos, egresos y dispersión de tesorería del periodo",
+      "mapaHelp": "De dónde vino y a dónde se fue el dinero de tus bancos este mes, según tu reporte de flujo de efectivo (tesorería)",
       "monto": "Monto",
       "saldoInicial": "Saldo inicial",
       "ingresos": "Ingresos",
@@ -853,10 +853,14 @@
       }
     },
     "respiro": {
-      "title": "Meses de respiro",
-      "help": "Cuánto aguanta tu caja si sigues gastando como este mes.",
-      "source": "Cifra calculó: caja al cierre ({caja}) ÷ salidas de operación del mes ({salidas}), con tu reporte Flujo de Efectivo.",
-      "noOutflows": "Sin dato: este mes no hubo salidas de operación con qué medir el ritmo de gasto."
+      "title": "Tu caja",
+      "help": "Lo que tienes hoy en caja y bancos, y para cuántos meses te alcanza si dejara de entrar dinero.",
+      "cajaSource": "Saldo de tus cuentas de caja y bancos en la balanza al cierre del mes.",
+      "mesesLabel": "Meses de respiro",
+      "source": "Cifra calculó: tu caja ÷ {gasto} que te cuesta operar al mes (promedio de los últimos {meses} meses de tu Estado de Resultados).",
+      "sourceOneMonth": "Cifra calculó: tu caja ÷ {gasto} que te costó operar este mes, según tu Estado de Resultados.",
+      "noOutflows": "Sin dato: tu Estado de Resultados del año no trae gastos con qué medir el ritmo.",
+      "noCash": "Sin dato: no encontramos cuentas de caja y bancos en tu balanza de este mes."
     }
   },
   "polizas": {
@@ -892,7 +896,7 @@
     "pendingInvoices": "Facturas pendientes de cobro",
     "outstanding": "Lo que clientes aún no te pagan",
     "averageDays": "Días promedio para cobrar",
-    "averageDaysHelp": "Desde que facturas hasta que entra el dinero",
+    "averageDaysHelp": "Cuánto tardan en pagarte, según tu balanza: saldo de clientes ÷ ventas del mes",
     "days": "{value} días",
     "over60": "Cartera > 60 días",
     "topClient": "Top cliente",
@@ -951,10 +955,10 @@
       "detalleError": "No se pudo cargar el detalle de movimientos.",
       "emptyTitle": "Sin detalle de cartera para este periodo",
       "emptyMessage": "Carga el reporte de Movimientos Auxiliares de CONTPAQi para ver el detalle de saldos por cliente y proveedor.",
-      "dsoTitle": "Antigüedad Prom. Cuentas por Cobrar",
+      "dsoTitle": "Días promedio de cobro",
       "dpoTitle": "Antigüedad Prom. Cuentas por Pagar",
       "brechaTitle": "Brecha de financiamiento comercial",
-      "plazoSubtitle": "días promedio de crédito",
+      "plazoSubtitle": "según tu balanza: saldo de clientes ÷ ventas del mes",
       "brechaSubtitle": "DSO − DPO",
       "brechaDeficit": "Déficit de plazo comercial: financias a clientes {days} días más de lo que tus proveedores te financian",
       "brechaSuperavit": "Superávit de plazo comercial: tus proveedores financian tu operación"
@@ -1079,7 +1083,7 @@
       "cccNote": "DSO {dso} + DIO {dio} − DPO {dpo} días simulados.",
       "runway": "Meses de respiro",
       "runwayMeaning": "Cuánto tiempo puede sobrevivir el negocio con el efectivo actual sin recibir nuevos ingresos",
-      "runwayNote": "Meses de respiro = caja simulada / salidas operativas del mes (métrica #28)."
+      "runwayNote": "Meses de respiro = caja simulada ÷ gasto mensual de operación simulado (misma definición de la métrica #28)."
     },
     "chart": {
       "compareTitle": "Estructura Base vs Simulada",
@@ -1132,7 +1136,7 @@
         "deltaEbitda": "Δ EBITDA",
         "deltaCash": "Δ Caja",
         "cash": "Caja al cierre",
-        "burn": "Salidas operativas del mes",
+        "burn": "Gasto mensual de operación",
         "runway": "Meses de respiro"
       }
     }
@@ -1204,11 +1208,11 @@
       "daOfRevenue": "Depreciación y amortización / Ingresos",
       "currentRatio": "Activo circulante / Pasivo circulante",
       "quickRatio": "(Activo circulante − Inventarios) / Pasivo circulante",
-      "cashRatio": "Caja y bancos / Pasivo circulante",
-      "cashRunwayMonths": "Saldo de caja / Salidas operativas mensuales",
+      "cashRatio": "Tu caja (caja y bancos de la balanza) ÷ pasivo circulante",
+      "cashRunwayMonths": "Tu caja ÷ gasto mensual de operación (promedio de hasta 3 meses del Estado de Resultados)",
       "cashEfficiency": "FCF / EBITDA",
       "ccc": "DSO + DIO − DPO",
-      "dso": "Cuentas por cobrar / Ventas × días del periodo",
+      "dso": "Saldo promedio de clientes ÷ ventas del mes anualizadas × 365 días (balanza)",
       "dpo": "Cuentas por pagar / Compras × días del periodo",
       "dio": "Inventarios / Costo de ventas × días del periodo",
       "interestCoverage": "EBIT / Gastos financieros",
@@ -1483,10 +1487,11 @@
     "infoClose": "Cerrar",
     "nullReasons": {
       "negativeCapital": "Capital contable negativo: esta razón no aplica",
-      "noTreasury": "Sin dato: sube el Flujo de Efectivo de CONTPAQi para calcularla",
+      "noTreasury": "Sin dato: sube tu reporte de flujo de efectivo (tesorería) para calcularla",
       "noInventory": "No aplica: tu balanza no registra inventario",
       "noBalanceData": "Sin dato: la balanza del mes no trae esos saldos",
-      "unknown": "Sin dato este mes"
+      "unknown": "Sin dato este mes",
+      "noCash": "Sin dato: tu balanza no trae cuentas de caja y bancos"
     }
   },
   "ingesta": {

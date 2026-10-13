@@ -2,6 +2,7 @@ import { AppError } from "@/auth/errors";
 import { prisma } from "@/lib/prisma";
 import { previousPeriod } from "@/lib/session-types";
 import { cccFromBalanza } from "@/services/capitalTrabajoCalcs";
+import { cajaYRespiro } from "@/services/caja";
 import { CATALOG_ASSUMPTIONS, buildPeriodSnapshot } from "@/services/financialSnapshot";
 import type { AccountRoles } from "@/services/ingest/types";
 import { resolveAccountRoles } from "@/services/ingresoMixService";
@@ -230,6 +231,8 @@ function packModules(input: {
   egresosCorte: AuxiliarEgresos[];
   egresosHastaCierre: AuxiliarEgresos[];
   accountRoles?: AccountRoles | null;
+  /** Meses del año hasta el periodo: ritmo de gasto de meses de respiro. */
+  balanzaHistorial: BalanzaPnL[];
 }): ModulePack {
   const pnl = pnlFromBalanza(input.balanzaMov);
   const structure = structureFromBalanza(input.balanzaCierre, input.accountRoles);
@@ -269,6 +272,12 @@ function packModules(input: {
       saldoCierre,
       mesesEnCorte,
       view: input.view,
+      respiro: cajaYRespiro({
+        periodo: input.periodo,
+        balanzaCierre: input.balanzaCierre,
+        balanzaHistorial: input.balanzaHistorial,
+        roles: input.accountRoles,
+      }),
     }),
     pnl: buildPnlDetallado(pnl, ytdTreasury, input.egresosCorte),
     capitalTrabajo: buildCapitalTrabajo({
@@ -317,6 +326,7 @@ export async function getFullDashboard(
           egresosCorte: data.egresosPeriodo,
           egresosHastaCierre: data.egresosHastaPeriodo,
           accountRoles,
+          balanzaHistorial: data.balanzaYtd,
         });
 
   const ytd =
@@ -335,6 +345,7 @@ export async function getFullDashboard(
           egresosCorte: data.egresosYtd,
           egresosHastaCierre: data.egresosHastaPeriodo,
           accountRoles,
+          balanzaHistorial: data.balanzaYtd,
         });
 
   return {
@@ -358,6 +369,7 @@ export function snapshotFromLoaded(
     balanza: data.balanzaMes,
     tesoreria: data.tesoreriaMes,
     accountRoles,
+    balanzaHistorial: data.balanzaYtd,
   });
 }
 

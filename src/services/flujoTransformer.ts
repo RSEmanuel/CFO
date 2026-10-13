@@ -348,17 +348,8 @@ export type FlujoAlerta =
   | { kind: "negativeTwoMonths"; salidaNeta: number }
   | { kind: "highCapex"; capex: number; entradas: number };
 
-/** Umbral de "poca caja": menos de 1.5 meses de salidas de operación (~6 semanas). */
+/** Umbral de "poca caja": menos de 1.5 meses de gasto de operación (~6 semanas). */
 export const MESES_RESPIRO_MINIMO = 1.5;
-
-/**
- * Meses de respiro del mes: caja al cierre ÷ salidas de operación del mes. Es
- * la misma fórmula de la métrica #28 del catálogo cuando hay tesorería.
- * null si en el mes no hubo salidas de operación (no hay ritmo con qué medir).
- */
-export function mesesDeRespiro(row: FlujoMensual): number | null {
-  return row.salidasOperativas > 0.01 ? round2(row.saldoFinal / row.salidasOperativas) : null;
-}
 
 export function flujoMesActivo(rows: FlujoMensual[], periodo: string): FlujoMensual | null {
   if (rows.length === 0) {
@@ -368,16 +359,26 @@ export function flujoMesActivo(rows: FlujoMensual[], periodo: string): FlujoMens
   return rows[found >= 0 ? found : rows.length - 1];
 }
 
-export function buildFlujoAlertas(rows: FlujoMensual[], periodo: string): FlujoAlerta[] {
-  const current = flujoMesActivo(rows, periodo);
-  if (!current) {
-    return [];
-  }
+/**
+ * Alertas de caja del mes. "Poca caja" usa la definición única de tu caja y
+ * meses de respiro (services/caja.ts, desde la balanza); las de movimientos
+ * salen de la tesorería del mismo mes, nunca de otro.
+ */
+export function buildFlujoAlertas(
+  rows: FlujoMensual[],
+  periodo: string,
+  respiro: { caja: number; mesesDeRespiro: number | null } | null,
+): FlujoAlerta[] {
   const alerts: FlujoAlerta[] = [];
 
-  const meses = mesesDeRespiro(current);
-  if (meses != null && meses < MESES_RESPIRO_MINIMO) {
-    alerts.push({ kind: "lowRunway", caja: round2(current.saldoFinal), meses });
+  const meses = respiro?.mesesDeRespiro ?? null;
+  if (respiro && meses != null && meses < MESES_RESPIRO_MINIMO) {
+    alerts.push({ kind: "lowRunway", caja: round2(respiro.caja), meses });
+  }
+
+  const current = rows.find((row) => row.periodo === periodo);
+  if (!current) {
+    return alerts;
   }
 
   const prior = rows.find((row) => row.periodo === shiftPeriodo(current.periodo, -1));

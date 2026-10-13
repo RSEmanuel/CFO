@@ -14,7 +14,7 @@ import { nearlyEqual, round2 } from "@/services/money";
 
 export type StatementPolarity = "higherIsBetter" | "lowerIsBetter" | "neutral";
 
-export type StatementValueFormat = "money" | "pct" | "x" | "days" | "score";
+export type StatementValueFormat = "money" | "pct" | "x" | "days" | "months" | "score";
 
 export type StatementNode = {
   id: string;
@@ -71,7 +71,7 @@ export function formatStatementRatio(value: number | null, unit: StatementValueF
   if (unit === "pct") {
     return `${value.toFixed(1)}%`;
   }
-  if (unit === "days") {
+  if (unit === "days" || unit === "months") {
     return value.toFixed(1);
   }
   if (unit === "score") {
@@ -843,7 +843,8 @@ function metricNode(metric: CatalogMetric, yearKeys: string[], values: Record<st
     labelKey: `metrics.${metric.key}.name`,
     kind: "account",
     formulaKey: `metrics.formulas.${metric.key}`,
-    format: unitToFormat(metric.unit),
+    // Meses de respiro va en meses (1 decimal, igual que Métricas), no como razón "x".
+    format: metric.key === "cashRunwayMonths" ? "months" : unitToFormat(metric.unit),
     values,
     polarity: "neutral",
   };

@@ -85,6 +85,8 @@ function snapshotAntes(rows: BalanzaPnL[], tesoreria: Parameters<typeof treasury
   return {
     anio: 2026,
     periodo: 7,
+    gastoMensual: null,
+    mesesDeRespiro: null,
     ingresos: pnl.ingresos,
     cogs: pnl.cogs,
     opex: pnl.opex,

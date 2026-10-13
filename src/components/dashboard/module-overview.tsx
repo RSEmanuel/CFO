@@ -2,7 +2,7 @@
 
 import { MetricCard } from "@/components/metric-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { fmtDays, fmtMoney, fmtPct, fmtRatio, n } from "@/components/dashboard/safe";
+import { fmtDays, fmtMoney, fmtMonths, fmtPct, fmtRatio, n } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
 
 function ebitdaMargin(pack: ModulePack): number | null {
@@ -54,9 +54,9 @@ export function ModuleOverview({
         <MetricCard
           favoriteId="metric:overview:cash-runway"
           title="Meses de respiro"
-          value={fmtDays(flujo?.cashRunwayDias)}
+          value={fmtMonths(flujo?.mesesDeRespiro)}
           loading={loading}
-          currentNumeric={flujo?.cashRunwayDias}
+          currentNumeric={flujo?.mesesDeRespiro}
           hint="Días de caja al ritmo de salidas operativas"
         />
         <MetricCard

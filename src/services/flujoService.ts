@@ -25,15 +25,28 @@ export async function getFlujo(tenantId: string): Promise<FlujoPayload> {
     }),
     getCommittedIngestPeriods(tenantId),
   ]);
-  const rows = source.map((row) => ({
-    periodo: `${row.anio}-${String(row.periodo).padStart(2, "0")}`,
-    saldoInicial: toNumber(row.saldoInicialPeriodo),
-    entradasOperativas: toNumber(row.entradasOperativas),
-    salidasOperativas: toNumber(row.salidasOperativas),
-    salidasCapex: toNumber(row.salidasCapex),
-    servicioDeuda: toNumber(row.servicioDeuda),
-    saldoFinal: toNumber(row.saldoFinalPeriodo),
-  }));
+  // Una fila por mes: el reporte trae una fila por banco y hay que sumarlas.
+  const porMes = new Map<string, FlujoMensual>();
+  for (const row of source) {
+    const periodo = `${row.anio}-${String(row.periodo).padStart(2, "0")}`;
+    const acc = porMes.get(periodo) ?? {
+      periodo,
+      saldoInicial: 0,
+      entradasOperativas: 0,
+      salidasOperativas: 0,
+      salidasCapex: 0,
+      servicioDeuda: 0,
+      saldoFinal: 0,
+    };
+    acc.saldoInicial = round2(acc.saldoInicial + toNumber(row.saldoInicialPeriodo));
+    acc.entradasOperativas = round2(acc.entradasOperativas + toNumber(row.entradasOperativas));
+    acc.salidasOperativas = round2(acc.salidasOperativas + toNumber(row.salidasOperativas));
+    acc.salidasCapex = round2(acc.salidasCapex + toNumber(row.salidasCapex));
+    acc.servicioDeuda = round2(acc.servicioDeuda + toNumber(row.servicioDeuda));
+    acc.saldoFinal = round2(acc.saldoFinal + toNumber(row.saldoFinalPeriodo));
+    porMes.set(periodo, acc);
+  }
+  const rows = [...porMes.values()];
   return {
     tenantId,
     hasData: rows.length > 0,

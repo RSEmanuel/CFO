@@ -197,11 +197,15 @@ test("sin tesorería, las métricas de flujo quedan N/D con motivo, nunca 0", ()
   assert.equal(snapshot.disponibilidad?.tesoreria, false);
   const all = getAllMetrics(snapshot, null);
   const byKey = new Map(Object.values(all).flat().map((m) => [m.key, m]));
-  for (const key of ["ocfMargin", "fcfMargin", "capexOfRevenue", "cashRunwayMonths", "cashEfficiency"]) {
+  for (const key of ["ocfMargin", "fcfMargin", "capexOfRevenue", "cashEfficiency"]) {
     assert.equal(byKey.get(key)?.value, null, key);
     assert.equal(byKey.get(key)?.nullReason, "noTreasury", key);
     assert.equal(byKey.get(key)?.formatted, "", key);
   }
+  // Meses de respiro (B06) sale de la balanza: tiene dato aunque no haya tesorería.
+  assert.equal(byKey.get("cashRunwayMonths")?.value, snapshot.mesesDeRespiro);
+  assert.notEqual(snapshot.mesesDeRespiro, null);
+  assert.equal(byKey.get("cashRunwayMonths")?.nullReason, null);
   // ROIC de caja también queda N/D; si además el capital es negativo, ese motivo manda.
   assert.equal(byKey.get("cashRoic")?.value, null);
   assert.ok(["noTreasury", "negativeCapital"].includes(byKey.get("cashRoic")?.nullReason ?? ""));
@@ -235,4 +239,23 @@ test("un snapshot sin disponibilidad (armado a mano) conserva los valores de sie
   const margenes = calculateMargenes(legacy);
   assert.equal(margenes.find((m) => m.key === "ocfMargin")?.value, 0);
   assert.equal(margenes.find((m) => m.key === "ocfMargin")?.nullReason, null);
+});
+
+test("meses de respiro (#28) y razón de efectivo (#27) usan tu caja de la balanza; sin cuentas de caja quedan N/D", () => {
+  const rows = rowsEscenario(-1);
+  const snapshot = buildPeriodSnapshot({ anio: 2026, periodo: 7, balanza: rows, tesoreria: [], accountRoles: COMPAC_ACCOUNT_ROLES });
+  assert.equal(snapshot.saldoCaja, snapshot.cajaBancos);
+
+  const sinCaja = buildPeriodSnapshot({
+    anio: 2026,
+    periodo: 7,
+    balanza: rows.filter((row) => !/^110[12]/.test(row.idCuenta)),
+    tesoreria: [],
+    accountRoles: COMPAC_ACCOUNT_ROLES,
+  });
+  const byKey = new Map(Object.values(getAllMetrics(sinCaja, null)).flat().map((m) => [m.key, m]));
+  for (const key of ["cashRunwayMonths", "cashRatio"]) {
+    assert.equal(byKey.get(key)?.value, null, key);
+    assert.equal(byKey.get(key)?.nullReason, "noCash", key);
+  }
 });

@@ -193,8 +193,9 @@ test("paridad módulo vs catálogo: buildCapitalTrabajo y buildPeriodSnapshot re
     accountRoles: COMPAC_ACCOUNT_ROLES,
   });
 
+  // Misma regla de N/D que el catálogo: sin inventario el DIO es null, nunca 0.
   assert.equal(modulo.ccc.dso, snapshot.dso);
-  assert.equal(modulo.ccc.dio, snapshot.dio);
+  assert.equal(modulo.ccc.dio, snapshot.disponibilidad?.inventario ? snapshot.dio : null);
   assert.equal(modulo.ccc.dpo, snapshot.dpo);
   assert.equal(modulo.ccc.days, snapshot.ccc);
   assert.equal(modulo.nwc.amount, snapshot.nwc);

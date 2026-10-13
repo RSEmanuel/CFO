@@ -83,7 +83,7 @@ export type SimulatorBaseline = {
   // Balance / tesorería (buildPeriodSnapshot).
   deudaFinanciera: number;
   caja: number;
-  /** Salidas operativas del mes (tesorería): burn de la métrica #28. */
+  /** Gasto mensual de operación (services/caja.ts): burn de meses de respiro #28. */
   salidasOperativas: number;
   /** Tasa efectiva REAL del periodo (impuestos/ebt; 0 si no hubo provisión). */
   tasaEfectiva: number;
@@ -282,7 +282,7 @@ export function simulate(baseline: SimulatorBaseline, deltas: Partial<SimulatorD
 /**
  * Derivados del baseline con las MISMAS guardas del motor/catálogo, para que
  * la UI muestre la columna "Base" sin duplicar aritmética: márgenes sobre
- * ventas (guarda safeRatio) y runway #28 (caja / salidas operativas del mes).
+ * ventas (guarda safeRatio) y runway #28 (tu caja / gasto mensual de operación).
  */
 export function baselineDerived(baseline: SimulatorBaseline): {
   sga: number;

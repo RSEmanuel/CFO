@@ -12,7 +12,7 @@ export type MetricUnit = "pct" | "x" | "days" | "score";
  * - noInventory: la balanza no registra inventario.
  * - noBalanceData: la balanza del periodo no trae los saldos que la alimentan.
  */
-export type CatalogNullReason = "negativeCapital" | "noTreasury" | "noInventory" | "noBalanceData";
+export type CatalogNullReason = "negativeCapital" | "noTreasury" | "noInventory" | "noBalanceData" | "noCash";
 
 export type CatalogMetric = {
   id: number;
@@ -182,15 +182,16 @@ export function calculateEficiencia(s: PeriodSnapshot): CatalogMetric[] {
 }
 
 export function calculateLiquidez(s: PeriodSnapshot): CatalogMetric[] {
-  const { tesoreria, inventario, dso, dpo } = s.disponibilidad ?? {};
-  const runwayMonths = s.salidasOperativas > 0.01 ? round2(s.saldoCaja / s.salidasOperativas) : null;
-  const runway = metric(28, "cashRunwayMonths", requires(tesoreria, runwayMonths), "x", missingReason(tesoreria, "noTreasury"));
+  const { tesoreria, inventario, dso, dpo, caja } = s.disponibilidad ?? {};
+  // Meses de respiro (B06): definición única de services/caja.ts, solo balanza.
+  const runwayMonths = caja === false ? null : s.mesesDeRespiro;
+  const runway = metric(28, "cashRunwayMonths", runwayMonths, "x", caja === false ? "noCash" : runwayMonths == null ? "noBalanceData" : null);
   runway.formatted = runwayMonths == null ? "" : runwayMonths.toFixed(1);
 
   return [
     metric(25, "currentRatio", safeRatio(s.activoCirculante, Math.abs(s.pasivoCirculante)), "x"),
     metric(26, "quickRatio", safeRatio(s.activoCirculante - s.inventarios, Math.abs(s.pasivoCirculante)), "x"),
-    metric(27, "cashRatio", safeRatio(s.cajaBancos, Math.abs(s.pasivoCirculante)), "x"),
+    metric(27, "cashRatio", requires(caja, safeRatio(s.cajaBancos, Math.abs(s.pasivoCirculante))), "x", missingReason(caja, "noCash")),
     runway,
     metric(29, "cashEfficiency", requires(tesoreria, safeRatio(s.fcf, s.ebitda)), "x", missingReason(tesoreria, "noTreasury")),
     // Sin inventario el CCC es DSO − DPO (supuesto documentado); sin DSO o DPO no hay ciclo que medir.

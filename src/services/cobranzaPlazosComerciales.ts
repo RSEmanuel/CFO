@@ -54,10 +54,11 @@ export const EMPTY_PLAZOS_COMERCIALES: PlazosComerciales = {
 };
 
 export function plazosComercialesFromCcc(
-  ccc: Pick<CccBalanza, "dso" | "dpo" | "ventasAnualizadas" | "cogsAnualizado">,
+  ccc: Pick<CccBalanza, "dso" | "dpo" | "ventasAnualizadas" | "cogsAnualizado"> & Partial<Pick<CccBalanza, "disponible">>,
 ): PlazosComerciales {
-  const dso = ccc.ventasAnualizadas > FLOW_EPS ? ccc.dso : null;
-  const dpo = ccc.cogsAnualizado > FLOW_EPS ? ccc.dpo : null;
+  // Misma regla que el catálogo #31/#32: sin saldo o sin flujo es N/D, nunca 0.
+  const dso = ccc.ventasAnualizadas > FLOW_EPS && ccc.disponible?.dso !== false ? ccc.dso : null;
+  const dpo = ccc.cogsAnualizado > FLOW_EPS && ccc.disponible?.dpo !== false ? ccc.dpo : null;
   const brecha = dso != null && dpo != null ? round2(dso - dpo) : null;
   return { dso, dpo, brecha };
 }

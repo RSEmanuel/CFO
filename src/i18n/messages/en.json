@@ -719,7 +719,7 @@
     "cashIncreased": "Cash increased {amount}",
     "cashDecreased": "Cash decreased ({amount})",
     "alertsMessages": {
-      "lowRunway": "Your cash ({caja}) lasts {meses} months at this month's spending pace. Renegotiate supplier terms or speed up collections.",
+      "lowRunway": "Your cash ({caja}) covers {meses} months of operation. Renegotiate supplier terms or speed up collections.",
       "negativeTwoMonths": "Over the last two months, {monto} more went out than came in. Cut expenses or bring collections forward.",
       "highCapex": "This month's investments ({capex}) take more than half of operating inflows ({entradas}). Reschedule investments or seek financing."
     },
@@ -735,7 +735,7 @@
       "inflows": "Inflows",
       "outflows": "Outflows",
       "netFlow": "Net flow",
-      "endingCash": "Ending cash",
+      "endingCash": "Banks at close (ledgers)",
       "cashBalance": "Bank Balance",
       "dayBalance": "Closing balance",
       "dayNetFlow": "Day's Net Flow",
@@ -759,7 +759,7 @@
     "efectivo": {
       "tab": "Cash flow",
       "mapaTitle": "Sources and Uses of Funds",
-      "mapaHelp": "Inflows, outflows, and treasury dispersion for the period",
+      "mapaHelp": "Where your bank money came from and went this month, per your cash flow (treasury) report",
       "monto": "Amount",
       "saldoInicial": "Opening balance",
       "ingresos": "Cash in",
@@ -853,10 +853,14 @@
       }
     },
     "respiro": {
-      "title": "Months of runway",
-      "help": "How long your cash lasts if you keep spending like this month.",
-      "source": "Cifra calculated: closing cash ({caja}) ÷ this month's operating outflows ({salidas}), from your Cash Flow report.",
-      "noOutflows": "No data: there were no operating outflows this month to measure the spending pace."
+      "title": "Your cash",
+      "help": "What you have today in cash and banks, and how many months it lasts if money stopped coming in.",
+      "cajaSource": "Balance of your cash and bank accounts in the trial balance at month end.",
+      "mesesLabel": "Months of runway",
+      "source": "Cifra calculated: your cash ÷ {gasto} it costs to operate per month (average of the last {meses} months of your income statement).",
+      "sourceOneMonth": "Cifra calculated: your cash ÷ {gasto} it cost to operate this month, per your income statement.",
+      "noOutflows": "No data: this year's income statement has no expenses to measure the pace.",
+      "noCash": "No data: we found no cash or bank accounts in this month's trial balance."
     }
   },
   "polizas": {
@@ -892,7 +896,7 @@
     "pendingInvoices": "Outstanding invoices",
     "outstanding": "What customers still owe you",
     "averageDays": "Average days to collect",
-    "averageDaysHelp": "From invoicing until cash is received",
+    "averageDaysHelp": "How long customers take to pay you, per your trial balance: receivables ÷ monthly sales",
     "days": "{value} days",
     "over60": "Receivables > 60 days",
     "topClient": "Top customer",
@@ -951,10 +955,10 @@
       "detalleError": "Could not load the movement detail.",
       "emptyTitle": "No ledger detail for this period",
       "emptyMessage": "Upload the CONTPAQi Account Movements (Auxiliares) report to see customer and supplier balance detail.",
-      "dsoTitle": "Avg. Accounts Receivable Aging",
+      "dsoTitle": "Average collection days",
       "dpoTitle": "Avg. Accounts Payable Aging",
       "brechaTitle": "Trade financing gap",
-      "plazoSubtitle": "average credit days",
+      "plazoSubtitle": "per your trial balance: receivables ÷ monthly sales",
       "brechaSubtitle": "DSO − DPO",
       "brechaDeficit": "Trade-term deficit: you finance customers {days} days longer than your suppliers finance you",
       "brechaSuperavit": "Trade-term surplus: your suppliers finance the operation"
@@ -1079,7 +1083,7 @@
       "cccNote": "DSO {dso} + DIO {dio} − DPO {dpo} simulated days.",
       "runway": "Months of breathing room",
       "runwayMeaning": "How long the business can keep going on the cash it has, without new revenue.",
-      "runwayNote": "Months of breathing room = simulated cash / monthly operating outflows (metric #28)."
+      "runwayNote": "Months of runway = simulated cash ÷ simulated monthly operating cost (same definition as metric #28)."
     },
     "chart": {
       "compareTitle": "Base vs Simulated structure",
@@ -1132,7 +1136,7 @@
         "deltaEbitda": "Δ EBITDA",
         "deltaCash": "Δ Cash",
         "cash": "Cash at close",
-        "burn": "Monthly operating outflows",
+        "burn": "Monthly operating cost",
         "runway": "Months of breathing room"
       }
     }
@@ -1204,11 +1208,11 @@
       "daOfRevenue": "Depreciation and amortization / Revenue",
       "currentRatio": "Current assets / Current liabilities",
       "quickRatio": "(Current assets − Inventory) / Current liabilities",
-      "cashRatio": "Cash and banks / Current liabilities",
-      "cashRunwayMonths": "Cash balance / Monthly operating outflows",
+      "cashRatio": "Your cash (cash and bank accounts in the trial balance) ÷ current liabilities",
+      "cashRunwayMonths": "Your cash ÷ monthly operating cost (average of up to 3 months of the income statement)",
       "cashEfficiency": "FCF / EBITDA",
       "ccc": "DSO + DIO − DPO",
-      "dso": "Accounts receivable / Sales × days in period",
+      "dso": "Average receivables balance ÷ annualized monthly sales × 365 days (trial balance)",
       "dpo": "Accounts payable / Purchases × days in period",
       "dio": "Inventory / Cost of sales × days in period",
       "interestCoverage": "EBIT / Financial expenses",
@@ -1483,10 +1487,11 @@
     "infoClose": "Close",
     "nullReasons": {
       "negativeCapital": "Negative equity: this ratio does not apply",
-      "noTreasury": "No data: upload the CONTPAQi Cash Flow report to calculate it",
+      "noTreasury": "No data: upload your cash flow (treasury) report to calculate it",
       "noInventory": "Not applicable: your trial balance has no inventory",
       "noBalanceData": "No data: this month's trial balance lacks those balances",
-      "unknown": "No data this month"
+      "unknown": "No data this month",
+      "noCash": "No data: your trial balance has no cash or bank accounts"
     }
   },
   "ingesta": {

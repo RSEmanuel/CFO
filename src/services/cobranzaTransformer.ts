@@ -61,10 +61,14 @@ export function bucketOf(dias: number): AgingBucketLabel {
   return "90+";
 }
 
+/**
+ * `dso` llega ya calculado con la definición única (cccFromBalanza sobre la
+ * balanza del mes, igual que el catálogo #31 y la pestaña Cartera).
+ */
 export function buildCobranza(
   facturas: CobranzaFactura[],
   asOfIso: string,
-  ingresoTtm = 0,
+  dso: number | null = null,
 ): CobranzaModel {
   const open = facturas
     .map((factura) => ({
@@ -75,7 +79,6 @@ export function buildCobranza(
     .filter((item) => item.saldo > 0);
 
   const cxcAbierta = round2(open.reduce((sum, item) => sum + item.saldo, 0));
-  const dso = ingresoTtm > 0.01 ? Math.round((cxcAbierta / ingresoTtm) * 365) : null;
 
   const agingMap: Record<AgingBucketLabel, number> = {
     "0–30": 0,

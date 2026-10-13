@@ -1,7 +1,7 @@
 "use client";
 
 import { MetricCard } from "@/components/metric-card";
-import { fmtDays, fmtMoney, fmtPct, fmtRatio, n } from "@/components/dashboard/safe";
+import { fmtDays, fmtMoney, fmtMonths, fmtPct, fmtRatio, n } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
 import type { ReactNode } from "react";
 
@@ -43,7 +43,7 @@ export function renderModuleFavoriteMetric(
       <MetricCard favoriteId={id} title="Free Cash Flow" value={fmtMoney(d?.freeCashFlow?.amount, d?.freeCashFlow?.amountFormatted)} loading={loading} currentNumeric={d?.freeCashFlow?.amount} />
     ),
     "metric:overview:cash-runway": (
-      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} currentNumeric={flujo?.cashRunwayDias} />
+      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtMonths(flujo?.mesesDeRespiro)} loading={loading} currentNumeric={flujo?.mesesDeRespiro} />
     ),
     "metric:overview:ebitda-margin": (
       <MetricCard favoriteId={id} title="Margen EBITDA" value={fmtPct(margin)} loading={loading} currentNumeric={margin} />
@@ -70,7 +70,7 @@ export function renderModuleFavoriteMetric(
       <MetricCard favoriteId={id} title="Cobertura de intereses" value={fmtRatio(salud?.coberturaIntereses?.value)} loading={loading} />
     ),
     "metric:cashflow:saldo-final": (
-      <MetricCard favoriteId={id} title="Saldo final" value={fmtMoney(d?.saldoFinal?.amount, d?.saldoFinal?.amountFormatted)} loading={loading} />
+      <MetricCard favoriteId={id} title="Saldo final en bancos (tesorería)" value={fmtMoney(d?.saldoFinal?.amount, d?.saldoFinal?.amountFormatted)} loading={loading} />
     ),
     "metric:cashflow:entradas-operativas": (
       <MetricCard favoriteId={id} title="Entradas operativas" value={fmtMoney(d?.entradasOperativas?.amount, d?.entradasOperativas?.amountFormatted)} loading={loading} />
@@ -88,10 +88,10 @@ export function renderModuleFavoriteMetric(
       <MetricCard favoriteId={id} title="Free Cash Flow" value={fmtMoney(d?.freeCashFlow?.amount, d?.freeCashFlow?.amountFormatted)} loading={loading} />
     ),
     "metric:cashflow:runway-actual": (
-      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtDays(flujo?.cashRunwayDias)} loading={loading} />
+      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtMonths(flujo?.mesesDeRespiro)} loading={loading} />
     ),
     "metric:cashflow:runway-proyectado": (
-      <MetricCard favoriteId={id} title="Meses de respiro proyectados" value={fmtDays(flujo?.cashRunwayProyectadoDias)} loading={loading} />
+      <MetricCard favoriteId={id} title="Meses de respiro" value={fmtMonths(flujo?.mesesDeRespiro)} loading={loading} />
     ),
     "metric:pnl:costos-fijos": (
       <MetricCard favoriteId={id} title="Costos fijos" value={fmtPct(mix?.fijoPct)} loading={loading} />
