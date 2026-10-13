@@ -48,10 +48,10 @@ export async function getDataCapabilities(
     posicionFinanciera: ["Posición financiera aún no disponible", "Carga una balanza de comprobación."],
     flujo: [
       "Flujo de caja aún no disponible",
-      "Para habilitarlo, carga un archivo de tesorería con entradas y salidas.",
+      "Carga el reporte Flujo de Efectivo de CONTPAQi o la plantilla máster con tu tesorería.",
     ],
-    cobranza: ["Cobranza aún no disponible", "Para habilitarla, carga el auxiliar de clientes."],
-    cxp: ["Cuentas por pagar aún no disponibles", "Para habilitarlas, carga el auxiliar de proveedores."],
+    cobranza: ["Cobranza aún no disponible", "Carga la plantilla máster con tus facturas de venta."],
+    cxp: ["Cuentas por pagar aún no disponibles", "Carga la plantilla máster con tus facturas de proveedores."],
     officialBudget: ["Presupuesto oficial aún no disponible", "Carga montos presupuestados por cuenta."],
     projection: ["Proyección estadística aún no disponible", "Se requieren al menos 8 periodos históricos."],
   };

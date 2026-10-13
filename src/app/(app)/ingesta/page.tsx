@@ -46,8 +46,24 @@ function isExcel(name: string): boolean {
   return lower.endsWith(".xlsx") || lower.endsWith(".xlsm");
 }
 
+const SOURCE_KEYS: Record<string, string> = {
+  compac: "ingesta.sources.compac",
+  master_template: "ingesta.sources.master_template",
+};
+
 export default function IngestaPage() {
   const { t } = useLocale();
+  // Traducción si existe; si no, el texto de respaldo. Nunca se muestra una clave o un código interno.
+  const translateOr = (key: string, fallback: string) => {
+    const text = t(key);
+    return text && text !== key ? text : fallback;
+  };
+  const documentLabel = (type: string) => translateOr(`ingesta.docTypes.${type}`, t("ingesta.unknownDocument"));
+  const profileLabel = (profileKey: string) => {
+    const [source, kind] = profileKey.split("/");
+    const format = translateOr(`ingesta.docTypes.${(kind ?? "").replace(/-/g, "_")}`, profileKey);
+    return source in SOURCE_KEYS ? `${format} (${t(SOURCE_KEYS[source])})` : format;
+  };
   const { user, tenantId, periodo, anio, selectPeriod, refreshPeriods } = useSession();
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
@@ -344,7 +360,7 @@ export default function IngestaPage() {
             <p>
               {t("ingesta.availableModules", {
                 modules: commitSummary.availableModules.length
-                  ? commitSummary.availableModules.join(", ")
+                  ? commitSummary.availableModules.map((module) => translateOr(`ingesta.modules.${module}`, module)).join(", ")
                   : t("ingesta.noneYet"),
               })}
             </p>
@@ -382,14 +398,8 @@ export default function IngestaPage() {
                       : "text-muted-foreground"
                   }
                 >
-                  {item.documentType === "balanza"
-                    ? t("ingesta.trialBalance")
-                    : item.documentType === "flujo_efectivo"
-                      ? t("ingesta.docTypes.flujo_efectivo")
-                      : item.documentType === "auxiliar_cuentas"
-                        ? t("ingesta.docTypes.auxiliar_cuentas")
-                        : item.documentType}{" "}
-                  · {item.sourceSystem === "compac" ? "Compac" : item.sourceSystem}
+                  {documentLabel(item.documentType)}
+                  {item.sourceSystem in SOURCE_KEYS ? ` · ${t(SOURCE_KEYS[item.sourceSystem])}` : ""}
                   {item.persistable
                     ? ` · ${t("ingesta.ready")}`
                     : ` · ${t("ingesta.notSaved")}`}
@@ -447,8 +457,10 @@ export default function IngestaPage() {
                           key={candidate.profileId}
                           value={candidate.profileId}
                         >
-                          {candidate.profileKey} v{candidate.profileVersion} ·{" "}
-                          {(candidate.score * 100).toFixed(0)}% · {candidate.origin}
+                          {t("ingesta.profileOption", {
+                            format: profileLabel(candidate.profileKey),
+                            score: (candidate.score * 100).toFixed(0),
+                          })}
                         </option>
                       ))}
                     </select>
@@ -481,8 +493,8 @@ export default function IngestaPage() {
                   }
                 >
                   <p className={issue.severity === "WARNING" ? "font-medium" : "font-medium text-destructive"}>
-                    {issue.rule}
-                    {issue.severity ? ` · ${issue.severity}` : ""}
+                    {translateOr(`ingesta.rules.${issue.rule}`, t("ingesta.rules.generic"))}
+                    {` · ${t(issue.severity === "WARNING" ? "ingesta.severity.WARNING" : "ingesta.severity.ERROR")}`}
                   </p>
                   <p>{issue.message}</p>
                   {issue.sheet ? (

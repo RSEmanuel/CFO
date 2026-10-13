@@ -416,7 +416,7 @@ describe("ingest detect/map", () => {
     assert.equal(detected.selectedProfileId, COMPAC_FLUJO_EFECTIVO_PROFILE.id);
     assert.equal(detected.inferredPeriodo, 7);
     assert.equal(detected.inferredAnio, 2026);
-    assert.match(detected.notes[0] ?? "", /se persistirá tesorería/);
+    assert.match(detected.notes[0] ?? "", /guardará tus bancos/);
   });
 
   it("el auxiliar de cuentas infiere el periodo del rango, no la fecha de impresión", async () => {

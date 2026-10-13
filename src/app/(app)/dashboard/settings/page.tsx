@@ -11,7 +11,6 @@ import { ApiError, apiRequest } from "@/lib/api";
 import { type TenantOption } from "@/lib/session-types";
 import { monthLabelKey } from "@/i18n/format";
 import type { Locale } from "@/i18n/config";
-import { EMPTY_COMPAC_TENANT } from "@/services/tenants/constants";
 import { USER_ADMIN_ROLES } from "@/auth/rbac";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
@@ -27,8 +26,8 @@ export default function SettingsPage() {
       ? t("settings.ytdCutoff", { year: anio })
       : `${t(monthLabelKey((periodo || 1) - 1))} ${anio}`;
 
-  const [companyName, setCompanyName] = useState<string>(EMPTY_COMPAC_TENANT.name);
-  const [companyRfc, setCompanyRfc] = useState<string>(EMPTY_COMPAC_TENANT.rfc);
+  const [companyName, setCompanyName] = useState("");
+  const [companyRfc, setCompanyRfc] = useState("");
   const [creatingCompany, setCreatingCompany] = useState(false);
 
   async function onCreateCompany(event: FormEvent) {
@@ -41,6 +40,8 @@ export default function SettingsPage() {
       });
       await refreshMe();
       setTenantId(created.id);
+      setCompanyName("");
+      setCompanyRfc("");
       toast.success(t("settings.companyCreated", { name: created.name }));
     } catch (error) {
       toast.error(error instanceof ApiError ? t(`errors.${error.code}`) : t("settings.companyCreateFailed"));
@@ -106,7 +107,6 @@ export default function SettingsPage() {
             <span className="text-muted-foreground">{t("settings.cutoff")}: </span>
             {corte}
           </p>
-          {canManage ? <p className="text-muted-foreground">{t("settings.compacHint")}</p> : null}
         </CardContent>
       </Card>
 

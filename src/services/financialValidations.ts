@@ -41,7 +41,7 @@ export function collectPartidaDobleIssues(
         rule: "PARTIDA_DOBLE",
         severity: "WARNING",
         sheet: "balanza_pnl",
-        message: "Partida doble no se validó (modo off: típico si el export mezcla cuentas de resultado y padres).",
+        message: "Cifra no comparó cargos contra abonos porque el reporte mezcla cuentas de mayor y subcuentas. Si dudas del archivo, revisa sus totales en CONTPAQi.",
       },
     ];
   }
@@ -65,7 +65,7 @@ export function collectPartidaDobleIssues(
       rule: "PARTIDA_DOBLE",
       severity: "ERROR",
       sheet: "balanza_pnl",
-      message: `La balanza no cumple partida doble. Debe=${totalDebe.toFixed(2)} Haber=${totalHaber.toFixed(2)}.`,
+      message: `Los cargos (${totalDebe.toFixed(2)}) no suman lo mismo que los abonos (${totalHaber.toFixed(2)}). Exporta de nuevo la balanza completa desde CONTPAQi.`,
     },
   ];
 }
@@ -93,7 +93,7 @@ export function collectConciliacionTesoreriaIssues(
       {
         rule: "CONCILIACION_TESORERIA",
         sheet: "tesoreria_flujo",
-        message: "No hay cuentas de banco/caja para conciliar contra la balanza.",
+        message: "La balanza no trae cuentas de bancos o caja para comparar con tu tesorería. Revisa que sea la balanza completa.",
       },
     ];
   }
@@ -104,13 +104,13 @@ export function collectConciliacionTesoreriaIssues(
   const issues: QualityIssue[] = missingInBalanza.map((id) => ({
     rule: "CONCILIACION_TESORERIA",
     sheet: "tesoreria_flujo",
-    message: `La cuenta de tesorería ${id} no existe en balanza_pnl (id_cuenta).`,
+    message: `La cuenta de banco ${id} no aparece en la balanza. Revisa que el número de cuenta sea el mismo en ambos archivos.`,
   }));
 
   if (!nearlyEqual(totalTesoreria, totalBalanzaCaja)) {
     issues.push({
       rule: "CONCILIACION_TESORERIA",
-      message: `Conciliación tesorería vs balanza fallida. Tesorería=${totalTesoreria.toFixed(2)} Balanza(caja/bancos)=${totalBalanzaCaja.toFixed(2)}.`,
+      message: `El saldo de bancos de tesorería (${totalTesoreria.toFixed(2)}) no coincide con el de la balanza (${totalBalanzaCaja.toFixed(2)}). Revisa que ambos archivos sean del mismo mes.`,
     });
   }
 
@@ -220,7 +220,7 @@ export function collectLimitesAuxiliaresIssues(ventas: VentaRow[], egresos: Egre
         rule: "LIMITES_AUXILIARES",
         sheet: "auxiliar_ventas",
         row: fila.row,
-        message: `monto_cobrado (${fila.montoCobrado.toFixed(2)}) excede subtotal+IVA (${total.toFixed(2)}).`,
+        message: `Lo cobrado (${fila.montoCobrado.toFixed(2)}) es mayor que el total de la factura con IVA (${total.toFixed(2)}). Corrige el monto cobrado.`,
       });
     }
     if (fila.estatusPago === "Pagado" && !nearlyEqual(fila.montoCobrado, total)) {
@@ -228,7 +228,7 @@ export function collectLimitesAuxiliaresIssues(ventas: VentaRow[], egresos: Egre
         rule: "LIMITES_AUXILIARES",
         sheet: "auxiliar_ventas",
         row: fila.row,
-        message: "Una factura Pagada debe tener monto_cobrado igual a subtotal+IVA.",
+        message: "Una factura «Pagada» debe tener cobrado su total con IVA. Corrige el estatus o el monto cobrado.",
       });
     }
     if (fila.estatusPago === "Pendiente" && fila.montoCobrado + MONEY_TOLERANCE >= total) {
@@ -236,7 +236,7 @@ export function collectLimitesAuxiliaresIssues(ventas: VentaRow[], egresos: Egre
         rule: "LIMITES_AUXILIARES",
         sheet: "auxiliar_ventas",
         row: fila.row,
-        message: "Una factura Pendiente debe tener monto_cobrado menor a subtotal+IVA.",
+        message: "Una factura «Pendiente» debe tener cobrado menos que su total con IVA. Corrige el estatus o el monto cobrado.",
       });
     }
     if (fila.estatusPago === "Cancelado" && !nearlyEqual(fila.montoCobrado, 0)) {
@@ -244,7 +244,7 @@ export function collectLimitesAuxiliaresIssues(ventas: VentaRow[], egresos: Egre
         rule: "LIMITES_AUXILIARES",
         sheet: "auxiliar_ventas",
         row: fila.row,
-        message: "Una factura Cancelada debe tener monto_cobrado igual a 0.",
+        message: "Una factura «Cancelada» no puede tener cobros. Corrige el estatus o el monto cobrado.",
       });
     }
   }
@@ -255,7 +255,7 @@ export function collectLimitesAuxiliaresIssues(ventas: VentaRow[], egresos: Egre
         rule: "LIMITES_AUXILIARES",
         sheet: "auxiliar_egresos",
         row: fila.row,
-        message: "El monto_subtotal de egresos no puede ser negativo.",
+        message: "El subtotal de una factura de proveedor no puede ser negativo. Corrígelo en la plantilla.",
       });
     }
   }
@@ -284,7 +284,7 @@ export function collectIdentidadTesoreriaIssues(tesoreria: TesoreriaRow[]): Qual
         rule: "IDENTIDAD_TESORERIA" as const,
         sheet: "tesoreria_flujo",
         row: fila.row,
-        message: `Fórmula de tesorería inválida. Esperado=${esperado.toFixed(2)} Reportado=${fila.saldoFinalPeriodo.toFixed(2)}.`,
+        message: `El saldo final de este banco no cuadra: debería ser ${esperado.toFixed(2)} y el archivo dice ${fila.saldoFinalPeriodo.toFixed(2)}. Revisa sus entradas y salidas.`,
       },
     ];
   });
@@ -303,7 +303,7 @@ export function collectPeriodoWorkbookIssues(
         rule: "PERIODO",
         sheet: "balanza_pnl",
         row: fila.row,
-        message: `La fila no corresponde al periodo ${periodo}/${anio}.`,
+        message: `Esta fila no es del periodo ${periodo}/${anio}. Revisa que el archivo sea del mes correcto.`,
       });
     }
   }
@@ -313,7 +313,7 @@ export function collectPeriodoWorkbookIssues(
         rule: "PERIODO",
         sheet: "tesoreria_flujo",
         row: fila.row,
-        message: `La fila no corresponde al periodo ${periodo}/${anio}.`,
+        message: `Esta fila no es del periodo ${periodo}/${anio}. Revisa que el archivo sea del mes correcto.`,
       });
     }
   }
@@ -350,7 +350,7 @@ export function collectQualityIssues(
               rule: "CONCILIACION_TESORERIA" as const,
               severity: "WARNING" as const,
               sheet: "tesoreria_flujo",
-              message: "No hay tesorería en esta carga. El tablero de flujo mostrará N/D.",
+              message: "Esta carga no trae tesorería, así que Flujo quedará sin datos. Sube el reporte Flujo de Efectivo de CONTPAQi para verlo.",
             },
           ]
       : [

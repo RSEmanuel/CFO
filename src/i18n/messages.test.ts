@@ -24,6 +24,15 @@ describe("i18n catalogs", () => {
     assert.equal(accountName, "Servicios marítimos 4102");
   });
 
+  it("no muestra instrucciones de desarrollo ni códigos internos a los clientes", () => {
+    const internal = /npm |npx |prisma generate|julio 2026|periodo 7, año 2026|empresa vacía|sidebar|\btenant\b|modo off|balanza_pnl|monto_cobrado|BUILTIN/i;
+    for (const locale of ["es", "en"] as const) {
+      const t = createT(locale);
+      const offending = collectKeys(MESSAGES[locale]).filter((key) => internal.test(t(key)));
+      assert.deepEqual(offending, [], locale);
+    }
+  });
+
   it("accepts only es and en and persists under cfo.locale", () => {
     assert.equal(LOCALE_STORAGE_KEY, "cfo.locale");
     assert.equal(isLocale("es"), true);
