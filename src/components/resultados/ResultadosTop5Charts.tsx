@@ -164,18 +164,18 @@ function SlicePctLabel({ cx, cy, midAngle, outerRadius, payload }: PieLabelGeom)
   if (cx == null || cy == null || midAngle == null || outerRadius == null || !payload || payload.pct < 3) {
     return null;
   }
-  const radius = Number(outerRadius) + 20;
+  const radius = Number(outerRadius) + 26;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
   return (
     <text
       x={x}
       y={y}
-      fill={CHART_AXIS.tick}
+      fill="var(--cifra-ink)"
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
-      fontSize={14}
-      fontWeight={600}
+      fontSize={18}
+      fontWeight={700}
       className="financial-nums"
     >
       {`${payload.pct.toFixed(1)}%`}
@@ -283,7 +283,7 @@ function Top5Card({
       {variant === "pie" ? (
         <div className="h-[300px] w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 20, right: 64, bottom: 20, left: 64 }}>
+            <PieChart margin={{ top: 28, right: 88, bottom: 28, left: 88 }}>
               <Tooltip content={<Top5PieTooltip />} />
               <Pie
                 data={pieRows}
