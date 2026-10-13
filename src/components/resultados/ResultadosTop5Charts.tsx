@@ -122,7 +122,7 @@ type LabelGeom = {
 };
 
 /** Separación entre el total del mes y el borde superior de la barra apilada. */
-const TOTAL_LABEL_OFFSET = 14;
+const TOTAL_LABEL_OFFSET = 22;
 
 function num(value: number | string | undefined): number {
   const parsed = typeof value === "number" ? value : Number(value);
@@ -323,7 +323,7 @@ function Top5Card({
               />
               <YAxis
                 width={64}
-                domain={[0, yMax > 0 ? yMax * 1.22 : 1]}
+                domain={[0, yMax > 0 ? yMax * 1.3 : 1]}
                 tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
