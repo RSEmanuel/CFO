@@ -1,4 +1,6 @@
 import type { MonthlyFinancials } from "@/services/financialDataTransformer";
+import { classifyErCuenta, computeErBuckets, type ErClasificacion } from "@/services/estadoOperativo";
+import { selectLeafCodes } from "@/services/ingest/leafAccounts";
 import { round2, toNumber } from "@/services/money";
 
 export type ResultadosAccountBreakdown = {
@@ -10,7 +12,7 @@ export type ResultadosAccountBreakdown = {
   depreciacionAmortizacion: boolean;
 };
 
-export function buildResultadosSeries(rows: Array<{
+type ResultadosRow = {
   anio: number;
   periodo: number;
   idCuenta: string;
@@ -19,60 +21,91 @@ export function buildResultadosSeries(rows: Array<{
   debe: unknown;
   haber: unknown;
   depreciacionAmortizacion: boolean;
-}>): { series: MonthlyFinancials[]; breakdown: ResultadosAccountBreakdown[] } {
-  const monthly = new Map<string, MonthlyFinancials>();
-  const breakdown: ResultadosAccountBreakdown[] = [];
+};
+
+/**
+ * Rubro de Resultados para cada clase del PyG oficial. Productos y gastos
+ * financieros (7xxx, 8xxx), PTU e ISR no son ingreso ni gasto de operación:
+ * quedan fuera de las tarjetas, igual que en `computeErBuckets`.
+ */
+const RUBRO: Partial<Record<ErClasificacion, ResultadosAccountBreakdown["categoriaMaestra"]>> = {
+  ventas: "Ingreso",
+  costo: "COGS",
+  gastosVenta: "OpEx",
+  gastosAdmin: "OpEx",
+  daContable: "OpEx",
+  otrosOperativos: "OpEx",
+};
+
+/**
+ * Serie mensual de Resultados. Los totales de cada mes (ingreso, costo, gasto,
+ * D&A y EBITDA) son los de `computeErBuckets`, para que las tarjetas, la
+ * tendencia y el paquete del mes digan lo mismo que el Estado de resultados.
+ * El desglose por cuenta usa la misma clasificación y las mismas cuentas hoja,
+ * así que siempre suma el total de su rubro.
+ */
+export function buildResultadosSeries(rows: ResultadosRow[]): {
+  series: MonthlyFinancials[];
+  breakdown: ResultadosAccountBreakdown[];
+} {
+  const rowsByPeriodo = new Map<string, ResultadosRow[]>();
   for (const row of rows) {
-    if (!["Ingreso", "COGS", "OpEx"].includes(row.categoriaMaestra)) continue;
     const periodo = `${row.anio}-${String(row.periodo).padStart(2, "0")}`;
-    const amount = round2(
-      row.categoriaMaestra === "Ingreso"
-        ? toNumber(row.haber as number) - toNumber(row.debe as number)
-        : toNumber(row.debe as number) - toNumber(row.haber as number),
+    const list = rowsByPeriodo.get(periodo) ?? [];
+    list.push(row);
+    rowsByPeriodo.set(periodo, list);
+  }
+
+  const series: MonthlyFinancials[] = [];
+  const breakdown: ResultadosAccountBreakdown[] = [];
+  for (const [periodo, monthRows] of rowsByPeriodo) {
+    const er = computeErBuckets(
+      monthRows.map((row) => ({
+        idCuenta: row.idCuenta,
+        nombreCuenta: row.nombreCuenta,
+        debe: toNumber(row.debe as number),
+        haber: toNumber(row.haber as number),
+      })),
     );
-    const current = monthly.get(periodo) ?? {
+    const leaves = selectLeafCodes(monthRows.map((row) => row.idCuenta));
+    const current: MonthlyFinancials = {
       periodo,
-      ingreso_total: 0,
+      ingreso_total: er.ventas,
       desglose_ingreso: {},
       micro_categorias: {},
-      costo_total: 0,
+      costo_total: er.costo,
       desglose_costo: {},
-      gasto_total: 0,
+      gasto_total: er.totalOpex,
       desglose_gasto: {},
-      ebitda: 0,
-      depreciacion_amortizacion: 0,
+      ebitda: er.ebitda,
+      depreciacion_amortizacion: er.da,
     };
-    const target =
-      row.categoriaMaestra === "Ingreso"
-        ? current.desglose_ingreso
-        : row.categoriaMaestra === "COGS"
-          ? current.desglose_costo
-          : current.desglose_gasto;
-    target[row.nombreCuenta] = round2((target[row.nombreCuenta] ?? 0) + amount);
-    if (row.categoriaMaestra === "Ingreso") current.ingreso_total = round2(current.ingreso_total + amount);
-    if (row.categoriaMaestra === "COGS") current.costo_total = round2(current.costo_total + amount);
-    if (row.categoriaMaestra === "OpEx") current.gasto_total = round2(current.gasto_total + amount);
-    if (row.depreciacionAmortizacion) {
-      current.depreciacion_amortizacion = round2((current.depreciacion_amortizacion ?? 0) + amount);
+    for (const row of monthRows) {
+      const clase = classifyErCuenta(row.idCuenta);
+      const rubro = clase ? RUBRO[clase] : undefined;
+      if (!rubro || !leaves.has(row.idCuenta)) continue;
+      const amount = round2(
+        rubro === "Ingreso"
+          ? toNumber(row.haber as number) - toNumber(row.debe as number)
+          : toNumber(row.debe as number) - toNumber(row.haber as number),
+      );
+      const target =
+        rubro === "Ingreso" ? current.desglose_ingreso : rubro === "COGS" ? current.desglose_costo : current.desglose_gasto;
+      target[row.nombreCuenta] = round2((target[row.nombreCuenta] ?? 0) + amount);
+      breakdown.push({
+        periodo,
+        idCuenta: row.idCuenta,
+        nombreCuenta: row.nombreCuenta,
+        categoriaMaestra: rubro,
+        amount,
+        depreciacionAmortizacion: row.depreciacionAmortizacion,
+      });
     }
-    current.ebitda = round2(
-      current.ingreso_total -
-        current.costo_total -
-        current.gasto_total +
-        (current.depreciacion_amortizacion ?? 0),
-    );
-    monthly.set(periodo, current);
-    breakdown.push({
-      periodo,
-      idCuenta: row.idCuenta,
-      nombreCuenta: row.nombreCuenta,
-      categoriaMaestra: row.categoriaMaestra as ResultadosAccountBreakdown["categoriaMaestra"],
-      amount,
-      depreciacionAmortizacion: row.depreciacionAmortizacion,
-    });
+    series.push(current);
   }
+
   return {
-    series: [...monthly.values()].sort((a, b) => a.periodo.localeCompare(b.periodo)),
+    series: series.sort((a, b) => a.periodo.localeCompare(b.periodo)),
     breakdown,
   };
 }

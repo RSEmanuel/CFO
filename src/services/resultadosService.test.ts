@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { INITIAL_RESULTADOS_FILTERS } from "@/components/resultados/resultados-filter-bar";
+import { computeErBuckets } from "@/services/estadoOperativo";
 import { buildResultadosSeries } from "@/services/resultadosLedger";
 import { RESULTADOS_CATEGORIAS, RESULTADOS_ROW_SELECT } from "@/services/resultadosService";
 import {
@@ -29,11 +30,11 @@ describe("resultados desde BalanzaPnL", () => {
         categoriaMaestra: "COGS", debe: 400, haber: 0, depreciacionAmortizacion: false,
       },
       {
-        anio: 2026, periodo: 7, idCuenta: "6001", nombreCuenta: "Administración",
+        anio: 2026, periodo: 7, idCuenta: "6201", nombreCuenta: "Administración",
         categoriaMaestra: "OpEx", debe: 200, haber: 0, depreciacionAmortizacion: false,
       },
       {
-        anio: 2026, periodo: 7, idCuenta: "6002", nombreCuenta: "Depreciación",
+        anio: 2026, periodo: 7, idCuenta: "6301", nombreCuenta: "Depreciación",
         categoriaMaestra: "OpEx", debe: 50, haber: 0, depreciacionAmortizacion: true,
       },
       {
@@ -72,6 +73,50 @@ describe("resultados desde BalanzaPnL", () => {
       ["2025-12", 100],
       ["2026-07", 300],
     ]);
+  });
+
+  // Cifras evidentemente de ejemplo. Productos financieros (7xxx), gastos financieros (8xxx),
+  // PTU (6405) e ISR (6406) no son ingreso ni gasto de operación en el PyG oficial.
+  const mesConFinancieros = [
+    { idCuenta: "4101-0001-0000-0000", nombreCuenta: "VENTAS", categoriaMaestra: "Ingreso", debe: 0, haber: 1000 },
+    { idCuenta: "4201-0001-0000-0000", nombreCuenta: "DEVOLUCIONES", categoriaMaestra: "Ingreso", debe: 40, haber: 0 },
+    { idCuenta: "5101-0001-0000-0000", nombreCuenta: "COSTO", categoriaMaestra: "COGS", debe: 300, haber: 0 },
+    { idCuenta: "6101-0001-0000-0000", nombreCuenta: "SUELDOS", categoriaMaestra: "OpEx", debe: 200, haber: 0 },
+    { idCuenta: "6301-0001-0000-0000", nombreCuenta: "DEPRECIACION", categoriaMaestra: "OpEx", debe: 30, haber: 0 },
+    { idCuenta: "6405-0001-0000-0000", nombreCuenta: "PTU", categoriaMaestra: "OpEx", debe: 20, haber: 0 },
+    { idCuenta: "6406-0001-0000-0000", nombreCuenta: "ISR", categoriaMaestra: "OpEx", debe: 60, haber: 0 },
+    { idCuenta: "7102-0001-0000-0000", nombreCuenta: "INTERESES GANADOS", categoriaMaestra: "Ingreso", debe: 0, haber: 15 },
+    { idCuenta: "8101-0001-0000-0000", nombreCuenta: "INTERESES PAGADOS", categoriaMaestra: "OpEx", debe: 90, haber: 0 },
+  ];
+  const filasMes = mesConFinancieros.map((row) => ({
+    ...row,
+    anio: 2026,
+    periodo: 7,
+    depreciacionAmortizacion: row.idCuenta.startsWith("6301"),
+  }));
+
+  it("ingreso, costo, gasto y EBITDA son los del PyG oficial (computeErBuckets)", () => {
+    const { series } = buildResultadosSeries(filasMes);
+    const er = computeErBuckets(filasMes);
+    assert.equal(series[0].ingreso_total, er.ventas);
+    assert.equal(series[0].costo_total, er.costo);
+    assert.equal(series[0].gasto_total, er.totalOpex);
+    assert.equal(series[0].depreciacion_amortizacion, er.da);
+    assert.equal(series[0].ebitda, er.ebitda);
+    assert.deepEqual(
+      [series[0].ingreso_total, series[0].gasto_total, series[0].ebitda],
+      [960, 230, 460],
+    );
+  });
+
+  it("el desglose suma exactamente el total de cada rubro y deja fuera 7xxx, 8xxx, PTU e ISR", () => {
+    const { series, breakdown } = buildResultadosSeries(filasMes);
+    const suma = (values: Record<string, number>) => Object.values(values).reduce((acc, value) => acc + value, 0);
+    assert.equal(suma(series[0].desglose_ingreso), series[0].ingreso_total);
+    assert.equal(suma(series[0].desglose_costo), series[0].costo_total);
+    assert.equal(suma(series[0].desglose_gasto), series[0].gasto_total);
+    const fuera = ["INTERESES GANADOS", "INTERESES PAGADOS", "PTU", "ISR"];
+    assert.ok(breakdown.every((row) => !fuera.includes(row.nombreCuenta)));
   });
 });
 
