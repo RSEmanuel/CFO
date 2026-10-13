@@ -1,5 +1,6 @@
 "use client";
 
+import { ForgotPasswordFlow } from "@/components/auth/forgot-password-flow";
 import { Input } from "@/components/ui/input";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
@@ -16,6 +17,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState(isClientDevAuthBypass ? "DevMode123!" : "");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [mode, setMode] = useState<"login" | "forgot">("login");
+  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && user) {
@@ -26,6 +29,7 @@ export default function LoginPage() {
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setError(null);
+    setNotice(null);
     setPending(true);
     try {
       await login(email, password);
@@ -116,60 +120,87 @@ export default function LoginPage() {
 
       <section className="flex min-w-0 flex-1 items-center justify-center py-4 lg:py-0">
         <div className="flex w-full min-w-0 max-w-[400px] flex-col gap-6 rounded-card border border-beige-deep bg-card p-8 shadow-[var(--shadow-card)] sm:p-10">
-          <div className="flex flex-col gap-2">
-            <h2 className="font-sans text-[26px] font-normal tracking-[-0.01em] text-foreground">
-              {t("auth.title")}
-            </h2>
-            <p className="text-sm leading-[1.5] text-muted-foreground">
-              {isClientDevAuthBypass ? t("auth.accessDev") : t("auth.access")}
-            </p>
-          </div>
+          {mode === "forgot" ? (
+            <ForgotPasswordFlow
+              initialEmail={email}
+              onCancel={() => setMode("login")}
+              onDone={(resetEmail) => {
+                setEmail(resetEmail);
+                setPassword("");
+                setError(null);
+                setNotice(t("auth.resetDone"));
+                setMode("login");
+              }}
+            />
+          ) : (
+            <>
+              <div className="flex flex-col gap-2">
+                <h2 className="font-sans text-[26px] font-normal tracking-[-0.01em] text-foreground">
+                  {t("auth.title")}
+                </h2>
+                <p className="text-sm leading-[1.5] text-muted-foreground">
+                  {isClientDevAuthBypass ? t("auth.accessDev") : t("auth.access")}
+                </p>
+              </div>
 
-          <form className="flex flex-col gap-6" onSubmit={onSubmit}>
-            <div className="flex flex-col gap-4">
-              <label className="flex flex-col gap-[7px]" htmlFor="email">
-                <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                  {t("auth.email")}
-                </span>
-                <Input
-                  id="email"
-                  type="email"
-                  autoComplete="username"
-                  required
-                  value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  className="h-[46px] bg-background"
-                />
-              </label>
-              <label className="flex flex-col gap-[7px]" htmlFor="password">
-                <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                  {t("auth.password")}
-                </span>
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="h-[46px] bg-background"
-                />
-              </label>
-            </div>
-            {error ? <p className="text-sm text-destructive">{error}</p> : null}
-            <div className="flex flex-col gap-4">
-              <button
-                type="submit"
-                disabled={pending}
-                className="flex h-12 items-center justify-center rounded-full bg-clay text-[15px] font-medium text-white transition-colors hover:bg-clay-hover disabled:pointer-events-none disabled:opacity-50"
-              >
-                {pending ? t("auth.submitting") : t("auth.submit")}
-              </button>
-              <button type="button" className="text-center text-[13.5px] text-muted-foreground hover:text-clay">
-                {t("auth.forgot")}
-              </button>
-            </div>
-          </form>
+              <form className="flex flex-col gap-6" onSubmit={onSubmit}>
+                <div className="flex flex-col gap-4">
+                  <label className="flex flex-col gap-[7px]" htmlFor="email">
+                    <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                      {t("auth.email")}
+                    </span>
+                    <Input
+                      id="email"
+                      type="email"
+                      autoComplete="username"
+                      required
+                      value={email}
+                      onChange={(event) => setEmail(event.target.value)}
+                      className="h-[46px] bg-background"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-[7px]" htmlFor="password">
+                    <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
+                      {t("auth.password")}
+                    </span>
+                    <Input
+                      id="password"
+                      type="password"
+                      autoComplete="current-password"
+                      required
+                      value={password}
+                      onChange={(event) => setPassword(event.target.value)}
+                      className="h-[46px] bg-background"
+                    />
+                  </label>
+                </div>
+                {error ? <p className="text-sm text-destructive">{error}</p> : null}
+                {notice ? <p className="text-sm text-foreground">{notice}</p> : null}
+                <div className="flex flex-col gap-4">
+                  <button
+                    type="submit"
+                    disabled={pending}
+                    className="flex h-12 items-center justify-center rounded-full bg-clay text-[15px] font-medium text-white transition-colors hover:bg-clay-hover disabled:pointer-events-none disabled:opacity-50"
+                  >
+                    {pending ? t("auth.submitting") : t("auth.submit")}
+                  </button>
+                  {isClientDevAuthBypass ? null : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setError(null);
+                        setNotice(null);
+                        setMode("forgot");
+                      }}
+                      className="text-center text-[13.5px] text-muted-foreground hover:text-clay"
+                    >
+                      {t("auth.forgot")}
+                    </button>
+                  )}
+                </div>
+              </form>
+            </>
+          )}
         </div>
       </section>
     </main>

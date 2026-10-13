@@ -19,7 +19,13 @@ import {
   AuthFlowType,
   AdminSetUserPasswordCommand,
   ChangePasswordCommand,
+  CodeMismatchException,
+  ConfirmForgotPasswordCommand,
+  ExpiredCodeException,
+  ForgotPasswordCommand,
+  InvalidParameterException,
   LimitExceededException,
+  TooManyFailedAttemptsException,
   TooManyRequestsException,
 } from "@aws-sdk/client-cognito-identity-provider";
 import { createHmac } from "crypto";
@@ -186,6 +192,93 @@ export async function changeOwnCognitoPassword(
       });
     }
     if (error instanceof LimitExceededException || error instanceof TooManyRequestsException) {
+      throw new AppError("VALIDATION_ERROR", "Demasiados intentos. Espera unos minutos.", 429, {
+        reason: "tooManyAttempts",
+      });
+    }
+    mapCognitoError(error);
+  }
+}
+
+/**
+ * Manda por correo un código para restablecer la contraseña. Nunca revela si el
+ * correo existe: el app client tiene PreventUserExistenceErrors y aquí se tragan
+ * los errores de usuario inexistente o sin correo verificado.
+ */
+export async function sendPasswordResetCode(email: string): Promise<void> {
+  const { clientId } = getConfig();
+  const client = getClient();
+  const secretHash = computeSecretHash(email);
+
+  try {
+    await client.send(
+      new ForgotPasswordCommand({
+        ClientId: clientId,
+        Username: email,
+        ...(secretHash ? { SecretHash: secretHash } : {}),
+      }),
+    );
+  } catch (error) {
+    if (error instanceof LimitExceededException || error instanceof TooManyRequestsException) {
+      throw new AppError("VALIDATION_ERROR", "Demasiados intentos. Espera unos minutos.", 429, {
+        reason: "tooManyAttempts",
+      });
+    }
+    if (
+      error instanceof UserNotFoundException ||
+      error instanceof NotAuthorizedException ||
+      error instanceof InvalidParameterException
+    ) {
+      console.warn("No se envió código de restablecimiento", (error as Error).name);
+      return;
+    }
+    mapCognitoError(error);
+  }
+}
+
+export async function confirmPasswordReset(
+  email: string,
+  code: string,
+  newPassword: string,
+): Promise<void> {
+  const { clientId } = getConfig();
+  const client = getClient();
+  const secretHash = computeSecretHash(email);
+
+  try {
+    await client.send(
+      new ConfirmForgotPasswordCommand({
+        ClientId: clientId,
+        Username: email,
+        ConfirmationCode: code,
+        Password: newPassword,
+        ...(secretHash ? { SecretHash: secretHash } : {}),
+      }),
+    );
+  } catch (error) {
+    // Usuario inexistente se reporta igual que código incorrecto, para no revelar cuentas.
+    if (
+      error instanceof CodeMismatchException ||
+      error instanceof UserNotFoundException ||
+      error instanceof NotAuthorizedException
+    ) {
+      throw new AppError("VALIDATION_ERROR", "El código no es correcto.", 400, {
+        reason: "codeWrong",
+      });
+    }
+    if (error instanceof ExpiredCodeException) {
+      throw new AppError("VALIDATION_ERROR", "El código ya venció.", 400, { reason: "codeExpired" });
+    }
+    if (error instanceof InvalidPasswordException) {
+      throw new AppError("VALIDATION_ERROR", "La contraseña no cumple la política del User Pool.", 400, {
+        reason: "passwordPolicy",
+      });
+    }
+    if (
+      error instanceof LimitExceededException ||
+      error instanceof TooManyRequestsException ||
+      error instanceof TooManyFailedAttemptsException
+    ) {
       throw new AppError("VALIDATION_ERROR", "Demasiados intentos. Espera unos minutos.", 429, {
         reason: "tooManyAttempts",
       });

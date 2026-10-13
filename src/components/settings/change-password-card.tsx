@@ -1,5 +1,6 @@
 "use client";
 
+import { meetsPasswordPolicy } from "@/auth/passwordPolicy";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,11 +9,6 @@ import { useLocale } from "@/context/LocaleContext";
 import { ApiError, apiRequest } from "@/lib/api";
 import { FormEvent, useState } from "react";
 import { toast } from "sonner";
-
-/** Misma política que el User Pool: 8+ caracteres, mayúscula, minúscula y número. */
-function meetsPasswordPolicy(value: string): boolean {
-  return value.length >= 8 && /[A-Z]/.test(value) && /[a-z]/.test(value) && /[0-9]/.test(value);
-}
 
 const REASON_MESSAGE_KEY: Record<string, string> = {
   currentPasswordWrong: "settings.currentPasswordWrong",

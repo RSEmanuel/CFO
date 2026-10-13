@@ -1,7 +1,12 @@
 import { extractBearerToken, verifyAccessToken } from "@/auth/jwt";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_API_PATHS = new Set(["/api/auth/login", "/api/health"]);
+const PUBLIC_API_PATHS = new Set([
+  "/api/auth/login",
+  "/api/auth/forgot-password",
+  "/api/auth/reset-password",
+  "/api/health",
+]);
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
