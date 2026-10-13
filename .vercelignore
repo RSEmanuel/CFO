@@ -1,0 +1,23 @@
+# Archivos de entorno locales: NUNCA subir a Vercel.
+# Las variables de produccion viven en el dashboard de Vercel (vercel env).
+.env
+.env.local
+.env.production
+.env.production.local
+.env*.local
+
+# Secretos y respaldos
+backup-cfo.sql
+*.pem
+*.key
+
+# Datos de ejemplo / muestra
+sample_data/
+Data_ejemplo/
+
+# Artefactos de build / dependencias
+node_modules
+.next
+src/generated
+dist
+*.log
