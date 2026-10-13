@@ -118,7 +118,10 @@ export function MetricsCatalog() {
         </div>
         {data ? (
           <span className="w-fit rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground">
-            {t("metrics.available", { count: allMetrics.length })}
+            {t("metrics.available", {
+              count: allMetrics.filter((metric) => metric.value != null).length,
+              total: allMetrics.length,
+            })}
           </span>
         ) : null}
       </div>

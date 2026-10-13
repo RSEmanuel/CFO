@@ -92,7 +92,8 @@ function csvEscape(value: string): string {
 function formatCell(node: StatementNode, key: string, numberMode: NumberMode): string {
   const value = node.values[key];
   if (numberMode === "ratio") {
-    return formatStatementRatio(value, node.format ?? "x");
+    // Los grupos de razones (Liquidez, Actividad…) son solo encabezados.
+    return node.kind === "group" ? "" : formatStatementRatio(value, node.format ?? "x");
   }
   return formatStatementMoney(value, node.outflow === true);
 }
@@ -384,11 +385,9 @@ export function StatementTreeTable({
                               <span
                                 className={cn(
                                   strong && "font-semibold",
-                                  numberMode === "ratio" && value != null && Number.isFinite(value)
-                                    ? "text-favorable"
-                                    : row.node.outflow
-                                      ? "text-muted-foreground"
-                                      : "text-foreground",
+                                  // Las razones no tienen semáforo propio en la tabla: verde solo sería
+                                  // correcto si el valor fuera sano (regla de colores de señal).
+                                  numberMode !== "ratio" && row.node.outflow ? "text-muted-foreground" : "text-foreground",
                                 )}
                               >
                                 {formatCell(row.node, column.key, numberMode)}

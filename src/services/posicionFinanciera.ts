@@ -65,7 +65,8 @@ export function formatStatementMoney(value: number | null, outflow = false): str
 
 export function formatStatementRatio(value: number | null, unit: StatementValueFormat): string {
   if (value == null || !Number.isFinite(value)) {
-    return "—";
+    // Mismo "N/D" que promete la ayuda de Razones y que usan los indicadores.
+    return "N/D";
   }
   if (unit === "pct") {
     return `${value.toFixed(1)}%`;
@@ -884,15 +885,18 @@ export function buildRazonesTree(
     return values;
   };
 
-  const mapGroup = (id: string, labelKey: string, metrics: CatalogMetric[]): StatementNode =>
-    groupNode(
+  // El renglón de grupo no lleva cifra: sumar razones (veces, %, días) no da un número con sentido.
+  const mapGroup = (id: string, labelKey: string, metrics: CatalogMetric[]): StatementNode => ({
+    ...groupNode(
       id,
       id,
       yearKeys,
       metrics.map((metric) => metricNode(metric, yearKeys, valueFor(metric.key))),
       "neutral",
       { labelKey },
-    );
+    ),
+    values: emptyValues(yearKeys),
+  });
 
   return [
     mapGroup("ratio:liquidez", "posicionFinanciera.structure.ratioLiquidity", groups.liquidez),

@@ -26,7 +26,8 @@ export type CobranzaClienteRow = {
 
 export type CobranzaModel = {
   cxcAbierta: number;
-  dso: number;
+  /** null sin ventas de los últimos 12 meses: no hay con qué medir el plazo (no es 0 días). */
+  dso: number | null;
   pctMayor60: number;
   topCliente: { nombre: string; pct: number };
   aging: CobranzaAgingBar[];
@@ -74,7 +75,7 @@ export function buildCobranza(
     .filter((item) => item.saldo > 0);
 
   const cxcAbierta = round2(open.reduce((sum, item) => sum + item.saldo, 0));
-  const dso = ingresoTtm > 0.01 ? Math.round((cxcAbierta / ingresoTtm) * 365) : 0;
+  const dso = ingresoTtm > 0.01 ? Math.round((cxcAbierta / ingresoTtm) * 365) : null;
 
   const agingMap: Record<AgingBucketLabel, number> = {
     "0–30": 0,

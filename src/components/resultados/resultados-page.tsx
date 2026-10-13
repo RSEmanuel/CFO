@@ -130,12 +130,13 @@ export function ResultadosPage() {
           variation: t("pdf.variation"),
           context: t("pdf.context"),
           noComparable: t("pdf.noComparable"),
+          noData: t("pdf.noData"),
         },
         units: filters.units,
         contextLabel: kpis.contextLabel,
         rubros: kpis.rubros.map((rubro) => ({
           title: t(rubroTitleKey(rubro.key)),
-          value: rubro.value ?? 0,
+          value: rubro.value ?? null,
           deltaPct: rubro.deltaPct,
         })),
       });

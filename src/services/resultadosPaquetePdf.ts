@@ -6,7 +6,8 @@ import type { Locale } from "@/i18n/config";
 
 export type PaquetePdfRubro = {
   title: string;
-  value: number;
+  /** null = no hay dato del rubro en el periodo: se imprime "Sin dato", nunca $0. */
+  value: number | null;
   deltaPct: number | null;
 };
 
@@ -28,6 +29,7 @@ export type PaquetePdfInput = {
     variation: string;
     context: string;
     noComparable: string;
+    noData?: string;
   };
 };
 
@@ -60,6 +62,7 @@ export function buildPaqueteDelMesPdf(input: PaquetePdfInput): jsPDF {
     variation: "Variación",
     context: "Contexto",
     noComparable: "Sin comparativo",
+    noData: "Sin dato",
   };
 
   doc.setFont("helvetica", "bold");
@@ -91,7 +94,7 @@ export function buildPaqueteDelMesPdf(input: PaquetePdfInput): jsPDF {
   input.rubros.forEach((rubro, index) => {
     const y = headerY + 12 + index * 10;
     doc.text(rubro.title, colX[0], y);
-    doc.text(formatAxisTick(rubro.value, input.units), colX[1], y);
+    doc.text(rubro.value == null ? (labels.noData ?? "Sin dato") : formatAxisTick(rubro.value, input.units), colX[1], y);
     doc.text(formatDelta(rubro.deltaPct, labels.noComparable), colX[2], y);
     doc.text(input.contextLabel ?? "—", colX[3], y);
   });

@@ -144,7 +144,7 @@ export function CobranzaPage() {
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
           <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.averageDays")}</p>
           <p className="text-xs text-muted-foreground">{t("cobranza.averageDaysHelp")}</p>
-          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">{t("cobranza.days", { value: model.dso })}</p>
+          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">{model.dso == null ? t("common.na") : t("cobranza.days", { value: model.dso })}</p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
           <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.over60")}</p>

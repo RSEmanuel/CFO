@@ -5,8 +5,14 @@ import { round2 } from "@/services/money";
 export type MetricCategory = "margenes" | "retorno" | "eficiencia" | "liquidez" | "solvencia" | "gestion";
 export type MetricUnit = "pct" | "x" | "days" | "score";
 
-/** Motivo de un valor N/D: hoy solo capital contable ≤ 0 (déficit patrimonial). */
-export type CatalogNullReason = "negativeCapital";
+/**
+ * Motivo de un valor N/D. Un N/D nunca se muestra como 0:
+ * - negativeCapital: capital contable ≤ 0, el ratio deja de ser significativo.
+ * - noTreasury: la métrica sale de tesorería y no hay tesorería cargada.
+ * - noInventory: la balanza no registra inventario.
+ * - noBalanceData: la balanza del periodo no trae los saldos que la alimentan.
+ */
+export type CatalogNullReason = "negativeCapital" | "noTreasury" | "noInventory" | "noBalanceData";
 
 export type CatalogMetric = {
   id: number;
@@ -100,6 +106,15 @@ function ratioOnCapital(numerator: number, capital: number): number | null {
   return capital > 0.01 ? safeRatio(numerator, capital) : null;
 }
 
+/** Deja la métrica en N/D (con su motivo) si falta la fuente que la alimenta. */
+function requires(available: boolean | undefined, value: number | null): number | null {
+  return available === false ? null : value;
+}
+
+function missingReason(available: boolean | undefined, reason: CatalogNullReason): CatalogNullReason | null {
+  return available === false ? reason : null;
+}
+
 function clampScore(value: number | null, maxAbs: number): number | null {
   if (value == null || !Number.isFinite(value)) {
     return null;
@@ -108,14 +123,15 @@ function clampScore(value: number | null, maxAbs: number): number | null {
 }
 
 export function calculateMargenes(s: PeriodSnapshot): CatalogMetric[] {
+  const tesoreria = s.disponibilidad?.tesoreria;
   return [
     metric(1, "grossMargin", pctOf(s.utilidadBruta, s.ingresos), "pct"),
     metric(2, "ebitdaMargin", pctOf(s.ebitda, s.ingresos), "pct"),
     metric(3, "netMargin", pctOf(s.utilidadNeta, s.ingresos), "pct"),
     metric(4, "nopatMargin", pctOf(s.nopat, s.ingresos), "pct"),
     metric(5, "operatingMargin", pctOf(s.ebit, s.ingresos), "pct"),
-    metric(6, "ocfMargin", pctOf(s.ocf, s.ingresos), "pct"),
-    metric(7, "fcfMargin", pctOf(s.fcf, s.ingresos), "pct"),
+    metric(6, "ocfMargin", requires(tesoreria, pctOf(s.ocf, s.ingresos)), "pct", missingReason(tesoreria, "noTreasury")),
+    metric(7, "fcfMargin", requires(tesoreria, pctOf(s.fcf, s.ingresos)), "pct", missingReason(tesoreria, "noTreasury")),
     metric(8, "effectiveTaxRate", pctOf(s.impuestos, s.ebt), "pct"),
   ];
 }
@@ -128,35 +144,47 @@ export function calculateRetorno(s: PeriodSnapshot, previous: PeriodSnapshot | n
   // Capital empleado = activo total − |pasivo circulante|: la balanza persiste
   // pasivos en negativo; sin el abs el denominador sumaría en vez de restar.
   const capitalEmpleado = round2(s.activoTotal - Math.abs(s.pasivoCirculante));
+  const tesoreria = s.disponibilidad?.tesoreria;
+  const inventario = s.disponibilidad?.inventario;
 
   return [
     metric(9, "roic", pctOnCapital(s.nopat, s.capitalInvertido), "pct", capitalNullReason(s.capitalInvertido)),
     metric(10, "roce", pctOnCapital(s.ebit, capitalEmpleado), "pct", capitalNullReason(capitalEmpleado)),
     metric(11, "roe", pctOnCapital(s.utilidadNeta, s.patrimonio), "pct", capitalNullReason(s.patrimonio)),
     metric(12, "roa", pctOf(s.utilidadNeta, s.activoTotal), "pct"),
-    metric(13, "gmroi", safeRatio(s.utilidadBruta, s.inventarioPromedio), "x"),
+    metric(13, "gmroi", requires(inventario, safeRatio(s.utilidadBruta, s.inventarioPromedio)), "x", missingReason(inventario, "noInventory")),
     metric(14, "ronic", ronic, "pct"),
-    metric(15, "cashRoic", pctOnCapital(s.ocf, s.capitalInvertido), "pct", capitalNullReason(s.capitalInvertido)),
+    metric(
+      15,
+      "cashRoic",
+      requires(tesoreria, pctOnCapital(s.ocf, s.capitalInvertido)),
+      "pct",
+      // Con capital negativo la razón no aplica aunque se cargue tesorería: ese motivo va primero.
+      capitalNullReason(s.capitalInvertido) ?? missingReason(tesoreria, "noTreasury"),
+    ),
   ];
 }
 
 export function calculateEficiencia(s: PeriodSnapshot): CatalogMetric[] {
+  const tesoreria = s.disponibilidad?.tesoreria;
+  const inventario = s.disponibilidad?.inventario;
   return [
     metric(16, "assetTurnover", safeRatio(s.ingresos, s.activoTotal), "x"),
     metric(17, "receivablesTurnover", safeRatio(s.ingresos, s.cxc), "x"),
-    metric(18, "inventoryTurnover", safeRatio(s.cogs, s.inventarios), "x"),
+    metric(18, "inventoryTurnover", requires(inventario, safeRatio(s.cogs, s.inventarios)), "x", missingReason(inventario, "noInventory")),
     metric(19, "payablesTurnover", safeRatio(s.cogs, s.cxp), "x"),
     metric(20, "icTurnover", ratioOnCapital(s.ingresos, s.capitalInvertido), "x", capitalNullReason(s.capitalInvertido)),
     metric(21, "nwcOfRevenue", pctOf(s.nwc, s.ingresos), "pct"),
-    metric(22, "capexOfRevenue", pctOf(s.capex, s.ingresos), "pct"),
+    metric(22, "capexOfRevenue", requires(tesoreria, pctOf(s.capex, s.ingresos)), "pct", missingReason(tesoreria, "noTreasury")),
     metric(23, "sgaOfRevenue", pctOf(s.sga, s.ingresos), "pct"),
     metric(24, "daOfRevenue", pctOf(s.da, s.ingresos), "pct"),
   ];
 }
 
 export function calculateLiquidez(s: PeriodSnapshot): CatalogMetric[] {
+  const { tesoreria, inventario, dso, dpo } = s.disponibilidad ?? {};
   const runwayMonths = s.salidasOperativas > 0.01 ? round2(s.saldoCaja / s.salidasOperativas) : null;
-  const runway = metric(28, "cashRunwayMonths", runwayMonths, "x");
+  const runway = metric(28, "cashRunwayMonths", requires(tesoreria, runwayMonths), "x", missingReason(tesoreria, "noTreasury"));
   runway.formatted = runwayMonths == null ? "" : runwayMonths.toFixed(1);
 
   return [
@@ -164,11 +192,12 @@ export function calculateLiquidez(s: PeriodSnapshot): CatalogMetric[] {
     metric(26, "quickRatio", safeRatio(s.activoCirculante - s.inventarios, Math.abs(s.pasivoCirculante)), "x"),
     metric(27, "cashRatio", safeRatio(s.cajaBancos, Math.abs(s.pasivoCirculante)), "x"),
     runway,
-    metric(29, "cashEfficiency", safeRatio(s.fcf, s.ebitda), "x"),
-    metric(30, "ccc", s.ccc, "days"),
-    metric(31, "dso", s.dso, "days"),
-    metric(32, "dpo", s.dpo, "days"),
-    metric(33, "dio", s.dio, "days"),
+    metric(29, "cashEfficiency", requires(tesoreria, safeRatio(s.fcf, s.ebitda)), "x", missingReason(tesoreria, "noTreasury")),
+    // Sin inventario el CCC es DSO − DPO (supuesto documentado); sin DSO o DPO no hay ciclo que medir.
+    metric(30, "ccc", requires(dso !== false && dpo !== false, s.ccc), "days", missingReason(dso !== false && dpo !== false, "noBalanceData")),
+    metric(31, "dso", requires(dso, s.dso), "days", missingReason(dso, "noBalanceData")),
+    metric(32, "dpo", requires(dpo, s.dpo), "days", missingReason(dpo, "noBalanceData")),
+    metric(33, "dio", requires(inventario, s.dio), "days", missingReason(inventario, "noInventory")),
   ];
 }
 

@@ -191,3 +191,48 @@ test("fallback deudaBruta por nombre: saldos de pasivo negativos reportan magnit
   ];
   assert.equal(deudaFinancieraPorNombre(mixtas), 450);
 });
+
+test("sin tesorería, las métricas de flujo quedan N/D con motivo, nunca 0", () => {
+  const snapshot = snapshotEscenario(-1);
+  assert.equal(snapshot.disponibilidad?.tesoreria, false);
+  const all = getAllMetrics(snapshot, null);
+  const byKey = new Map(Object.values(all).flat().map((m) => [m.key, m]));
+  for (const key of ["ocfMargin", "fcfMargin", "capexOfRevenue", "cashRunwayMonths", "cashEfficiency"]) {
+    assert.equal(byKey.get(key)?.value, null, key);
+    assert.equal(byKey.get(key)?.nullReason, "noTreasury", key);
+    assert.equal(byKey.get(key)?.formatted, "", key);
+  }
+  // ROIC de caja también queda N/D; si además el capital es negativo, ese motivo manda.
+  assert.equal(byKey.get("cashRoic")?.value, null);
+  assert.ok(["noTreasury", "negativeCapital"].includes(byKey.get("cashRoic")?.nullReason ?? ""));
+});
+
+test("sin inventario en la balanza, DIO, rotación de inventario y GMROI quedan N/D (no aplica)", () => {
+  const all = getAllMetrics(snapshotEscenario(-1), null);
+  const byKey = new Map(Object.values(all).flat().map((m) => [m.key, m]));
+  for (const key of ["dio", "inventoryTurnover", "gmroi"]) {
+    assert.equal(byKey.get(key)?.value, null, key);
+    assert.equal(byKey.get(key)?.nullReason, "noInventory", key);
+  }
+  // Con clientes, proveedores y ventas en la balanza, DSO/DPO/CCC sí tienen dato.
+  assert.ok((byKey.get("dso")?.value ?? 0) > 0);
+  assert.ok(byKey.get("dpo")?.value != null);
+  assert.ok(byKey.get("ccc")?.value != null);
+});
+
+test("sin saldo de clientes, DSO y CCC quedan N/D en lugar de 0 días", () => {
+  const rows = rowsEscenario(-1).filter((row) => !row.idCuenta.startsWith("1105"));
+  const snapshot = buildPeriodSnapshot({ anio: 2026, periodo: 7, balanza: rows, tesoreria: [], accountRoles: COMPAC_ACCOUNT_ROLES });
+  const liquidez = getAllMetrics(snapshot, null).liquidez;
+  const dso = liquidez.find((m) => m.key === "dso");
+  assert.equal(dso?.value, null);
+  assert.equal(dso?.nullReason, "noBalanceData");
+  assert.equal(liquidez.find((m) => m.key === "ccc")?.value, null);
+});
+
+test("un snapshot sin disponibilidad (armado a mano) conserva los valores de siempre", () => {
+  const { disponibilidad: _omit, ...legacy } = snapshotEscenario(-1);
+  const margenes = calculateMargenes(legacy);
+  assert.equal(margenes.find((m) => m.key === "ocfMargin")?.value, 0);
+  assert.equal(margenes.find((m) => m.key === "ocfMargin")?.nullReason, null);
+});

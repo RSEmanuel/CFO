@@ -571,7 +571,7 @@
     "titleTrial": "Balanza de Comprobación",
     "positionHint": "Saldos de cierre del último periodo de cada año. Pasivo y Capital se presentan en signo económico (positivo = a favor); un Capital negativo es déficit patrimonial y la identidad A = P + C se lee directo en el árbol.",
     "resultsHint": "Cada año suma los mismos meses del año elegido. Un mes que falta en un año anterior no se cuenta ni se inventa. Costos y gastos se muestran entre paréntesis.",
-    "ratiosHint": "Ratios del motor financiero al cierre de cada año. N/D cuando el denominador es cero o el capital contable es negativo (déficit: el ratio no es significativo).",
+    "ratiosHint": "Razones al cierre de cada año. N/D cuando falta el dato: sin tesorería, sin inventario, sin saldos en la balanza o con capital contable negativo.",
     "trialHint": "Movimientos del periodo seleccionado. Los totales de cargos y abonos se muestran aunque no cuadren.",
     "emptyTable": "No hay balanza para este periodo. Carga datos en Ingesta.",
     "information": "Información",
@@ -1138,7 +1138,7 @@
     "loading": "Cargando métricas",
     "eyebrow": "Inteligencia financiera",
     "intro": "50 indicadores para entender rentabilidad, eficiencia, liquidez y creación de valor.",
-    "available": "{count} métricas disponibles",
+    "available": "{count} de {total} con dato este mes",
     "retry": "Reintentar",
     "highlights": "Destacados",
     "customizeHelp": "Marca con una estrella cualquier métrica o gráfico para personalizar este panel.",
@@ -1146,7 +1146,6 @@
     "none": "No hay métricas para el corte seleccionado.",
     "assumptions": "Supuestos de cálculo",
     "noComparable": "Sin comparativo",
-    "nullReasonNegativeCapital": "Capital contable negativo — ratio no significativo",
     "limitationPeriod": "La agregación trimestral y anual aún no está disponible; se mantiene el corte mensual seleccionado.",
     "limitationCurrency": "No hay tipo de cambio configurado; los indicadores se mantienen sobre la base MXN.",
     "limitationUnits": "Este catálogo contiene ratios, porcentajes y días; conserva la unidad técnica de cada indicador.",
@@ -1475,7 +1474,14 @@
       "help": "De cada $100 de utilidad neta, cuánto se reparte a los dueños en dividendos. Si es 30%, se van $30 y quedan $70 en la empresa. Ni alto ni bajo es siempre mejor: depende de si el negocio necesita esa caja."
     },
     "infoAriaLabel": "¿Qué es esta métrica?",
-    "infoClose": "Cerrar"
+    "infoClose": "Cerrar",
+    "nullReasons": {
+      "negativeCapital": "Capital contable negativo: esta razón no aplica",
+      "noTreasury": "Sin dato: sube el Flujo de Efectivo de CONTPAQi para calcularla",
+      "noInventory": "No aplica: tu balanza no registra inventario",
+      "noBalanceData": "Sin dato: la balanza del mes no trae esos saldos",
+      "unknown": "Sin dato este mes"
+    }
   },
   "ingesta": {
     "title": "Ingesta",
@@ -1631,7 +1637,8 @@
     "amount": "Monto",
     "variation": "Variación",
     "context": "Contexto",
-    "noComparable": "Sin comparativo"
+    "noComparable": "Sin comparativo",
+    "noData": "Sin dato"
   },
   "export": {
     "type": "Tipo",

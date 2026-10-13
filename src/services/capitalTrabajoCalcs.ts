@@ -100,6 +100,11 @@ export type CccBalanza = {
   cogsAnualizado: number;
   /** Meses que cubren ventas/COGS (1 = mensual, N = YTD). */
   meses: number;
+  /**
+   * Si cada plazo tiene con qué calcularse. Sin ventas o sin saldo de clientes
+   * el DSO vale 0 por compatibilidad, pero no es un dato: se muestra como N/D.
+   */
+  disponible: { dso: boolean; dpo: boolean; dio: boolean };
 };
 
 export function cccFromBalanza(input: {
@@ -129,10 +134,14 @@ export function cccFromBalanza(input: {
   const ventasAnualizadas = round2(ventas * factor);
   const cogsAnualizado = round2(cogs * factor);
 
-  const dso = ventasAnualizadas > 0.01 && cxcPromedio > 0.01 ? round2((cxcPromedio / ventasAnualizadas) * DAYS_IN_YEAR) : 0;
-  const dpo = cogsAnualizado > 0.01 && cxpPromedio > 0.01 ? round2((cxpPromedio / cogsAnualizado) * DAYS_IN_YEAR) : 0;
-  const dio =
-    cogsAnualizado > 0.01 && inventarioPromedio > 0.01 ? round2((inventarioPromedio / cogsAnualizado) * DAYS_IN_YEAR) : 0;
+  const disponible = {
+    dso: ventasAnualizadas > 0.01 && cxcPromedio > 0.01,
+    dpo: cogsAnualizado > 0.01 && cxpPromedio > 0.01,
+    dio: cogsAnualizado > 0.01 && inventarioPromedio > 0.01,
+  };
+  const dso = disponible.dso ? round2((cxcPromedio / ventasAnualizadas) * DAYS_IN_YEAR) : 0;
+  const dpo = disponible.dpo ? round2((cxpPromedio / cogsAnualizado) * DAYS_IN_YEAR) : 0;
+  const dio = disponible.dio ? round2((inventarioPromedio / cogsAnualizado) * DAYS_IN_YEAR) : 0;
 
   return {
     dso,
@@ -147,6 +156,7 @@ export function cccFromBalanza(input: {
     ventasAnualizadas,
     cogsAnualizado,
     meses,
+    disponible,
   };
 }
 

@@ -571,7 +571,7 @@
     "titleTrial": "Trial Balance",
     "positionHint": "Closing balances for the latest period of each year. Liabilities and Equity are shown in economic sign (positive = in your favor); negative Equity is an equity deficit and A = L + E reads directly from the tree.",
     "resultsHint": "Each year adds up the same months as the selected year. A month missing in a prior year is neither counted nor filled in. Costs and expenses appear in parentheses.",
-    "ratiosHint": "Financial-engine ratios at each year end. N/A when the denominator is zero or equity is negative (deficit: the ratio is not meaningful).",
+    "ratiosHint": "Ratios at each year's close. N/D when the data is missing: no treasury, no inventory, no balances in the trial balance, or negative equity.",
     "trialHint": "Movements for the selected period. Total debits and credits appear even when they do not balance.",
     "emptyTable": "No trial balance exists for this period. Upload data in Ingest.",
     "information": "Information",
@@ -1138,7 +1138,7 @@
     "loading": "Loading metrics",
     "eyebrow": "Financial intelligence",
     "intro": "50 indicators to understand profitability, efficiency, liquidity, and value creation.",
-    "available": "{count} metrics available",
+    "available": "{count} of {total} with data this month",
     "retry": "Retry",
     "highlights": "Highlights",
     "customizeHelp": "Star any metric or chart to customize this panel.",
@@ -1146,7 +1146,6 @@
     "none": "No metrics are available for the selected cutoff.",
     "assumptions": "Calculation assumptions",
     "noComparable": "No comparable",
-    "nullReasonNegativeCapital": "Negative equity — ratio not meaningful",
     "limitationPeriod": "Quarterly and annual aggregation is not available yet; the selected monthly cutoff remains in use.",
     "limitationCurrency": "No exchange rate is configured; indicators remain based on MXN.",
     "limitationUnits": "This catalog contains ratios, percentages, and days; each indicator keeps its technical unit.",
@@ -1475,7 +1474,14 @@
       "help": "Of every $100 of net profit, how much is paid out to owners as dividends. At 30%, $30 leaves and $70 stays in the company. Neither high nor low is always better: it depends on whether the business needs that cash."
     },
     "infoAriaLabel": "What is this metric?",
-    "infoClose": "Close"
+    "infoClose": "Close",
+    "nullReasons": {
+      "negativeCapital": "Negative equity: this ratio does not apply",
+      "noTreasury": "No data: upload the CONTPAQi Cash Flow report to calculate it",
+      "noInventory": "Not applicable: your trial balance has no inventory",
+      "noBalanceData": "No data: this month's trial balance lacks those balances",
+      "unknown": "No data this month"
+    }
   },
   "ingesta": {
     "title": "Ingest",
@@ -1631,7 +1637,8 @@
     "amount": "Amount",
     "variation": "Change",
     "context": "Context",
-    "noComparable": "No comparable"
+    "noComparable": "No comparable",
+    "noData": "No data"
   },
   "export": {
     "type": "Type",

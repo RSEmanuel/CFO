@@ -66,6 +66,19 @@ export type PeriodSnapshot = {
   ke: number;
   kd: number;
   wacc: number;
+  /**
+   * Qué fuentes respaldan las cifras. Sin tesorería, OCF/FCF/CapEx valen 0 y
+   * sin inventario DIO vale 0: el catálogo los muestra N/D, nunca como dato.
+   * Opcional para snapshots armados a mano (se asume todo disponible).
+   */
+  disponibilidad?: SnapshotDisponibilidad;
+};
+
+export type SnapshotDisponibilidad = {
+  tesoreria: boolean;
+  inventario: boolean;
+  dso: boolean;
+  dpo: boolean;
 };
 
 export const CATALOG_ASSUMPTIONS: string[] = [
@@ -73,7 +86,8 @@ export const CATALOG_ASSUMPTIONS: string[] = [
   "Si no hay PTU/ISR (6405/6406) en PyG, la tasa para NOPAT es 30% (ISR corporativo México).",
   "Los gastos financieros se toman del 8101 (ER); si no hay, se usa el servicio de deuda de tesorería.",
   "La deuda financiera sale del rol deudaFinanciera del perfil de ingesta (default Compac: 2106 + 2306 + 2359, pasivos con costo CP/LP) en valor absoluto, porque la balanza persiste pasivos con signo negativo; sin rol configurado se infiere por nombre (préstamo, crédito, deuda), también en valor absoluto.",
-  "DSO/DPO/CCC se calculan desde la balanza: promedio (saldo inicial + final)/2 del rubro sobre ventas o COGS anualizados (×12 en vista mensual; ×12/meses en YTD), ×365 días. Sin rubro de inventario, DIO = 0 y CCC = DSO − DPO.",
+  "DSO/DPO/CCC se calculan desde la balanza: promedio (saldo inicial + final)/2 del rubro sobre ventas o COGS anualizados (×12 en vista mensual; ×12/meses en YTD), ×365 días. Sin rubro de inventario, DIO queda N/D y CCC = DSO − DPO.",
+  "Sin tesorería cargada, las métricas de flujo (#6, #7, #15, #22, #28, #29) quedan N/D en lugar de 0.",
   "El NWC (#21) es activo circulante − |pasivo circulante|: la balanza persiste pasivos con signo negativo y restar el valor absoluto evita que el capital de trabajo sume en vez de restar. Las razones de liquidez (#25–#27) usan |pasivo circulante| en el denominador (misma convención de magnitud).",
   "El patrimonio del snapshot es el capital contable NIF con signo económico: cuentas 3xxx + resultado del ejercicio YTD (misma fuente que el árbol B3). Con déficit (capital ≤ 0), los ratios sobre capital (#9 ROIC, #10 ROCE, #11 ROE, #15 Cash ROIC, #20 IC turnover, #36 apalancamiento, #48/#49) quedan N/D: no son significativos.",
   "El ROCE (#10) usa capital empleado = activo total − |pasivo circulante| y la razón de pasivos (#37) es |pasivo total| / activo total: misma convención de magnitud sobre pasivos persistidos en negativo.",
@@ -215,5 +229,11 @@ export function buildPeriodSnapshot(input: {
     ke,
     kd,
     wacc,
+    disponibilidad: {
+      tesoreria: input.tesoreria.length > 0,
+      inventario: ccc.disponible.dio,
+      dso: ccc.disponible.dso,
+      dpo: ccc.disponible.dpo,
+    },
   };
 }
