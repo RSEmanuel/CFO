@@ -118,7 +118,11 @@ type LabelGeom = {
   y?: number | string;
   width?: number | string;
   value?: number | string;
+  offset?: number;
 };
+
+/** Separación entre el total del mes y el borde superior de la barra apilada. */
+const TOTAL_LABEL_OFFSET = 14;
 
 function num(value: number | string | undefined): number {
   const parsed = typeof value === "number" ? value : Number(value);
@@ -130,10 +134,12 @@ function TotalStackLabel(props: LabelGeom) {
   if (!text) {
     return null;
   }
+  // Con `content` propio, Recharts entrega el borde de la barra sin aplicar el offset: se resta aquí.
+  const offset = typeof props.offset === "number" ? props.offset : TOTAL_LABEL_OFFSET;
   return (
     <text
       x={num(props.x) + num(props.width) / 2}
-      y={num(props.y)}
+      y={num(props.y) - offset}
       textAnchor="middle"
       className="fill-slate-700 text-xs font-semibold financial-nums"
       style={{ pointerEvents: "none" }}
@@ -350,7 +356,7 @@ function Top5Card({
                     {narrow ? null : (
                       <LabelList
                         position="top"
-                        offset={8}
+                        offset={TOTAL_LABEL_OFFSET}
                         valueAccessor={(entry) => {
                           const point = entry.payload as Top5StackedPoint | undefined;
                           if (!point || stackTopKey(point, stackedKeys) !== key) {
