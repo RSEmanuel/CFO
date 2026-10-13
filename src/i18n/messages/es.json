@@ -719,9 +719,9 @@
     "cashIncreased": "El efectivo incrementó {amount}",
     "cashDecreased": "El efectivo decreció ({amount})",
     "alertsMessages": {
-      "lowRunway": "Tu caja alcanza menos de ~6 semanas de operación: renegocia plazos o acelera cobranza.",
-      "negativeTwoMonths": "Dos meses consecutivos de flujo neto negativo: recorta gastos o anticipa ventas.",
-      "highCapex": "CapEx del mes se come más de la mitad de la operación: reagenda inversiones o busca financiamiento."
+      "lowRunway": "Tu caja ({caja}) alcanza para {meses} meses al ritmo de gasto de este mes. Renegocia plazos con proveedores o acelera la cobranza.",
+      "negativeTwoMonths": "En los últimos dos meses salió {monto} más de lo que entró. Recorta gastos o adelanta cobros.",
+      "highCapex": "Las inversiones del mes ({capex}) se comen más de la mitad de lo que entró por la operación ({entradas}). Reagenda inversiones o busca financiamiento."
     },
     "operativo": {
       "tab": "Operativo",
@@ -851,6 +851,12 @@
           "down": "Bajaron {amount} otros pasivos de corto plazo. Confirma que ese pago no te deje sin caja."
         }
       }
+    },
+    "respiro": {
+      "title": "Meses de respiro",
+      "help": "Cuánto aguanta tu caja si sigues gastando como este mes.",
+      "source": "Cifra calculó: caja al cierre ({caja}) ÷ salidas de operación del mes ({salidas}), con tu reporte Flujo de Efectivo.",
+      "noOutflows": "Sin dato: este mes no hubo salidas de operación con qué medir el ritmo de gasto."
     }
   },
   "polizas": {

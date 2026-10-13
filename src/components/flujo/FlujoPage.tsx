@@ -1,5 +1,6 @@
 "use client";
 
+import { FlujoAlertas } from "@/components/flujo/FlujoAlertas";
 import { FlujoDinamicaDiariaView, FlujoResumenKpis } from "@/components/flujo/FlujoOperativoView";
 import { FlujoEfectivoView } from "@/components/flujo/FlujoEfectivoView";
 import { FlujoLibreView } from "@/components/flujo/FlujoLibreView";
@@ -108,6 +109,7 @@ export function FlujoPage() {
         </div>
 
         <TabsContent value="vision" className="mt-4 space-y-4">
+          <FlujoAlertas periodo={effectivePeriod} rows={data?.rows ?? []} />
           <FlujoResumenKpis periodo={effectivePeriod} />
           <FlujoEfectivoView periodo={effectivePeriod} units={filters.units} />
         </TabsContent>

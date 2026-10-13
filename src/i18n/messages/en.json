@@ -719,9 +719,9 @@
     "cashIncreased": "Cash increased {amount}",
     "cashDecreased": "Cash decreased ({amount})",
     "alertsMessages": {
-      "lowRunway": "Cash covers less than ~6 weeks of operations: renegotiate terms or accelerate collections.",
-      "negativeTwoMonths": "Two consecutive months of negative net cash flow: cut expenses or bring forward sales.",
-      "highCapex": "This month's CapEx consumes more than half of operations: reschedule investments or seek financing."
+      "lowRunway": "Your cash ({caja}) lasts {meses} months at this month's spending pace. Renegotiate supplier terms or speed up collections.",
+      "negativeTwoMonths": "Over the last two months, {monto} more went out than came in. Cut expenses or bring collections forward.",
+      "highCapex": "This month's investments ({capex}) take more than half of operating inflows ({entradas}). Reschedule investments or seek financing."
     },
     "operativo": {
       "tab": "Operational",
@@ -851,6 +851,12 @@
           "down": "Other current liabilities fell by {amount}. Confirm that payment does not leave you short of cash."
         }
       }
+    },
+    "respiro": {
+      "title": "Months of runway",
+      "help": "How long your cash lasts if you keep spending like this month.",
+      "source": "Cifra calculated: closing cash ({caja}) ÷ this month's operating outflows ({salidas}), from your Cash Flow report.",
+      "noOutflows": "No data: there were no operating outflows this month to measure the spending pace."
     }
   },
   "polizas": {

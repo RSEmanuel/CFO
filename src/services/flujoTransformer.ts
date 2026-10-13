@@ -339,28 +339,54 @@ export function buildFlujosPorActividad(
   });
 }
 
-export type FlujoAlerta = { messageKey: string; values?: Record<string, string | number> };
+/**
+ * Alertas de caja del mes. Cada una trae el monto en riesgo para que el texto
+ * diga el número, qué significa y qué hacer.
+ */
+export type FlujoAlerta =
+  | { kind: "lowRunway"; caja: number; meses: number }
+  | { kind: "negativeTwoMonths"; salidaNeta: number }
+  | { kind: "highCapex"; capex: number; entradas: number };
+
+/** Umbral de "poca caja": menos de 1.5 meses de salidas de operación (~6 semanas). */
+export const MESES_RESPIRO_MINIMO = 1.5;
+
+/**
+ * Meses de respiro del mes: caja al cierre ÷ salidas de operación del mes. Es
+ * la misma fórmula de la métrica #28 del catálogo cuando hay tesorería.
+ * null si en el mes no hubo salidas de operación (no hay ritmo con qué medir).
+ */
+export function mesesDeRespiro(row: FlujoMensual): number | null {
+  return row.salidasOperativas > 0.01 ? round2(row.saldoFinal / row.salidasOperativas) : null;
+}
+
+export function flujoMesActivo(rows: FlujoMensual[], periodo: string): FlujoMensual | null {
+  if (rows.length === 0) {
+    return null;
+  }
+  const found = rows.findIndex((row) => row.periodo === periodo);
+  return rows[found >= 0 ? found : rows.length - 1];
+}
 
 export function buildFlujoAlertas(rows: FlujoMensual[], periodo: string): FlujoAlerta[] {
-  if (rows.length === 0) {
+  const current = flujoMesActivo(rows, periodo);
+  if (!current) {
     return [];
   }
-
-  const found = rows.findIndex((row) => row.periodo === periodo);
-  const current = rows[found >= 0 ? found : rows.length - 1];
   const alerts: FlujoAlerta[] = [];
 
-  if (current.saldoFinal < 1.5 * current.salidasOperativas) {
-    alerts.push({ messageKey: "flujo.alertsMessages.lowRunway" });
+  const meses = mesesDeRespiro(current);
+  if (meses != null && meses < MESES_RESPIRO_MINIMO) {
+    alerts.push({ kind: "lowRunway", caja: round2(current.saldoFinal), meses });
   }
 
   const prior = rows.find((row) => row.periodo === shiftPeriodo(current.periodo, -1));
   if (prior && flujoNetoOf(current) < 0 && flujoNetoOf(prior) < 0) {
-    alerts.push({ messageKey: "flujo.alertsMessages.negativeTwoMonths" });
+    alerts.push({ kind: "negativeTwoMonths", salidaNeta: round2(-(flujoNetoOf(current) + flujoNetoOf(prior))) });
   }
 
-  if (current.salidasCapex > 0.5 * current.entradasOperativas) {
-    alerts.push({ messageKey: "flujo.alertsMessages.highCapex" });
+  if (current.salidasCapex > 0.01 && current.salidasCapex > 0.5 * current.entradasOperativas) {
+    alerts.push({ kind: "highCapex", capex: round2(current.salidasCapex), entradas: round2(current.entradasOperativas) });
   }
 
   return alerts;
