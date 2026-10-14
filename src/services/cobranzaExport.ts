@@ -1,5 +1,4 @@
 import { type AntiguedadBucketKey, type AntiguedadTerceroRow } from "@/services/antiguedad";
-import type { AccionCobranza, ClienteQueNoPaga } from "@/services/clientesQueNoPagan";
 import { type CobranzaClienteRow } from "@/services/cobranzaTransformer";
 import type { ConcentracionRow, RiesgoClasificacion } from "@/services/concentracionRiesgo";
 import { slugAscii, type ColumnMode, type TableRow } from "@/services/tableExport";
@@ -22,33 +21,50 @@ export function cobranzaExportTable(
   };
 }
 
-export function clientesQueNoPaganExportTable(
-  clientes: ClienteQueNoPaga[],
+export type ListaClientesRow = {
+  cliente: string;
+  monto: number;
+  dias: number;
+  accion: string;
+  alMenos?: boolean;
+};
+
+/** "vencido": con fecha de vencimiento. "sinCobrar": solo días desde la factura (estimado, sin plazo). */
+export function listaClientesExportTable(
+  rows: ListaClientesRow[],
+  variant: "vencido" | "sinCobrar",
   columnMode: ColumnMode,
-  accionLabel: (accion: AccionCobranza) => string,
+  accionLabel: (accion: string) => string,
 ): { headers: string[]; rows: TableRow[] } {
+  const vencido = variant === "vencido";
   if (columnMode === "sistemas") {
     return {
-      headers: ["cliente_id", "cliente_nombre", "vencido", "dias_vencidos", "facturas_vencidas", "accion"],
-      rows: clientes.map((row) => [
-        slugAscii(row.cliente),
-        row.cliente,
-        row.vencido,
-        row.diasVencidos,
-        row.facturasVencidas,
-        row.accion,
-      ]),
+      headers: ["cliente_id", "cliente_nombre", vencido ? "vencido" : "saldo", vencido ? "dias_vencidos" : "dias_sin_cobrar", "dias_es_minimo", "accion"],
+      rows: rows.map((row) => [slugAscii(row.cliente), row.cliente, row.monto, row.dias, row.alMenos ? 1 : 0, row.accion]),
     };
   }
 
   return {
-    headers: ["Cliente", "Vencido", "Días vencidos", "Facturas vencidas", "Qué hacer"],
-    rows: clientes.map((row) => [row.cliente, row.vencido, row.diasVencidos, row.facturasVencidas, accionLabel(row.accion)]),
+    headers: vencido
+      ? ["Cliente", "Vencido", "Días vencidos", "Qué hacer"]
+      : ["Cliente", "Te debe", "Días sin cobrar (estimado)", "Qué hacer"],
+    rows: rows.map((row) => [
+      row.cliente,
+      row.monto,
+      row.alMenos ? `${row.dias}+` : row.dias,
+      accionLabel(row.accion),
+    ]),
   };
 }
 
-export function clientesQueNoPaganExportFilename(empresa: string, asOf: string, kind: "xlsx" | "csv"): string {
-  return `${slugAscii(empresa)}-clientes-que-no-pagan-${asOf}.${kind}`;
+export function listaClientesExportFilename(
+  empresa: string,
+  asOf: string,
+  variant: "vencido" | "sinCobrar",
+  kind: "xlsx" | "csv",
+): string {
+  const nombre = variant === "vencido" ? "clientes-que-no-pagan" : "clientes-sin-cobrar";
+  return `${slugAscii(empresa)}-${nombre}-${asOf}.${kind}`;
 }
 
 export function cobranzaExportFilename(empresa: string, asOf: string, kind: "xlsx" | "csv"): string {

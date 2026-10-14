@@ -10,6 +10,8 @@ import {
   type CobranzaFactura,
   type CobranzaModel,
 } from "@/services/cobranzaTransformer";
+import type { ClientesSinCobrarModel } from "@/services/carteraSinCobrar";
+import { getClientesSinCobrar } from "@/services/cobranzaSinCobrarService";
 import { buildClientesQueNoPagan, type ClientesQueNoPaganModel } from "@/services/clientesQueNoPagan";
 import { cccFromBalanza } from "@/services/capitalTrabajoCalcs";
 import { plazosComercialesFromCcc } from "@/services/cobranzaPlazosComerciales";
@@ -30,6 +32,11 @@ export type CobranzaPayload = {
   antiguedadCxp: AntiguedadModel | null;
   /** Lista accionable de B07: solo facturas vencidas, días desde el vencimiento. */
   clientesQueNoPagan: ClientesQueNoPaganModel | null;
+  /**
+   * Sin auxiliar de ventas: clientes con saldo y días sin cobrar, estimados con
+   * los movimientos auxiliares de CONTPAQi (no trae fecha de vencimiento).
+   */
+  clientesSinCobrar: ClientesSinCobrarModel | null;
   periodOrigins: PeriodOrigins;
 };
 
@@ -61,7 +68,7 @@ async function dsoDeBalanza(tenantId: string, asOf: string): Promise<number | nu
 }
 
 export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
-  const [ventas, egresos, committedPeriods] = await Promise.all([
+  const [ventas, egresos, committedPeriods, sinCobrar] = await Promise.all([
     prisma.auxiliarVentas.findMany({
       where: { tenantId },
       orderBy: { fechaEmision: "asc" },
@@ -71,16 +78,18 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
       orderBy: { fechaEmision: "asc" },
     }),
     getCommittedIngestPeriods(tenantId),
+    getClientesSinCobrar(tenantId),
   ]);
   if (ventas.length === 0 && egresos.length === 0) {
     return {
       tenantId,
-      hasData: false,
-      asOf: null,
+      hasData: sinCobrar != null,
+      asOf: sinCobrar?.corte ?? null,
       model: null,
       antiguedadCxc: null,
       antiguedadCxp: null,
       clientesQueNoPagan: null,
+      clientesSinCobrar: sinCobrar?.model ?? null,
       periodOrigins: {},
     };
   }
@@ -126,6 +135,8 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
     antiguedadCxc: ventas.length > 0 ? buildAntiguedad(documentosCxc, asOf) : null,
     antiguedadCxp: egresos.length > 0 ? buildAntiguedad(documentosCxp, asOf) : null,
     clientesQueNoPagan: ventas.length > 0 ? buildClientesQueNoPagan(documentosCxc, asOf) : null,
+    // Con ventas manda su fecha de vencimiento; los movimientos solo son el respaldo.
+    clientesSinCobrar: ventas.length > 0 ? null : sinCobrar?.model ?? null,
     periodOrigins: resolvePeriodOrigins(auxiliarPeriods, committedPeriods),
   };
 }

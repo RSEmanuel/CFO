@@ -2,7 +2,7 @@
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
-import { ClientesQueNoPaganSection } from "@/components/cobranza/ClientesQueNoPaganSection";
+import { ClientesQueNoPaganSection, type NoPaganRow } from "@/components/cobranza/ClientesQueNoPaganSection";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
 import { ConcentracionRiesgoSection } from "@/components/cobranza/ConcentracionRiesgoSection";
 import { DataEmptyState } from "@/components/data-empty-state";
@@ -15,15 +15,17 @@ import { useCobranza } from "@/hooks/use-cobranza";
 import { CHART } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
 import type { AntiguedadBucketKey } from "@/services/antiguedad";
-import type { AccionCobranza } from "@/services/clientesQueNoPagan";
+import { clienteParaRevisar } from "@/services/carteraSinCobrar";
+import { clienteParaSuspender } from "@/services/clientesQueNoPagan";
 import {
   antiguedadExportFilename,
   antiguedadExportTable,
   cobranzaExportFilename,
-  clientesQueNoPaganExportFilename,
-  clientesQueNoPaganExportTable,
+  listaClientesExportFilename,
+  listaClientesExportTable,
   cobranzaExportTable,
 } from "@/services/cobranzaExport";
+import type { CobranzaPayload } from "@/services/cobranzaService";
 import { formatAxisTick, formatMxn } from "@/services/money";
 import {
   buildCsv,
@@ -85,25 +87,24 @@ export function CobranzaPage() {
     }
   };
 
-  const noPagan = data?.clientesQueNoPagan ?? null;
-  const exportNoPagan = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
-    if (!noPagan || !asOf) {
+  const lista = listaDeClientes(data);
+  const exportLista = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
+    if (!lista || !asOf) {
       return;
     }
+    const variant = lista.variant;
     try {
-      const { headers, rows } = clientesQueNoPaganExportTable(
-        noPagan.clientes,
-        columnMode,
-        (accion: AccionCobranza) => t(`cobranza.noPagan.acciones.${accion}`),
+      const { headers, rows } = listaClientesExportTable(lista.rows, variant, columnMode, (accion) =>
+        t(`cobranza.${variant === "vencido" ? "noPagan" : "sinCobrar"}.acciones.${accion}`),
       );
-      const filename = clientesQueNoPaganExportFilename(empresa, asOf, fileKind);
+      const filename = listaClientesExportFilename(empresa, asOf, variant, fileKind);
       if (fileKind === "csv") {
         downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
         return;
       }
       const workbook = await buildWorkbook(headers, rows, {
         tenant: empresa,
-        reporte: "clientes-que-no-pagan",
+        reporte: variant === "vencido" ? "clientes-que-no-pagan" : "clientes-sin-cobrar",
         generatedAt: new Date().toISOString(),
       });
       downloadBlob(await workbookToBlob(workbook), filename);
@@ -166,9 +167,7 @@ export function CobranzaPage() {
       {!error && data && !data.hasData ? (
         <DataEmptyState title={t("cobranza.emptyTitle")} message={t("cobranza.emptyMessage")} />
       ) : null}
-      {noPagan ? (
-        <ClientesQueNoPaganSection model={noPagan} onExport={exportNoPagan} />
-      ) : null}
+      {lista ? <ClientesQueNoPaganSection {...lista} onExport={exportLista} /> : null}
       {model && asOf ? (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -315,4 +314,55 @@ export function CobranzaPage() {
       </Tabs>
     </div>
   );
+}
+
+type ListaClientes = {
+  variant: "vencido" | "sinCobrar";
+  total: number;
+  rows: NoPaganRow[];
+  topCount: number;
+  topPct: number;
+  alerta: NoPaganRow | null;
+};
+
+/** Con auxiliar de ventas manda la fecha de vencimiento; sin él, los días desde la factura. */
+function listaDeClientes(data: CobranzaPayload | null): ListaClientes | null {
+  if (data?.clientesQueNoPagan) {
+    const model = data.clientesQueNoPagan;
+    const paraRow = (row: { cliente: string; vencido: number; diasVencidos: number; accion: string }): NoPaganRow => ({
+      cliente: row.cliente,
+      monto: row.vencido,
+      dias: row.diasVencidos,
+      accion: row.accion,
+    });
+    const alerta = clienteParaSuspender(model);
+    return {
+      variant: "vencido",
+      total: model.totalVencido,
+      rows: model.clientes.map(paraRow),
+      topCount: model.topCount,
+      topPct: model.topPct,
+      alerta: alerta ? paraRow(alerta) : null,
+    };
+  }
+  if (data?.clientesSinCobrar) {
+    const model = data.clientesSinCobrar;
+    const paraRow = (row: { cliente: string; saldo: number; diasSinCobrar: number; alMenos: boolean; accion: string }): NoPaganRow => ({
+      cliente: row.cliente,
+      monto: row.saldo,
+      dias: row.diasSinCobrar,
+      accion: row.accion,
+      alMenos: row.alMenos,
+    });
+    const alerta = clienteParaRevisar(model);
+    return {
+      variant: "sinCobrar",
+      total: model.totalSaldo,
+      rows: model.clientes.map(paraRow),
+      topCount: model.topCount,
+      topPct: model.topPct,
+      alerta: alerta ? paraRow(alerta) : null,
+    };
+  }
+  return null;
 }

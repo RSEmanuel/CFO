@@ -890,7 +890,7 @@
   },
   "cobranza": {
     "emptyTitle": "Cobranza aún no disponible",
-    "emptyMessage": "Carga el auxiliar de ventas para habilitar cobranza.",
+    "emptyMessage": "Carga la plantilla máster con ventas, o los movimientos auxiliares del catálogo de tus clientes, para ver cobranza.",
     "loadError": "No se pudo cargar la cobranza",
     "exportError": "No se pudo generar el archivo",
     "pendingInvoices": "Facturas pendientes de cobro",
@@ -1009,11 +1009,9 @@
     },
     "noPagan": {
       "title": "Clientes que no te pagan",
-      "sinVencido": "Ningún cliente tiene facturas vencidas. Sigue revisando cada mes.",
       "resumenUno": "Te deben {monto} vencidos y todo está en 1 cliente. Llámalo esta semana.",
       "resumen": "Te deben {monto} vencidos; el {pct}% está en {n} clientes. Llámalos esta semana.",
       "alerta": "{cliente} te debe {monto} con {dias} días de retraso. Suspende su crédito hasta que pague.",
-      "vencido": "Vencido",
       "queHacer": "Qué hacer",
       "acciones": {
         "recordar": "Recuérdale el pago",
@@ -1021,7 +1019,28 @@
         "exigir_fecha": "Exige fecha de pago por escrito",
         "suspender_credito": "Suspende su crédito hasta que pague"
       },
-      "fuente": "Sale de tu auxiliar de ventas: solo facturas ya vencidas, contadas desde su fecha de vencimiento."
+      "fuente": "Sale de tu auxiliar de ventas: solo facturas ya vencidas, contadas desde su fecha de vencimiento.",
+      "vacio": "Ningún cliente tiene facturas vencidas. Sigue revisando cada mes.",
+      "monto": "Vencido",
+      "dias": "Días vencidos"
+    },
+    "sinCobrar": {
+      "title": "Clientes con facturas sin cobrar",
+      "vacio": "Ningún cliente te debe facturas abiertas. Sigue revisando cada mes.",
+      "resumenUno": "Te deben {monto} y todo está en 1 cliente. Llámalo esta semana.",
+      "resumen": "Te deben {monto}; el {pct}% está en {n} clientes. Llámalos esta semana.",
+      "alerta": "{cliente} lleva {dias} días sin pagarte {monto}. Revisa su plazo de crédito y, si ya lo rebasó, suspende su crédito.",
+      "monto": "Te debe",
+      "dias": "Días sin cobrar",
+      "queHacer": "Qué hacer",
+      "alMenos": "Al menos: su factura más antigua es anterior a los datos que has cargado.",
+      "acciones": {
+        "seguimiento": "Dale seguimiento",
+        "llamar": "Llámale y pide fecha de pago",
+        "exigir_fecha": "Exige fecha de pago por escrito",
+        "revisar_plazo": "Revisa su plazo y suspende su crédito si ya lo rebasó"
+      },
+      "fuente": "Cifra calculó los días desde la factura más antigua sin cobrar, con tus movimientos auxiliares de clientes de CONTPAQi. No traen plazo de crédito, así que esta cifra es estimada y no dice qué está vencido."
     }
   },
   "control": {

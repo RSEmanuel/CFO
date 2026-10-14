@@ -890,7 +890,7 @@
   },
   "cobranza": {
     "emptyTitle": "Collections not available yet",
-    "emptyMessage": "Upload the sales auxiliary to enable collections.",
+    "emptyMessage": "Upload the master template with sales, or your customers' auxiliary ledger movements, to see collections.",
     "loadError": "Could not load collections",
     "exportError": "Could not generate the file",
     "pendingInvoices": "Outstanding invoices",
@@ -1009,11 +1009,9 @@
     },
     "noPagan": {
       "title": "Customers who aren't paying you",
-      "sinVencido": "No customer has overdue invoices. Keep checking every month.",
       "resumenUno": "You're owed {monto} overdue, all from 1 customer. Call them this week.",
       "resumen": "You're owed {monto} overdue; {pct}% is with {n} customers. Call them this week.",
       "alerta": "{cliente} owes you {monto} and is {dias} days late. Suspend their credit until they pay.",
-      "vencido": "Overdue",
       "queHacer": "What to do",
       "acciones": {
         "recordar": "Remind them of the payment",
@@ -1021,7 +1019,28 @@
         "exigir_fecha": "Ask for a payment date in writing",
         "suspender_credito": "Suspend their credit until they pay"
       },
-      "fuente": "From your sales auxiliary: only invoices already overdue, counted from their due date."
+      "fuente": "From your sales auxiliary: only invoices already overdue, counted from their due date.",
+      "vacio": "No customer has overdue invoices. Keep checking every month.",
+      "monto": "Overdue",
+      "dias": "Days overdue"
+    },
+    "sinCobrar": {
+      "title": "Customers with unpaid invoices",
+      "vacio": "No customer has open invoices. Keep checking every month.",
+      "resumenUno": "You're owed {monto}, all from 1 customer. Call them this week.",
+      "resumen": "You're owed {monto}; {pct}% is with {n} customers. Call them this week.",
+      "alerta": "{cliente} has gone {dias} days without paying {monto}. Check their credit terms and, if they've passed them, suspend their credit.",
+      "monto": "Owes you",
+      "dias": "Days unpaid",
+      "queHacer": "What to do",
+      "alMenos": "At least: their oldest invoice is older than the data you've uploaded.",
+      "acciones": {
+        "seguimiento": "Follow up",
+        "llamar": "Call and ask for a payment date",
+        "exigir_fecha": "Ask for a payment date in writing",
+        "revisar_plazo": "Check their terms and suspend credit if they've passed them"
+      },
+      "fuente": "Cifra calculated days since the oldest unpaid invoice from your CONTPAQi customer auxiliary movements. They carry no credit terms, so this figure is estimated and does not say what is overdue."
     }
   },
   "control": {
