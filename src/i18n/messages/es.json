@@ -1789,5 +1789,107 @@
     "noMonth": "Sin mes",
     "empty": "Todavía no se ha subido ningún archivo a esta empresa. Súbelo desde Ingesta.",
     "truncated": "Se muestran los {count} archivos más recientes."
+  },
+  "landing": {
+    "meta": {
+      "title": "Cifra · CFO virtual"
+    },
+    "skip": "Saltar al contenido",
+    "nav": {
+      "label": "Secciones de la página",
+      "sceneOf": "Escena {n} de {total}"
+    },
+    "header": {
+      "login": "Iniciar sesión",
+      "demo": "Solicitar demo"
+    },
+    "hint": "Desplaza para recorrer",
+    "staticToggle": "Ver sin animaciones",
+    "sampleNote": "Ilustración de muestra. Las cifras reales aparecen cuando cargas tu contabilidad.",
+    "poster": {
+      "confirmed": "De tu contabilidad",
+      "estimated": "Estimada por Cifra",
+      "missing": "Sin dato",
+      "months": "meses de respiro"
+    },
+    "scenes": {
+      "torre": {
+        "label": "Inicio",
+        "eyebrow": "Cifra · CFO virtual",
+        "title": "Tus cifras, en claro.",
+        "body": "Resultado, caja y cobranza de tu empresa en un solo lugar, explicados para quien dirige, no para quien contabiliza.",
+        "tagA": "Contabilidad mexicana",
+        "tagB": "CONTPAQi o plantilla"
+      },
+      "resultados": {
+        "label": "Resultados",
+        "eyebrow": "Resultados",
+        "title": "Cuánto ganaste de verdad.",
+        "body": "Tu estado de resultados, mes contra mes y sin tecnicismos. Ves qué sube, qué baja y qué revisar primero.",
+        "tagA": "Ingresos y gastos",
+        "tagB": "Margen"
+      },
+      "caja": {
+        "label": "Caja y flujo",
+        "eyebrow": "Caja y flujo",
+        "title": "Cuánto respiro te queda.",
+        "body": "Tu caja de hoy y cuántos meses de respiro tienes. Si te va a faltar, lo ves con tiempo para decidir.",
+        "tagA": "Meses de respiro",
+        "tagB": "Flujo de efectivo"
+      },
+      "cobranza": {
+        "label": "Cobranza",
+        "eyebrow": "Cobranza",
+        "title": "A quién cobrarle primero.",
+        "body": "Los clientes que no te pagan, ordenados por lo que más pesa en tu caja. Empieza por el primero de la lista y cobra.",
+        "tagA": "Facturas sin cobrar",
+        "tagB": "Lista accionable"
+      },
+      "salud": {
+        "label": "Salud financiera",
+        "eyebrow": "Salud financiera",
+        "title": "Un vistazo, una decisión.",
+        "body": "Liquidez, rentabilidad y deuda en indicadores que se entienden. Cada uno dice qué significa y qué hacer.",
+        "tagA": "Indicadores claros",
+        "tagB": "Escenarios"
+      },
+      "mundo": {
+        "label": "Empezar",
+        "eyebrow": "Empieza hoy",
+        "title": "Carga tu contabilidad. Cifra hace el resto.",
+        "body": "Entra con tu cuenta o pide una demo y te mostramos tus propias cifras.",
+        "primary": "Iniciar sesión",
+        "secondary": "Solicitar demo"
+      }
+    },
+    "how": {
+      "eyebrow": "Cómo funciona",
+      "title": "De tu contabilidad a una decisión.",
+      "lede": "Hoy tus números viven en el sistema contable, en Excel y en la cabeza de tu contador. Cifra los junta y los explica.",
+      "one": {
+        "title": "Cargas tu contabilidad",
+        "body": "Sube tu balanza de comprobación de CONTPAQi o nuestra plantilla."
+      },
+      "two": {
+        "title": "Cifra la ordena y la calcula",
+        "body": "Cada número dice si viene de tu contabilidad o si es una estimación."
+      },
+      "three": {
+        "title": "Decides con claridad",
+        "body": "Resultados, caja y cobranza en tableros. Cada alerta termina en una acción."
+      }
+    },
+    "demo": {
+      "eyebrow": "Solicitar demo",
+      "title": "Te mostramos tus propias cifras.",
+      "body": "Escríbenos y agendamos una demo con la contabilidad de tu empresa.",
+      "button": "Escribir para pedir una demo",
+      "subject": "Solicitud de demo de Cifra",
+      "login": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "footer": {
+      "tagline": "Tus cifras, en claro.",
+      "endorsement": "Un producto de Data Frontier"
+    }
   }
 }

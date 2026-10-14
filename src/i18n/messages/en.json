@@ -1789,5 +1789,107 @@
     "noMonth": "No month",
     "empty": "No files have been uploaded to this company yet. Upload one from Ingest.",
     "truncated": "Showing the {count} most recent files."
+  },
+  "landing": {
+    "meta": {
+      "title": "Cifra · Virtual CFO"
+    },
+    "skip": "Skip to content",
+    "nav": {
+      "label": "Page sections",
+      "sceneOf": "Scene {n} of {total}"
+    },
+    "header": {
+      "login": "Sign in",
+      "demo": "Request a demo"
+    },
+    "hint": "Scroll to explore",
+    "staticToggle": "View without animations",
+    "sampleNote": "Sample illustration. Real figures appear once you upload your accounting.",
+    "poster": {
+      "confirmed": "From your accounting",
+      "estimated": "Estimated by Cifra",
+      "missing": "No data",
+      "months": "months of runway"
+    },
+    "scenes": {
+      "torre": {
+        "label": "Start",
+        "eyebrow": "Cifra · Virtual CFO",
+        "title": "Your numbers, made clear.",
+        "body": "Results, cash and collections for your company in one place, explained for the person who runs it, not the one who does the books.",
+        "tagA": "Mexican accounting",
+        "tagB": "CONTPAQi or template"
+      },
+      "resultados": {
+        "label": "Results",
+        "eyebrow": "Results",
+        "title": "What you really earned.",
+        "body": "Your income statement, month over month and jargon-free. See what went up, what went down and what to review first.",
+        "tagA": "Income and expenses",
+        "tagB": "Margin"
+      },
+      "caja": {
+        "label": "Cash and flow",
+        "eyebrow": "Cash and flow",
+        "title": "How much runway you have left.",
+        "body": "Your cash today and how many months of runway it buys. If it will run short, you see it early enough to decide.",
+        "tagA": "Months of runway",
+        "tagB": "Cash flow"
+      },
+      "cobranza": {
+        "label": "Collections",
+        "eyebrow": "Collections",
+        "title": "Who to chase first.",
+        "body": "The customers who are not paying you, ranked by how much they weigh on your cash. Start with the first one and collect.",
+        "tagA": "Unpaid invoices",
+        "tagB": "Actionable list"
+      },
+      "salud": {
+        "label": "Financial health",
+        "eyebrow": "Financial health",
+        "title": "One glance, one decision.",
+        "body": "Liquidity, profitability and debt as indicators you can understand. Each one says what it means and what to do.",
+        "tagA": "Clear indicators",
+        "tagB": "Scenarios"
+      },
+      "mundo": {
+        "label": "Get started",
+        "eyebrow": "Start today",
+        "title": "Upload your accounting. Cifra does the rest.",
+        "body": "Sign in with your account or request a demo and we will show you your own figures.",
+        "primary": "Sign in",
+        "secondary": "Request a demo"
+      }
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "From your accounting to a decision.",
+      "lede": "Today your numbers live in the accounting system, in Excel and in your accountant's head. Cifra brings them together and explains them.",
+      "one": {
+        "title": "Upload your accounting",
+        "body": "Upload your CONTPAQi trial balance or our template."
+      },
+      "two": {
+        "title": "Cifra organizes and calculates",
+        "body": "Every number says whether it comes from your accounting or is an estimate."
+      },
+      "three": {
+        "title": "Decide with clarity",
+        "body": "Results, cash and collections in dashboards. Every alert ends in an action."
+      }
+    },
+    "demo": {
+      "eyebrow": "Request a demo",
+      "title": "We show you your own figures.",
+      "body": "Write to us and we will schedule a demo with your company's accounting.",
+      "button": "Write to request a demo",
+      "subject": "Cifra demo request",
+      "login": "Already have an account? Sign in"
+    },
+    "footer": {
+      "tagline": "Your numbers, made clear.",
+      "endorsement": "A Data Frontier product"
+    }
   }
 }
