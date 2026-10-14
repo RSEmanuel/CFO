@@ -163,6 +163,9 @@ export function CobranzaPage() {
         <TabsContent value="antiguedad" className="mt-4">
       <div className="space-y-4">
       {error ? <DataEmptyState title={t("cobranza.loadError")} message={error} /> : null}
+      {!error && data && !data.hasData ? (
+        <DataEmptyState title={t("cobranza.emptyTitle")} message={t("cobranza.emptyMessage")} />
+      ) : null}
       {noPagan ? (
         <ClientesQueNoPaganSection model={noPagan} onExport={exportNoPagan} />
       ) : null}
