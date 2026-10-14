@@ -1059,6 +1059,47 @@
       "COBRANZA": "Receivables & Collections",
       "POSICION": "Financial Position",
       "METRICAS": "Other Catalog Metrics"
+    },
+    "portada": {
+      "titulo": "{mes}: how your month closed",
+      "frase": {
+        "ventasUtilidad": "You sold {ventas} and kept {utilidad} as profit.",
+        "ventasPerdida": "You sold {ventas} and lost {perdida}.",
+        "respiro": "Your cash lasts {meses} months."
+      },
+      "utilidad": {
+        "label": "Profit for the month",
+        "anterior": "Previous month: {monto}",
+        "sinAnterior": "No previous month to compare.",
+        "sinDato": "Upload this month's trial balance to see it."
+      },
+      "caja": {
+        "label": "Your cash",
+        "fuente": "Cash and bank accounts from your trial balance at month end.",
+        "sinDato": "Your trial balance has no cash or bank accounts."
+      },
+      "respiro": {
+        "label": "Months of runway",
+        "fuente": "Cifra calculated: your cash ÷ what it costs you to operate each month.",
+        "sinDato": "The trial balance or operating spend is missing."
+      },
+      "clientes": {
+        "vencido": "Invoices already overdue from your sales auxiliary.",
+        "sinCobrar": "Estimated from your customer movements; no credit terms.",
+        "sinDato": "Upload sales or your customer movements."
+      },
+      "gasto": {
+        "label": "Costs and expenses for the month",
+        "mas": "{pct}% more than last month.",
+        "menos": "{pct}% less than last month.",
+        "igual": "Same as last month.",
+        "sinAnterior": "No previous month to compare.",
+        "sinDato": "Upload this month's trial balance to see them."
+      },
+      "alertas": {
+        "perdida": "This month you lost {monto}. Review your biggest costs and expenses and cut what doesn't drive sales.",
+        "gastoSube": "Your costs and expenses rose {pct}% ({monto}) versus last month. Review what drove the increase."
+      }
     }
   },
   "favorites": {

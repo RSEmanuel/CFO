@@ -4,6 +4,7 @@ import {
   FavoriteWidgetRenderer,
   type ControlWidgetContext,
 } from "@/components/control/favorite-widget-renderer";
+import { PortadaMes } from "@/components/control/PortadaMes";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { CatalogFavoritesSection } from "@/components/metrics/favorite-metrics-grid";
 import {
@@ -160,6 +161,8 @@ export function ControlPage() {
           }
         }}
       />
+
+      <PortadaMes periodo={effectivePeriod || filters.periodo} />
 
       <DashboardDataProvider>
         <div className="space-y-8">

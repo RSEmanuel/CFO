@@ -1059,6 +1059,47 @@
       "COBRANZA": "Cobranza y Cartera",
       "POSICION": "Posición Financiera",
       "METRICAS": "Otras Métricas del Catálogo"
+    },
+    "portada": {
+      "titulo": "{mes}: así cerró tu mes",
+      "frase": {
+        "ventasUtilidad": "Vendiste {ventas} y te quedaron {utilidad} de utilidad.",
+        "ventasPerdida": "Vendiste {ventas} y perdiste {perdida}.",
+        "respiro": "Tu caja alcanza para {meses} meses de respiro."
+      },
+      "utilidad": {
+        "label": "Utilidad del mes",
+        "anterior": "Mes anterior: {monto}",
+        "sinAnterior": "Sin mes anterior para comparar.",
+        "sinDato": "Carga la balanza de este mes para verla."
+      },
+      "caja": {
+        "label": "Tu caja",
+        "fuente": "Cajas y bancos de tu balanza al cierre del mes.",
+        "sinDato": "Tu balanza no trae cuentas de caja y bancos."
+      },
+      "respiro": {
+        "label": "Meses de respiro",
+        "fuente": "Cifra calculó: tu caja ÷ lo que te cuesta operar al mes.",
+        "sinDato": "Falta la balanza o el gasto de operación."
+      },
+      "clientes": {
+        "vencido": "Facturas ya vencidas de tu auxiliar de ventas.",
+        "sinCobrar": "Estimada con tus movimientos de clientes; sin plazo de crédito.",
+        "sinDato": "Carga ventas o los movimientos de tus clientes."
+      },
+      "gasto": {
+        "label": "Costos y gastos del mes",
+        "mas": "{pct}% más que el mes anterior.",
+        "menos": "{pct}% menos que el mes anterior.",
+        "igual": "Igual que el mes anterior.",
+        "sinAnterior": "Sin mes anterior para comparar.",
+        "sinDato": "Carga la balanza de este mes para verlos."
+      },
+      "alertas": {
+        "perdida": "Este mes perdiste {monto}. Revisa tus costos y gastos más grandes y recorta lo que no te deje venta.",
+        "gastoSube": "Tus costos y gastos subieron {pct}% ({monto}) contra el mes anterior. Revisa en qué se fue el aumento."
+      }
     }
   },
   "favorites": {
