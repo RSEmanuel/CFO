@@ -1,0 +1,745 @@
+/*
+ * Landing de marketing "scroll-world". Solo usa variables de tokens/cifra.tokens.css.
+ * Las variables --lp-* definidas aqui existen en el :root base; los bloques oscuros solo las sobreescriben.
+ */
+
+.lp-root {
+  --lp-shade: var(--cifra-ink);
+  --lp-topbar-h: 68px;
+  background: var(--cifra-paper);
+  color: var(--cifra-ink);
+  font-family: var(--font-sans), var(--cifra-font-sans);
+  min-height: 100vh;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lp-root {
+    --lp-shade: var(--cifra-paper);
+  }
+}
+
+:root[data-theme="dark"] .lp-root {
+  --lp-shade: var(--cifra-paper);
+}
+
+.lp-root .cifra-num {
+  font-family: var(--font-mono), var(--cifra-font-mono);
+}
+
+.lp-root :focus-visible {
+  outline: 2px solid var(--cifra-brand);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.lp-skip {
+  position: absolute;
+  left: -9999px;
+  top: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  border-radius: var(--cifra-radius);
+  background: var(--cifra-brand);
+  color: var(--cifra-brand-contrast);
+  font-weight: 700;
+  text-decoration: none;
+}
+.lp-skip:focus {
+  left: 16px;
+}
+
+/* ------------------------------------------------------------- logo y barra */
+
+.lp-logo {
+  height: 30px;
+  width: auto;
+  display: block;
+}
+.lp-logo--dark {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lp-logo--light {
+    display: none;
+  }
+  :root:not([data-theme="light"]) .lp-logo--dark {
+    display: block;
+  }
+}
+:root[data-theme="dark"] .lp-logo--light {
+  display: none;
+}
+:root[data-theme="dark"] .lp-logo--dark {
+  display: block;
+}
+
+.lp-topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  min-height: var(--lp-topbar-h);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px clamp(16px, 5vw, 64px);
+  background: color-mix(in srgb, var(--cifra-paper) 82%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cifra-line-2);
+}
+.lp-brand {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+.lp-nav {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--cifra-line);
+  border-radius: var(--cifra-radius);
+  background: color-mix(in srgb, var(--cifra-surface) 70%, transparent);
+}
+.lp-nav__item {
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--cifra-ink-3);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 7px 14px;
+  border-radius: 7px;
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+}
+.lp-nav__item:hover {
+  color: var(--cifra-ink);
+}
+.lp-nav__item.is-active,
+.lp-nav__item[aria-current="true"] {
+  color: var(--cifra-brand-contrast);
+  background: var(--cifra-brand);
+}
+.lp-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--cifra-radius);
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.lp-btn--primary {
+  background: var(--cifra-brand);
+  color: var(--cifra-brand-contrast);
+  border: 1.5px solid var(--cifra-brand);
+}
+.lp-btn--ghost {
+  background: transparent;
+  color: var(--cifra-ink);
+  border: 1.5px solid var(--cifra-line);
+}
+.lp-btn--ghost:hover {
+  border-color: var(--cifra-ink-3);
+}
+.lp-btn:hover {
+  transform: translateY(-1px);
+}
+.lp-btn--sm {
+  min-height: 38px;
+  padding: 0 14px;
+  font-size: 0.88rem;
+}
+
+/* --------------------------------------------------------------------- copy */
+
+.lp-copy__num {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  color: var(--cifra-ink-3);
+}
+.lp-copy__eyebrow {
+  display: block;
+  margin-top: 16px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cifra-brand);
+}
+.lp-copy__title {
+  margin: 12px 0 0;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1.02;
+  font-size: clamp(2.1rem, 4.6vw, 3.7rem);
+  color: var(--cifra-ink);
+  text-wrap: balance;
+}
+.lp-copy__body {
+  margin: 18px 0 0;
+  max-width: 42ch;
+  font-size: clamp(1rem, 1.25vw, 1.15rem);
+  line-height: 1.55;
+  color: var(--cifra-ink-2);
+}
+.lp-copy__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 0;
+  padding: 0;
+}
+.lp-copy__tags li {
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--cifra-radius);
+  color: var(--cifra-brand);
+  background: var(--cifra-brand-soft);
+  border: 1px solid var(--cifra-line);
+}
+.lp-copy__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 26px;
+}
+
+/* ------------------------------------------------------------- posters (arte) */
+
+.lp-poster {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+.lp-poster picture {
+  display: contents;
+}
+.lp-poster-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+}
+.lp-poster-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.lp-box polygon,
+.lp-box ellipse,
+.lp-box rect {
+  stroke: color-mix(in srgb, var(--cifra-ink) 18%, transparent);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+}
+.lp-box .lp-shade {
+  stroke: none;
+  fill: var(--lp-shade);
+}
+.lp-shade--l {
+  fill-opacity: 0.07;
+}
+.lp-shade--r {
+  fill-opacity: 0.16;
+}
+.lp-grid {
+  stroke: var(--cifra-line);
+  stroke-opacity: 0.85;
+  stroke-width: 1;
+}
+.lp-ground-shadow {
+  fill: var(--lp-shade);
+  fill-opacity: 0.07;
+}
+.lp-flat {
+  stroke: color-mix(in srgb, var(--cifra-ink) 12%, transparent);
+  stroke-width: 1;
+  stroke-linejoin: round;
+}
+.lp-dot-hollow {
+  fill: none;
+  stroke: var(--cifra-brand);
+  stroke-width: 3;
+}
+.lp-face-dash {
+  stroke: var(--cifra-ink-3);
+  stroke-width: 0.03;
+  stroke-dasharray: 0.08 0.08;
+}
+.lp-face-axis {
+  stroke: var(--cifra-line);
+  stroke-width: 0.04;
+}
+.lp-face-ring {
+  fill: none;
+  stroke: var(--cifra-line);
+  stroke-width: 0.16;
+}
+.lp-face-ring-fill {
+  fill: none;
+  stroke: var(--cifra-brand);
+  stroke-width: 0.16;
+  stroke-linecap: round;
+}
+.lp-face-text {
+  fill: var(--cifra-ink-3);
+  font-weight: 600;
+}
+.lp-gauge-track {
+  fill: none;
+  stroke: var(--cifra-line);
+  stroke-width: 10;
+}
+.lp-gauge-fill {
+  fill: none;
+  stroke: var(--cifra-brand);
+  stroke-width: 10;
+  stroke-linecap: round;
+}
+.lp-poster-big {
+  font-size: 34px;
+  font-weight: 700;
+  fill: var(--cifra-ink);
+}
+.lp-poster-label {
+  font-family: var(--font-sans), var(--cifra-font-sans);
+  font-size: 22px;
+  font-weight: 600;
+  fill: var(--cifra-ink-3);
+}
+
+/* ------------------------------------------------------- version estatica */
+
+.lp-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 104px) clamp(16px, 5vw, 64px);
+  scroll-margin-top: var(--lp-topbar-h);
+}
+.lp-section--first {
+  padding-top: calc(var(--lp-topbar-h) + clamp(32px, 6vw, 80px));
+}
+.lp-frame {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid var(--cifra-line);
+  border-radius: var(--cifra-radius-lg);
+  background: var(--cifra-paper);
+}
+.lp-frame .lp-poster {
+  transform: none;
+}
+.lp-sample {
+  margin: 10px 4px 0;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--cifra-ink-3);
+}
+
+.lp-how {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(48px, 8vw, 104px) clamp(16px, 5vw, 64px);
+  scroll-margin-top: var(--lp-topbar-h);
+}
+.lp-how__steps {
+  list-style: none;
+  margin: 36px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.lp-step {
+  padding: 22px;
+  border: 1px solid var(--cifra-line);
+  border-radius: var(--cifra-radius-lg);
+  background: var(--cifra-surface);
+}
+.lp-step__n {
+  font-size: 0.85rem;
+  color: var(--cifra-brand);
+  font-weight: 700;
+}
+.lp-step__title {
+  margin: 10px 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.lp-step__body {
+  margin: 8px 0 0;
+  line-height: 1.5;
+  color: var(--cifra-ink-2);
+}
+
+.lp-demo {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(40px, 7vw, 88px) clamp(16px, 5vw, 64px);
+  scroll-margin-top: var(--lp-topbar-h);
+}
+.lp-demo__box {
+  padding: clamp(24px, 4vw, 48px);
+  border: 1px solid var(--cifra-line);
+  border-radius: var(--cifra-radius-lg);
+  background: var(--cifra-surface);
+}
+.lp-demo__pending {
+  margin: 22px 0 0;
+  padding: 12px 14px;
+  border: 1px dashed var(--cifra-ink-3);
+  border-radius: var(--cifra-radius);
+  color: var(--cifra-ink-2);
+  font-size: 0.92rem;
+}
+.lp-demo__login {
+  display: inline-block;
+  margin-top: 18px;
+  color: var(--cifra-brand);
+  font-weight: 700;
+}
+
+.lp-footer {
+  border-top: 1px solid var(--cifra-line);
+  padding: 28px clamp(16px, 5vw, 64px) 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  color: var(--cifra-ink-3);
+  font-size: 0.88rem;
+}
+
+/* ------------------------------------------------------------- vuelo (scroll) */
+
+.lp-flight {
+  position: relative;
+  /* La altura total la fija el componente segun los clips (ver ScrollFlight). */
+  height: 600vh;
+}
+.lp-pin {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+.lp-sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(
+      60% 46% at 72% 30%,
+      color-mix(in srgb, var(--cifra-brand-soft) 90%, transparent),
+      transparent 72%
+    ),
+    var(--cifra-paper);
+}
+.lp-progress {
+  position: absolute;
+  top: var(--lp-topbar-h);
+  left: 0;
+  right: 0;
+  height: 3px;
+  z-index: 40;
+  background: var(--cifra-line-2);
+}
+.lp-progress span {
+  display: block;
+  height: 100%;
+  width: 100%;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: var(--cifra-brand);
+}
+.lp-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+.lp-scene {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  overflow: hidden;
+  will-change: opacity;
+}
+.lp-scene .lp-poster {
+  padding-top: var(--lp-topbar-h);
+}
+.lp-scene__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 42%;
+  z-index: 1;
+}
+.lp-scene.has-clip .lp-poster {
+  opacity: 0;
+}
+.lp-copylayer {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+}
+.lp-copylayer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: min(60vw, 820px);
+  background: linear-gradient(
+    90deg,
+    var(--cifra-paper) 0%,
+    color-mix(in srgb, var(--cifra-paper) 84%, transparent) 38%,
+    color-mix(in srgb, var(--cifra-paper) 40%, transparent) 66%,
+    transparent 100%
+  );
+}
+.lp-copy {
+  position: absolute;
+  left: clamp(16px, 5vw, 64px);
+  top: 50%;
+  width: min(44vw, 500px);
+  opacity: 0;
+  transform: translateY(-50%);
+  will-change: opacity, transform;
+}
+.lp-route {
+  position: absolute;
+  right: clamp(12px, 2.4vw, 30px);
+  top: 50%;
+  z-index: 40;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-route__dot {
+  position: relative;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+.lp-route__dot i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--cifra-line);
+  border: 1.5px solid var(--cifra-ink-3);
+  transition: transform 0.25s, background 0.25s;
+}
+.lp-route__dot:hover i {
+  background: var(--cifra-brand-soft);
+}
+.lp-route__dot[aria-current="true"] i {
+  background: var(--cifra-brand);
+  border-color: var(--cifra-brand);
+  transform: scale(1.4);
+}
+.lp-route__label {
+  position: absolute;
+  right: 34px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: 7px;
+  color: var(--cifra-ink);
+  background: var(--cifra-surface);
+  border: 1px solid var(--cifra-line);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.lp-route__dot:hover .lp-route__label,
+.lp-route__dot:focus-visible .lp-route__label {
+  opacity: 1;
+}
+.lp-hint {
+  position: absolute;
+  left: 50%;
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  z-index: 30;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cifra-ink-3);
+  pointer-events: none;
+}
+.lp-hint i {
+  position: relative;
+  width: 22px;
+  height: 34px;
+  border-radius: 12px;
+  border: 2px solid var(--cifra-ink-3);
+}
+.lp-hint i::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 7px;
+  width: 4px;
+  height: 7px;
+  border-radius: 2px;
+  background: var(--cifra-brand);
+  transform: translateX(-50%);
+  animation: lp-wheel 1.7s ease-in-out infinite;
+}
+@keyframes lp-wheel {
+  0% {
+    opacity: 0;
+    top: 6px;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    top: 17px;
+  }
+}
+.lp-static-toggle {
+  position: absolute;
+  left: clamp(16px, 5vw, 64px);
+  bottom: calc(22px + env(safe-area-inset-bottom));
+  z-index: 45;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--cifra-ink-3);
+  background: color-mix(in srgb, var(--cifra-paper) 80%, transparent);
+  border: 1px solid var(--cifra-line);
+  border-radius: var(--cifra-radius);
+  padding: 7px 12px;
+  cursor: pointer;
+}
+.lp-static-toggle:hover {
+  color: var(--cifra-ink);
+}
+
+@media (max-width: 860px) {
+  .lp-nav {
+    display: none;
+  }
+  .lp-actions .lp-btn--ghost {
+    display: none;
+  }
+  .lp-section {
+    grid-template-columns: 1fr;
+  }
+  .lp-how__steps {
+    grid-template-columns: 1fr;
+  }
+  .lp-route {
+    gap: 4px;
+    right: 4px;
+  }
+  .lp-route__label {
+    display: none;
+  }
+  .lp-copylayer::before {
+    width: 100%;
+    height: 62%;
+    top: auto;
+    bottom: 0;
+    background: linear-gradient(
+      0deg,
+      var(--cifra-paper) 10%,
+      color-mix(in srgb, var(--cifra-paper) 78%, transparent) 50%,
+      transparent 100%
+    );
+  }
+  .lp-copy {
+    left: clamp(16px, 5vw, 64px);
+    right: clamp(44px, 10vw, 64px);
+    top: auto;
+    bottom: calc(clamp(60px, 11dvh, 110px) + env(safe-area-inset-bottom));
+    width: auto;
+    max-width: 560px;
+    transform: none;
+  }
+  .lp-copy__title {
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
+  }
+  .lp-copy__body {
+    max-width: none;
+  }
+  .lp-hint {
+    display: none;
+  }
+  /* En vertical el diorama ocupa ~55% del ancho del lienzo: se amplia para llenar la pantalla. */
+  .lp-scene .lp-poster-art {
+    left: -30%;
+    width: 160%;
+    height: auto;
+  }
+  .lp-static-toggle {
+    bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+  .lp-scene__video {
+    object-position: center 46%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-hint i::after {
+    animation: none;
+  }
+  .lp-btn {
+    transition: none;
+  }
+  .lp-btn:hover {
+    transform: none;
+  }
+}
