@@ -898,16 +898,16 @@
     "averageDays": "Average days to collect",
     "averageDaysHelp": "How long customers take to pay you, per your trial balance: receivables ÷ monthly sales",
     "days": "{value} days",
-    "over60": "Receivables > 60 days",
-    "topClient": "Top customer",
-    "aging": "Receivables aging",
+    "over60": "Overdue by more than 60 days",
+    "topClient": "Customer who owes you the most",
+    "aging": "What you're owed and since when",
     "balancesByClient": "Balances by customer",
     "client": "Customer",
     "balance": "Balance",
     "daysColumn": "Days",
-    "bucket": "Bucket",
+    "bucket": "Range",
     "agingSchedule": "Aging schedule",
-    "agingScheduleHelp": "Current and past-due balances by due date, as of the latest document.",
+    "agingScheduleHelp": "Current and overdue by each invoice's due date, as of the last document.",
     "agingTotal": "Total open",
     "receivable": "Receivable",
     "payable": "Payable",
@@ -1006,6 +1006,22 @@
       "emptyTitle": "No concentration data for this period",
       "emptyMessage": "Upload the CONTPAQi Account Movements (Auxiliares) report to analyze customer and supplier concentration.",
       "metodologia": "Methodology: amount is what was billed/purchased during the month. Average term = (average balance ÷ month activity) × days in period. HHI per currency: <1,500 low, 1,500–2,500 moderate, >2,500 high. Individual risk: >25% vulnerable, 10–25% strategic, <10% diversified."
+    },
+    "noPagan": {
+      "title": "Customers who aren't paying you",
+      "sinVencido": "No customer has overdue invoices. Keep checking every month.",
+      "resumenUno": "You're owed {monto} overdue, all from 1 customer. Call them this week.",
+      "resumen": "You're owed {monto} overdue; {pct}% is with {n} customers. Call them this week.",
+      "alerta": "{cliente} owes you {monto} and is {dias} days late. Suspend their credit until they pay.",
+      "vencido": "Overdue",
+      "queHacer": "What to do",
+      "acciones": {
+        "recordar": "Remind them of the payment",
+        "llamar": "Call and ask for a payment date",
+        "exigir_fecha": "Ask for a payment date in writing",
+        "suspender_credito": "Suspend their credit until they pay"
+      },
+      "fuente": "From your sales auxiliary: only invoices already overdue, counted from their due date."
     }
   },
   "control": {

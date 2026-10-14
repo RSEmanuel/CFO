@@ -2,6 +2,7 @@
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
+import { ClientesQueNoPaganSection } from "@/components/cobranza/ClientesQueNoPaganSection";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
 import { ConcentracionRiesgoSection } from "@/components/cobranza/ConcentracionRiesgoSection";
 import { DataEmptyState } from "@/components/data-empty-state";
@@ -14,10 +15,13 @@ import { useCobranza } from "@/hooks/use-cobranza";
 import { CHART } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
 import type { AntiguedadBucketKey } from "@/services/antiguedad";
+import type { AccionCobranza } from "@/services/clientesQueNoPagan";
 import {
   antiguedadExportFilename,
   antiguedadExportTable,
   cobranzaExportFilename,
+  clientesQueNoPaganExportFilename,
+  clientesQueNoPaganExportTable,
   cobranzaExportTable,
 } from "@/services/cobranzaExport";
 import { formatAxisTick, formatMxn } from "@/services/money";
@@ -64,7 +68,7 @@ export function CobranzaPage() {
       return;
     }
     try {
-      const { headers, rows } = cobranzaExportTable(model.clientes, columnMode);
+      const { headers, rows } = cobranzaExportTable(model.clientes, columnMode, bucketLabel);
       const filename = cobranzaExportFilename(empresa, asOf, fileKind);
       if (fileKind === "csv") {
         downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
@@ -73,6 +77,33 @@ export function CobranzaPage() {
       const workbook = await buildWorkbook(headers, rows, {
         tenant: empresa,
         reporte: "cobranza",
+        generatedAt: new Date().toISOString(),
+      });
+      downloadBlob(await workbookToBlob(workbook), filename);
+    } catch {
+      toast.error(t("cobranza.exportError"));
+    }
+  };
+
+  const noPagan = data?.clientesQueNoPagan ?? null;
+  const exportNoPagan = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
+    if (!noPagan || !asOf) {
+      return;
+    }
+    try {
+      const { headers, rows } = clientesQueNoPaganExportTable(
+        noPagan.clientes,
+        columnMode,
+        (accion: AccionCobranza) => t(`cobranza.noPagan.acciones.${accion}`),
+      );
+      const filename = clientesQueNoPaganExportFilename(empresa, asOf, fileKind);
+      if (fileKind === "csv") {
+        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
+        return;
+      }
+      const workbook = await buildWorkbook(headers, rows, {
+        tenant: empresa,
+        reporte: "clientes-que-no-pagan",
         generatedAt: new Date().toISOString(),
       });
       downloadBlob(await workbookToBlob(workbook), filename);
@@ -132,6 +163,9 @@ export function CobranzaPage() {
         <TabsContent value="antiguedad" className="mt-4">
       <div className="space-y-4">
       {error ? <DataEmptyState title={t("cobranza.loadError")} message={error} /> : null}
+      {noPagan ? (
+        <ClientesQueNoPaganSection model={noPagan} onExport={exportNoPagan} />
+      ) : null}
       {model && asOf ? (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
@@ -251,7 +285,7 @@ export function CobranzaPage() {
               <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
                 <th className="pb-2 font-medium">{t("cobranza.client")}</th>
                 <th className="pb-2 text-right font-medium">{t("cobranza.balance")}</th>
-                <th className="pb-2 text-right font-medium">{t("cobranza.daysColumn")}</th>
+                <th className="pb-2 text-right font-medium">{t("cobranza.daysPastDue")}</th>
                 <th className="pb-2 text-right font-medium">{t("cobranza.bucket")}</th>
               </tr>
             </thead>
@@ -261,7 +295,7 @@ export function CobranzaPage() {
                   <td className="py-3 font-sans text-base text-foreground">{row.cliente}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{row.dias}</td>
-                  <td className="py-3 text-right text-muted-foreground">{row.bucket}</td>
+                  <td className="py-3 text-right text-muted-foreground">{bucketLabel(row.bucket)}</td>
                 </tr>
               ))}
             </tbody>

@@ -10,6 +10,7 @@ import {
   type CobranzaFactura,
   type CobranzaModel,
 } from "@/services/cobranzaTransformer";
+import { buildClientesQueNoPagan, type ClientesQueNoPaganModel } from "@/services/clientesQueNoPagan";
 import { cccFromBalanza } from "@/services/capitalTrabajoCalcs";
 import { plazosComercialesFromCcc } from "@/services/cobranzaPlazosComerciales";
 import { resolveAccountRoles } from "@/services/ingresoMixService";
@@ -27,6 +28,8 @@ export type CobranzaPayload = {
   model: CobranzaModel | null;
   antiguedadCxc: AntiguedadModel | null;
   antiguedadCxp: AntiguedadModel | null;
+  /** Lista accionable de B07: solo facturas vencidas, días desde el vencimiento. */
+  clientesQueNoPagan: ClientesQueNoPaganModel | null;
   periodOrigins: PeriodOrigins;
 };
 
@@ -77,6 +80,7 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
       model: null,
       antiguedadCxc: null,
       antiguedadCxp: null,
+      clientesQueNoPagan: null,
       periodOrigins: {},
     };
   }
@@ -121,6 +125,7 @@ export async function getCobranza(tenantId: string): Promise<CobranzaPayload> {
     model: ventas.length > 0 ? buildCobranza(facturas, asOf, dso) : null,
     antiguedadCxc: ventas.length > 0 ? buildAntiguedad(documentosCxc, asOf) : null,
     antiguedadCxp: egresos.length > 0 ? buildAntiguedad(documentosCxp, asOf) : null,
+    clientesQueNoPagan: ventas.length > 0 ? buildClientesQueNoPagan(documentosCxc, asOf) : null,
     periodOrigins: resolvePeriodOrigins(auxiliarPeriods, committedPeriods),
   };
 }

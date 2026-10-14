@@ -11,7 +11,8 @@ import { formatAxisTick, formatMxn } from "@/services/money";
 import { useRef } from "react";
 
 /**
- * Aging de cartera (buckets de antigüedad de saldos). Auto-fetch con
+ * Aging de cartera: mismos rangos y mismo criterio (días desde el vencimiento)
+ * que Antigüedad de saldos y Clientes que no te pagan. Auto-fetch con
  * useCobranza: api-cache deduplica la request cuando la página de Cobranza
  * ya pidió el mismo payload.
  */
@@ -25,9 +26,9 @@ export function CobranzaAgingChart() {
     return <div className="h-64 animate-pulse rounded-card bg-secondary" />;
   }
 
-  const model = data?.model ?? null;
+  const antiguedad = data?.antiguedadCxc ?? null;
   const asOf = data?.asOf ?? null;
-  if (!model || !asOf) {
+  if (!antiguedad || !asOf) {
     return null;
   }
 
@@ -53,12 +54,15 @@ export function CobranzaAgingChart() {
       </div>
       <div ref={agingRef} className="mt-4 h-[280px] w-full min-w-0">
         <HeroBarChart
-          data={model.aging}
+          data={antiguedad.buckets.map((bucket) => ({
+            name: t(`cobranza.agingBuckets.${bucket.key}`),
+            saldo: bucket.saldo,
+          }))}
           xKey="name"
           yTickFormatter={(value) => formatAxisTick(value, "m")}
           tooltipFormatter={(value, name) => [formatMxn(Number(value)), name]}
-          legendFormatter={() => "Saldo"}
-          series={[{ dataKey: "saldo", name: "Saldo", fill: CHART.clay }]}
+          legendFormatter={() => t("cobranza.balance")}
+          series={[{ dataKey: "saldo", name: t("cobranza.balance"), fill: CHART.clay }]}
         />
       </div>
     </section>

@@ -898,16 +898,16 @@
     "averageDays": "Días promedio para cobrar",
     "averageDaysHelp": "Cuánto tardan en pagarte, según tu balanza: saldo de clientes ÷ ventas del mes",
     "days": "{value} días",
-    "over60": "Cartera > 60 días",
-    "topClient": "Top cliente",
-    "aging": "Antigüedad de cartera",
+    "over60": "Vencido a más de 60 días",
+    "topClient": "Cliente que más te debe",
+    "aging": "Cuánto te deben y desde cuándo",
     "balancesByClient": "Saldos por cliente",
     "client": "Cliente",
     "balance": "Saldo",
     "daysColumn": "Días",
-    "bucket": "Bucket",
+    "bucket": "Rango",
     "agingSchedule": "Antigüedad de saldos",
-    "agingScheduleHelp": "Vigente y vencido según fecha de vencimiento, al cierre del último documento.",
+    "agingScheduleHelp": "Vigente y vencido según la fecha de vencimiento de cada factura, al cierre del último documento.",
     "agingTotal": "Total abierto",
     "receivable": "Por cobrar",
     "payable": "Por pagar",
@@ -1006,6 +1006,22 @@
       "emptyTitle": "Sin datos de concentración para este periodo",
       "emptyMessage": "Carga el reporte de Movimientos Auxiliares de CONTPAQi para analizar la concentración de clientes y proveedores.",
       "metodologia": "Metodología: el monto es lo facturado/comprado en el mes. Plazo medio = (saldo promedio ÷ actividad del mes) × días del periodo. HHI por moneda: <1,500 baja, 1,500–2,500 moderada, >2,500 alta. Riesgo individual: >25% vulnerable, 10–25% estratégico, <10% diversificado."
+    },
+    "noPagan": {
+      "title": "Clientes que no te pagan",
+      "sinVencido": "Ningún cliente tiene facturas vencidas. Sigue revisando cada mes.",
+      "resumenUno": "Te deben {monto} vencidos y todo está en 1 cliente. Llámalo esta semana.",
+      "resumen": "Te deben {monto} vencidos; el {pct}% está en {n} clientes. Llámalos esta semana.",
+      "alerta": "{cliente} te debe {monto} con {dias} días de retraso. Suspende su crédito hasta que pague.",
+      "vencido": "Vencido",
+      "queHacer": "Qué hacer",
+      "acciones": {
+        "recordar": "Recuérdale el pago",
+        "llamar": "Llámale y pide fecha de pago",
+        "exigir_fecha": "Exige fecha de pago por escrito",
+        "suspender_credito": "Suspende su crédito hasta que pague"
+      },
+      "fuente": "Sale de tu auxiliar de ventas: solo facturas ya vencidas, contadas desde su fecha de vencimiento."
     }
   },
   "control": {
