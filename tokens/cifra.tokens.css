@@ -27,8 +27,56 @@
   --cifra-bad-soft:     #F5DEDA;
 
   /* ---- Tipografia ---- */
-  --cifra-font-sans: "Manrope", ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
-  --cifra-font-mono: "Azeret Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /* Baselayer: serif para display, sans para UI, mono para cifras. Las variables --font-* las define next/font en <html>. */
+  --cifra-font-serif: var(--font-serif), ui-serif, Georgia, Cambria, "Times New Roman", serif;
+  --cifra-font-sans: var(--font-sans), ui-sans-serif, system-ui, "Helvetica Neue", Arial, sans-serif;
+  --cifra-font-mono: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Escala Baselayer: tamano / interlineado / tracking / familia / peso */
+  --cifra-hero-display-size: 72px;
+  --cifra-hero-display-lh: 1.02;
+  --cifra-hero-display-tracking: -0.36px;
+  --cifra-hero-display-font: var(--cifra-font-serif);
+  --cifra-hero-display-weight: 500;
+
+  --cifra-section-heading-size: 48px;
+  --cifra-section-heading-lh: 1.1;
+  --cifra-section-heading-tracking: -0.24px;
+  --cifra-section-heading-font: var(--cifra-font-serif);
+  --cifra-section-heading-weight: 500;
+
+  --cifra-panel-heading-size: 24px;
+  --cifra-panel-heading-lh: 1.35;
+  --cifra-panel-heading-tracking: -0.24px;
+  --cifra-panel-heading-font: var(--cifra-font-sans);
+  --cifra-panel-heading-weight: 500;
+
+  --cifra-body-large-size: 20px;
+  --cifra-body-large-lh: 1.4;
+  --cifra-body-large-tracking: -0.18px;
+  --cifra-body-large-font: var(--cifra-font-sans);
+  --cifra-body-large-weight: 400;
+
+  --cifra-body-size: 16px;
+  --cifra-body-lh: 1.5;
+  --cifra-body-font: var(--cifra-font-sans);
+  --cifra-body-weight: 400;
+
+  --cifra-nav-size: 15px;
+  --cifra-nav-font: var(--cifra-font-sans);
+  --cifra-nav-weight: 500;
+
+  --cifra-eyebrow-size: 12px;
+  --cifra-eyebrow-lh: 1.15;
+  --cifra-eyebrow-transform: uppercase;
+  --cifra-eyebrow-font: var(--cifra-font-mono);
+  --cifra-eyebrow-weight: 500;
+
+  --cifra-mono-action-size: 16px;
+  --cifra-mono-action-lh: 1.15;
+  --cifra-mono-action-transform: uppercase;
+  --cifra-mono-action-font: var(--cifra-font-mono);
+  --cifra-mono-action-weight: 500;
 
   /* ---- Radio y sombra ---- */
   --cifra-radius:    10px;

@@ -1,10 +1,12 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoLibre } from "@/hooks/use-flujo-libre";
 import { CHART, CHART_AXIS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import type { FlujoLibreKind, FlujoLibreStep } from "@/services/flujoLibre";
+import { cn } from "@/lib/utils";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { useMemo } from "react";
 import { Bar, BarChart, Cell, LabelList, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -131,80 +133,86 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
   }
 
   return (
-    <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <h3 className="mb-1 font-sans text-lg font-medium text-foreground">{t("flujo.libre.title")}</h3>
-      <p className="max-w-3xl text-sm text-muted-foreground">{t("flujo.libre.subtitle")}</p>
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-1 flex items-start justify-between gap-3">
+            <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.libre.title")}</h3>
+            {toggle}
+          </div>
 
-      <div className="mt-4 h-[440px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={rows} margin={{ top: 28, right: 12, left: 8, bottom: 8 }}>
-            <XAxis
-              dataKey="label"
-              interval={0}
-              tick={<WaterfallXTick />}
-              axisLine={{ stroke: CHART_AXIS.stroke }}
-              tickLine={false}
-              height={14 + TICK_LINE_HEIGHT * TICK_MAX_LINES}
-            />
-            <YAxis
-              width={72}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 12, fontFamily: "var(--font-mono)" }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: number) => formatAxisTick(value, units)}
-            />
-            <Tooltip
-              cursor={{ fill: "rgb(21 80 224 / 0.06)" }}
-              contentStyle={TOOLTIP_STYLE}
-              formatter={(value, _name, item) => {
-                const payload = item?.payload as { signed?: number } | undefined;
-                const signed = typeof payload?.signed === "number" ? payload.signed : Number(value);
-                return [
-                  <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(signed, "inherit") }}>
-                    {formatMxn(signed)}
-                  </span>,
-                  t("flujo.efectivo.monto"),
-                ];
-              }}
-            />
-            <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={72} />
-            <Bar dataKey="amount" stackId="wf" radius={[4, 4, 0, 0]} maxBarSize={72} isAnimationActive={false}>
-              {rows.map((row) => (
-                <Cell key={row.label} fill={kindColor(row.kind, row.signed)} />
-              ))}
-              <LabelList
-                position="top"
-                content={({ x, y, width, index }: LibreLabelGeom) => {
-                  const row = index == null ? undefined : rows[index];
-                  if (!row) return null;
-                  return (
-                    <text
-                      x={Number(x ?? 0) + Number(width ?? 0) / 2}
-                      y={Number(y ?? 0) - 6}
-                      textAnchor="middle"
-                      fill={waterfallFigureColor(row.signed, "var(--cifra-ink-2)")}
-                      fontSize={11}
-                      fontFamily="var(--font-mono)"
-                      className="financial-nums"
-                    >
-                      {row.signed < 0 ? `-${formatAxisTick(-row.signed, units)}` : formatAxisTick(row.signed, units)}
-                    </text>
-                  );
-                }}
-              />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+          <div className={cn("mt-4 w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[440px]")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rows} margin={{ top: 28, right: 12, left: 8, bottom: 8 }}>
+                <XAxis
+                  dataKey="label"
+                  interval={0}
+                  tick={<WaterfallXTick />}
+                  axisLine={{ stroke: CHART_AXIS.stroke }}
+                  tickLine={false}
+                  height={14 + TICK_LINE_HEIGHT * TICK_MAX_LINES}
+                />
+                <YAxis
+                  width={72}
+                  tick={{ fill: CHART_AXIS.tick, fontSize: 12, fontFamily: "var(--cifra-font-mono)" }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value: number) => formatAxisTick(value, units)}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgb(21 80 224 / 0.06)" }}
+                  contentStyle={TOOLTIP_STYLE}
+                  formatter={(value, _name, item) => {
+                    const payload = item?.payload as { signed?: number } | undefined;
+                    const signed = typeof payload?.signed === "number" ? payload.signed : Number(value);
+                    return [
+                      <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(signed, "inherit") }}>
+                        {formatMxn(signed)}
+                      </span>,
+                      t("flujo.efectivo.monto"),
+                    ];
+                  }}
+                />
+                <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={72} />
+                <Bar dataKey="amount" stackId="wf" radius={[4, 4, 0, 0]} maxBarSize={72} isAnimationActive={false}>
+                  {rows.map((row) => (
+                    <Cell key={row.label} fill={kindColor(row.kind, row.signed)} />
+                  ))}
+                  <LabelList
+                    position="top"
+                    content={({ x, y, width, index }: LibreLabelGeom) => {
+                      const row = index == null ? undefined : rows[index];
+                      if (!row) return null;
+                      return (
+                        <text
+                          x={Number(x ?? 0) + Number(width ?? 0) / 2}
+                          y={Number(y ?? 0) - 6}
+                          textAnchor="middle"
+                          fill={waterfallFigureColor(row.signed, "var(--cifra-ink-2)")}
+                          fontSize={11}
+                          fontFamily="var(--cifra-font-mono)"
+                          className="financial-nums"
+                        >
+                          {row.signed < 0 ? `-${formatAxisTick(-row.signed, units)}` : formatAxisTick(row.signed, units)}
+                        </text>
+                      );
+                    }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
 
-      <p className="mt-3 text-sm text-muted-foreground">{t("flujo.libre.estimated")}</p>
-      {data.insight ? (
-        <p className="mt-2 text-sm text-foreground">
-          {t(`flujo.libre.insight.${data.insight.bucket}.${data.insight.direction}`, {
-            amount: formatMxn(data.insight.amount),
-          })}
-        </p>
-      ) : null}
-    </article>
+          <p className="mt-3 text-sm text-muted-foreground">{t("flujo.libre.estimated")}</p>
+          {data.insight ? (
+            <p className="mt-2 text-sm text-foreground">
+              {t(`flujo.libre.insight.${data.insight.bucket}.${data.insight.direction}`, {
+                amount: formatMxn(data.insight.amount),
+              })}
+            </p>
+          ) : null}
+        </>
+      )}
+    </ExpandableShell>
   );
 }

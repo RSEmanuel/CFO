@@ -1,9 +1,11 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
+import { cn } from "@/lib/utils";
 import {
   periodLabel,
   trailingMonthlyRows,
@@ -11,7 +13,7 @@ import {
   type MonthlyFinancials,
 } from "@/services/financialDataTransformer";
 import { formatAxisTick, formatCompactAxis, formatMxn, type DisplayUnits } from "@/services/money";
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CartesianGrid,
   LabelList,
@@ -106,7 +108,6 @@ function isLocalValley(values: Array<number | null>, index: number): boolean {
 
 const CHART_HEIGHT = 340;
 const CHART_MARGIN = { top: 32, right: 36, left: 8, bottom: 28 } as const;
-const PLOT_BOTTOM = CHART_HEIGHT - CHART_MARGIN.bottom;
 const SERIES_CLOSE_RATIO = 0.18;
 const SERIES_VERY_CLOSE_RATIO = 0.08;
 
@@ -206,6 +207,7 @@ function TrendPointLabel({
   color,
   visible,
   layouts,
+  plotBottom,
 }: {
   x?: number | string;
   y?: number | string;
@@ -214,6 +216,8 @@ function TrendPointLabel({
   color: string;
   visible: boolean[];
   layouts: PointLabelLayout[];
+  /** Borde inferior del área de trazo, en px; cambia con la tarjeta ampliada. */
+  plotBottom: number;
 }) {
   if (x == null || y == null || index == null || !visible[index]) {
     return null;
@@ -232,8 +236,8 @@ function TrendPointLabel({
   const px = Number(x);
   const py = Number(y);
 
-  if (side === "bottom" && py + dy > PLOT_BOTTOM - 6) {
-    const room = PLOT_BOTTOM - 8 - py;
+  if (side === "bottom" && py + dy > plotBottom - 6) {
+    const room = plotBottom - 8 - py;
     if (room >= 10) {
       dy = room;
     } else {
@@ -293,12 +297,31 @@ export function TendenciaIngresosCostosChart({
     [data, incomeVisible, costVisible],
   );
 
+  // Alto real del contenedor: 340 px normal, más con la tarjeta ampliada.
+  const chartBoxRef = useRef<HTMLDivElement>(null);
+  const [chartHeight, setChartHeight] = useState(CHART_HEIGHT);
+  const hasData = data.length > 0;
+  useEffect(() => {
+    const node = chartBoxRef.current;
+    if (!node || typeof ResizeObserver === "undefined") {
+      return;
+    }
+    const observer = new ResizeObserver(([entry]) => {
+      setChartHeight(entry.contentRect.height || CHART_HEIGHT);
+    });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [hasData]);
+  const plotBottom = chartHeight - CHART_MARGIN.bottom;
+
   if (data.length === 0) {
     return null;
   }
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+    <ExpandableShell className="p-6">
+      {(toggle, expanded) => (
+      <>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-sans text-xl font-medium text-foreground">{t("widgets.trendTitle")}</h2>
@@ -316,9 +339,10 @@ export function TendenciaIngresosCostosChart({
               {t("resultados.cost")}
             </li>
           </ul>
+          {toggle}
         </div>
       </div>
-      <div className="h-[340px] w-full min-w-0">
+      <div ref={chartBoxRef} className={cn("w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[340px]")}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={CHART_MARGIN}>
             <CartesianGrid vertical={false} stroke={CHART_AXIS.stroke} strokeDasharray="3 3" />
@@ -359,7 +383,7 @@ export function TendenciaIngresosCostosChart({
                   position="top"
                   offset={10}
                   content={
-                    <TrendPointLabel color={INGRESO_LABEL} visible={incomeVisible} layouts={labelLayouts.ingreso} />
+                    <TrendPointLabel color={INGRESO_LABEL} visible={incomeVisible} layouts={labelLayouts.ingreso} plotBottom={plotBottom} />
                   }
                 />
               )}
@@ -380,7 +404,7 @@ export function TendenciaIngresosCostosChart({
                   position="bottom"
                   offset={10}
                   content={
-                    <TrendPointLabel color={COSTO_LABEL} visible={costVisible} layouts={labelLayouts.costo} />
+                    <TrendPointLabel color={COSTO_LABEL} visible={costVisible} layouts={labelLayouts.costo} plotBottom={plotBottom} />
                   }
                 />
               )}
@@ -388,6 +412,8 @@ export function TendenciaIngresosCostosChart({
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </section>
+      </>
+      )}
+    </ExpandableShell>
   );
 }

@@ -98,9 +98,9 @@ function RatioBullet({
       {value == null ? (
         <p className="mt-6 text-sm text-muted-foreground">{t("posicionFinanciera.gauges.na")}</p>
       ) : (
-        <div className="mt-3 h-[72px] w-full">
+        <div className="mt-3 h-[80px] w-full">
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} layout="vertical" margin={{ top: 8, right: 12, left: 4, bottom: 8 }} barCategoryGap="35%">
+            <BarChart data={data} layout="vertical" margin={{ top: 6, right: 12, left: 4, bottom: 2 }} barCategoryGap={0}>
               <XAxis
                 type="number"
                 domain={[0, scaleMax]}
@@ -120,7 +120,7 @@ function RatioBullet({
                   ifOverflow="visible"
                 />
               ))}
-              <Bar dataKey="value" fill={zone ? ZONE_FILL[zone] : CHART_VARS.mute} barSize={8} radius={[999, 999, 999, 999]} maxBarSize={10} />
+              <Bar dataKey="value" fill={zone ? ZONE_FILL[zone] : CHART_VARS.mute} barSize={18} radius={[4, 4, 4, 4]} maxBarSize={20} />
               <Tooltip
                 cursor={false}
                 content={

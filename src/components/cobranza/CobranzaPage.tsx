@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
 import { ClientesQueNoPaganSection, type NoPaganRow } from "@/components/cobranza/ClientesQueNoPaganSection";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
@@ -139,7 +140,7 @@ export function CobranzaPage() {
     <div className="mx-auto w-full max-w-[1680px] bg-background">
       <Tabs value={tab} onValueChange={(value) => setTab(value as CobranzaTab)}>
         <div>
-          <p className="mb-2 text-lg font-bold tracking-tight text-clay">{t("nav.collections")}</p>
+          <p className="mb-2 text-2xl font-bold tracking-tight text-clay">{t("nav.collections")}</p>
           <TabsList className="flex h-auto flex-nowrap justify-start gap-2 overflow-x-auto border-0 bg-transparent p-0 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {COBRANZA_TABS.map((item) => (
               <TabsTrigger
@@ -200,7 +201,9 @@ export function CobranzaPage() {
       {model && asOf ? <CobranzaAgingChart /> : null}
 
       {antiguedad && asOf ? (
-        <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+        <ExpandableShell className="p-5">
+          {(toggle, expanded) => (
+          <>
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.agingSchedule")}</h2>
@@ -229,9 +232,11 @@ export function CobranzaPage() {
                 titulo={t("cobranza.agingSchedule")}
                 periodo={asOf}
               />
+              {toggle}
             </div>
           </div>
-          <div ref={antiguedadRef} className="mt-4 h-[260px] w-full min-w-0">
+          {/* Ampliada, la tabla sigue debajo: alto fijo grande en vez de flex-1 para que no aplaste la gráfica. */}
+          <div ref={antiguedadRef} className={cn("mt-4 w-full min-w-0", expanded ? "h-[60vh] shrink-0" : "h-[260px]")}>
             <HeroBarChart
               data={antiguedad.buckets.map((bucket) => ({
                 name: bucketLabel(bucket.key),
@@ -272,7 +277,9 @@ export function CobranzaPage() {
               </tbody>
             </table>
           </TableScroll>
-        </section>
+          </>
+          )}
+        </ExpandableShell>
       ) : null}
 
       {model ? (

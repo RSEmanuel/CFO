@@ -47,7 +47,7 @@
     "position": "Posición Financiera",
     "cashflow": "Flujo",
     "collections": "Cobranza",
-    "metrics": "Catálogo de métricas",
+    "metrics": "Métricas financieras",
     "control": "Panel de Control",
     "ingest": "Ingesta",
     "simulator": "Simulador What-If",
@@ -104,7 +104,6 @@
     "resetFailed": "No se pudo completar. Intenta de nuevo."
   },
   "settings": {
-    "intro": "Empresas y usuarios del portafolio. Cada empresa ve solo su propia información.",
     "languageTitle": "Idioma del portal",
     "languageHelp": "Selecciona el idioma utilizado en menús, métricas y mensajes del portal.",
     "languageAria": "Idioma del portal",
@@ -193,7 +192,7 @@
     "verticalAnalysis": "Análisis vertical",
     "pctOfRevenue": "% sobre ventas",
     "others": "Otros",
-    "goToCatalog": "Abrir catálogo de métricas",
+    "goToCatalog": "Abrir métricas financieras",
     "cost": "Costo",
     "expense": "Gasto",
     "ebitda": "EBITDA",
@@ -774,7 +773,6 @@
     },
     "libre": {
       "title": "De la utilidad al efectivo",
-      "subtitle": "Conciliación: ¿Por qué la utilidad no es igual al dinero en el banco? Muestra cómo los créditos a clientes y deudas a proveedores afectan tu liquidez real.",
       "estimated": "Cifra calculó este puente con la variación mensual de la balanza. No es el estado de cuenta del banco.",
       "emptyTitle": "Flujo libre aún no disponible",
       "emptyMessage": "Carga la balanza de comprobación de este mes en Ingesta para armar la conciliación.",
@@ -1045,10 +1043,9 @@
   },
   "control": {
     "title": "Panel de Control Ejecutivo",
-    "subtitle": "Métricas prioritarias y visualizaciones fijadas por la dirección financiera",
     "emptyTitle": "Tu Panel de Control está vacío",
     "emptyMessage": "Fija KPIs, gráficos y tablas con la estrella en cualquier módulo para construir tu vista ejecutiva aquí.",
-    "emptyCta": "Ir al catálogo de métricas",
+    "emptyCta": "Ir a métricas financieras",
     "emptyCtaResults": "Ir a Resultados",
     "emptyCtaFlujo": "Ir a Flujo",
     "emptyCtaCobranza": "Ir a Cobranza",
@@ -1058,7 +1055,51 @@
       "FLUJO": "Flujo y Tesorería",
       "COBRANZA": "Cobranza y Cartera",
       "POSICION": "Posición Financiera",
-      "METRICAS": "Otras Métricas del Catálogo"
+      "METRICAS": "Otras métricas financieras"
+    },
+    "portada": {
+      "titulo": "{mes}: así cerró tu mes",
+      "frase": {
+        "ventasUtilidad": "Vendiste {ventas} y te quedaron {utilidad} de utilidad.",
+        "ventasPerdida": "Vendiste {ventas} y perdiste {perdida}.",
+        "respiro": "Tu caja alcanza para {meses} meses de respiro."
+      },
+      "utilidad": {
+        "label": "Utilidad del mes",
+        "anterior": "Mes anterior: {monto}",
+        "sinAnterior": "Sin mes anterior para comparar.",
+        "sinDato": "Carga la balanza de este mes para verla."
+      },
+      "caja": {
+        "label": "Tu caja",
+        "fuente": "Cajas y bancos de tu balanza al cierre del mes.",
+        "sinDato": "Tu balanza no trae cuentas de caja y bancos."
+      },
+      "sello": {
+        "estimada": "Estimada"
+      },
+      "respiro": {
+        "label": "Meses de respiro",
+        "fuente": "Cifra calculó: tu caja ÷ lo que te cuesta operar al mes.",
+        "sinDato": "Falta la balanza o el gasto de operación."
+      },
+      "clientes": {
+        "vencido": "Facturas ya vencidas de tu auxiliar de ventas.",
+        "sinCobrar": "Estimada con tus movimientos de clientes; sin plazo de crédito.",
+        "sinDato": "Carga ventas o los movimientos de tus clientes."
+      },
+      "gasto": {
+        "label": "Costos y gastos del mes",
+        "mas": "{pct}% más que el mes anterior.",
+        "menos": "{pct}% menos que el mes anterior.",
+        "igual": "Igual que el mes anterior.",
+        "sinAnterior": "Sin mes anterior para comparar.",
+        "sinDato": "Carga la balanza de este mes para verlos."
+      },
+      "alertas": {
+        "perdida": "Este mes perdiste {monto}. Revisa tus costos y gastos más grandes y recorta lo que no te deje venta.",
+        "gastoSube": "Tus costos y gastos subieron {pct}% ({monto}) contra el mes anterior. Revisa en qué se fue el aumento."
+      }
     }
   },
   "favorites": {
@@ -1067,7 +1108,6 @@
   },
   "simulator": {
     "title": "Simulador de Sensibilidad & Escenarios What-If",
-    "subtitle": "Proyecta el P&L, la caja y el capital de trabajo del periodo moviendo seis drivers; la línea base es el cierre contable real.",
     "loadError": "No se pudo cargar la línea base del simulador",
     "units": {
       "days": "días",
@@ -1076,7 +1116,6 @@
     },
     "drivers": {
       "title": "Drivers del escenario",
-      "subtitle": "Mueve los controles para simular; la línea base sigue al periodo activo.",
       "groups": {
         "commercial": "Estrategia Comercial",
         "efficiency": "Eficiencia Operativa",
@@ -1177,15 +1216,14 @@
     }
   },
   "metrics": {
-    "emptyTitle": "Catálogo aún no disponible",
+    "emptyTitle": "Métricas financieras aún no disponibles",
     "emptyMessage": "Carga una balanza para calcular las 50 métricas.",
     "loadError": "No se pudieron cargar las métricas",
     "loading": "Cargando métricas",
     "eyebrow": "Inteligencia financiera",
-    "intro": "50 indicadores para entender rentabilidad, eficiencia, liquidez y creación de valor.",
     "available": "{count} de {total} con dato este mes",
     "retry": "Reintentar",
-    "highlights": "Destacados",
+    "highlights": "Favoritos",
     "customizeHelp": "Marca con una estrella cualquier métrica o gráfico para personalizar este panel.",
     "favorites": "Métricas favoritas",
     "none": "No hay métricas para el corte seleccionado.",
@@ -1640,6 +1678,8 @@
     }
   },
   "charts": {
+    "expand": "Ampliar gráfica",
+    "collapse": "Cerrar",
     "copyInsight": "Copiar insight",
     "copied": "Insight copiado",
     "downloadChart": "Descargar gráfica",
@@ -1696,7 +1736,6 @@
     "columns": "Columnas"
   },
   "users": {
-    "intro": "Quién puede entrar a {company} y qué puede hacer.",
     "selectCompany": "Elige una empresa en el selector de arriba para ver a sus personas.",
     "viewerOnly": "Esta sección es para administradores. Pide a tu administrador cualquier cambio de acceso.",
     "loadFailed": "No pudimos cargar la lista de personas. Recarga la página para intentarlo de nuevo.",
@@ -1760,7 +1799,6 @@
     }
   },
   "loads": {
-    "intro": "Cada archivo que se subió a {company}: quién, cuándo y si de verdad quedó en tus cifras.",
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
     "viewerOnly": "Esta sección es para quien sube archivos. Pide a tu administrador cualquier duda sobre las cargas.",
     "loadFailed": "No pudimos leer el historial. Recarga la página para intentarlo de nuevo.",
@@ -1789,5 +1827,107 @@
     "noMonth": "Sin mes",
     "empty": "Todavía no se ha subido ningún archivo a esta empresa. Súbelo desde Ingesta.",
     "truncated": "Se muestran los {count} archivos más recientes."
+  },
+  "landing": {
+    "meta": {
+      "title": "Cifra · CFO virtual"
+    },
+    "skip": "Saltar al contenido",
+    "nav": {
+      "label": "Secciones de la página",
+      "sceneOf": "Escena {n} de {total}"
+    },
+    "header": {
+      "login": "Iniciar sesión",
+      "demo": "Solicitar demo"
+    },
+    "hint": "Desplaza para recorrer",
+    "staticToggle": "Ver sin animaciones",
+    "sampleNote": "Ilustración de muestra. Las cifras reales aparecen cuando cargas tu contabilidad.",
+    "poster": {
+      "confirmed": "De tu contabilidad",
+      "estimated": "Estimada por Cifra",
+      "missing": "Sin dato",
+      "months": "meses de respiro"
+    },
+    "scenes": {
+      "torre": {
+        "label": "Inicio",
+        "eyebrow": "Cifra · CFO virtual",
+        "title": "Tus cifras, en claro.",
+        "body": "Resultado, caja y cobranza de tu empresa en un solo lugar, explicados para quien dirige, no para quien contabiliza.",
+        "tagA": "Contabilidad mexicana",
+        "tagB": "CONTPAQi o plantilla"
+      },
+      "resultados": {
+        "label": "Resultados",
+        "eyebrow": "Resultados",
+        "title": "Cuánto ganaste de verdad.",
+        "body": "Tu estado de resultados, mes contra mes y sin tecnicismos. Ves qué sube, qué baja y qué revisar primero.",
+        "tagA": "Ingresos y gastos",
+        "tagB": "Margen"
+      },
+      "caja": {
+        "label": "Caja y flujo",
+        "eyebrow": "Caja y flujo",
+        "title": "Cuánto respiro te queda.",
+        "body": "Tu caja de hoy y cuántos meses de respiro tienes. Si te va a faltar, lo ves con tiempo para decidir.",
+        "tagA": "Meses de respiro",
+        "tagB": "Flujo de efectivo"
+      },
+      "cobranza": {
+        "label": "Cobranza",
+        "eyebrow": "Cobranza",
+        "title": "A quién cobrarle primero.",
+        "body": "Los clientes que no te pagan, ordenados por lo que más pesa en tu caja. Empieza por el primero de la lista y cobra.",
+        "tagA": "Facturas sin cobrar",
+        "tagB": "Lista accionable"
+      },
+      "salud": {
+        "label": "Salud financiera",
+        "eyebrow": "Salud financiera",
+        "title": "Un vistazo, una decisión.",
+        "body": "Liquidez, rentabilidad y deuda en indicadores que se entienden. Cada uno dice qué significa y qué hacer.",
+        "tagA": "Indicadores claros",
+        "tagB": "Escenarios"
+      },
+      "mundo": {
+        "label": "Empezar",
+        "eyebrow": "Empieza hoy",
+        "title": "Carga tu contabilidad. Cifra hace el resto.",
+        "body": "Entra con tu cuenta o pide una demo y te mostramos tus propias cifras.",
+        "primary": "Iniciar sesión",
+        "secondary": "Solicitar demo"
+      }
+    },
+    "how": {
+      "eyebrow": "Cómo funciona",
+      "title": "De tu contabilidad a una decisión.",
+      "lede": "Hoy tus números viven en el sistema contable, en Excel y en la cabeza de tu contador. Cifra los junta y los explica.",
+      "one": {
+        "title": "Cargas tu contabilidad",
+        "body": "Sube tu balanza de comprobación de CONTPAQi o nuestra plantilla."
+      },
+      "two": {
+        "title": "Cifra la ordena y la calcula",
+        "body": "Cada número dice si viene de tu contabilidad o si es una estimación."
+      },
+      "three": {
+        "title": "Decides con claridad",
+        "body": "Resultados, caja y cobranza en tableros. Cada alerta termina en una acción."
+      }
+    },
+    "demo": {
+      "eyebrow": "Solicitar demo",
+      "title": "Te mostramos tus propias cifras.",
+      "body": "Escríbenos y agendamos una demo con la contabilidad de tu empresa.",
+      "button": "Escribir para pedir una demo",
+      "subject": "Solicitud de demo de Cifra",
+      "login": "¿Ya tienes cuenta? Inicia sesión"
+    },
+    "footer": {
+      "tagline": "Tus cifras, en claro.",
+      "endorsement": "Un producto de Data Frontier"
+    }
   }
 }

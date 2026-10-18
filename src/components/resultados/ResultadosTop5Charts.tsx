@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
@@ -262,159 +263,164 @@ function Top5Card({
   const lastLabel = series.months[series.months.length - 1]?.label ?? "";
 
   return (
-    <section className="w-full overflow-x-hidden rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="mb-1 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="font-sans text-lg font-medium text-foreground">{title}</h3>
-          <InsightText text={insightText} />
-        </div>
-        <div className="flex items-center gap-1">
-          {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
-          <p className="financial-nums text-2xl font-semibold tracking-tight">
-            {formatAxisTick(periodTotal || rankingTotal, units)}
+    <ExpandableShell className="w-full overflow-x-hidden p-6">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-1 flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="font-sans text-lg font-medium text-foreground">{title}</h3>
+              <InsightText text={insightText} />
+            </div>
+            <div className="flex items-center gap-1">
+              {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
+              <p className="financial-nums text-2xl font-semibold tracking-tight">
+                {formatAxisTick(periodTotal || rankingTotal, units)}
+              </p>
+              {toggle}
+            </div>
+          </div>
+          <p className="mb-4 text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+            {t(variant === "pie" ? "resultados.top5.pieWindow" : "resultados.top5.seriesWindow")} · {lastLabel} ·{" "}
+            {formatMxn(periodTotal)}
           </p>
-        </div>
-      </div>
-      <p className="mb-4 text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-        {t(variant === "pie" ? "resultados.top5.pieWindow" : "resultados.top5.seriesWindow")} · {lastLabel} ·{" "}
-        {formatMxn(periodTotal)}
-      </p>
 
-      {variant === "pie" ? (
-        <div className="h-[300px] w-full min-w-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart margin={{ top: 28, right: 88, bottom: 28, left: 88 }}>
-              <Tooltip content={<Top5PieTooltip />} />
-              <Pie
-                data={pieRows}
-                dataKey="monto"
-                nameKey="label"
-                cx="50%"
-                cy="50%"
-                innerRadius="48%"
-                outerRadius="78%"
-                paddingAngle={2}
-                minAngle={3}
-                stroke={CHART.card}
-                strokeWidth={2}
-                label={narrow ? false : (props: PieLabelGeom) => <SlicePctLabel {...props} />}
-                labelLine={false}
-                isAnimationActive={false}
-              >
-                {pieRows.map((row, index) => (
-                  <Cell key={row.key} fill={colors.get(row.key) ?? seriesColor(index, row.key)} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      ) : (
-        <div className="h-[360px] w-full min-w-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} barCategoryGap="25%" margin={{ top: 36, right: 16, left: 8, bottom: 8 }}>
-              <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
-              <XAxis
-                dataKey="mes"
-                interval={narrow ? "preserveStartEnd" : 0}
-                minTickGap={narrow ? 12 : 5}
-                tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-                axisLine={{ stroke: CHART_AXIS.stroke }}
-                tickLine={false}
-              />
-              <YAxis
-                width={64}
-                domain={[0, yMax > 0 ? yMax * 1.3 : 1]}
-                tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-                axisLine={false}
-                tickLine={false}
-                tickFormatter={(value: number) => formatAxisTick(value, units)}
-              />
-              <Tooltip
-                cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
-                content={
-                  <Top5Tooltip
-                    restLabel={restLabel}
-                    entidades={series.entidades}
-                    includeResto={Boolean(series.resto)}
-                    colors={colors}
-                  />
-                }
-              />
-              {stackedKeys.map((key, index) => {
-                const fill = colors.get(key) ?? seriesColor(index, key);
-                const isLast = key === lastBarKey;
-                return (
-                  <Bar
-                    key={key}
-                    dataKey={key}
-                    name={key === OTROS_KEY ? restLabel : series.entidades.find((actor) => actor.key === key)?.label}
-                    stackId={TOP5_STACK_ID}
-                    fill={fill}
-                    radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+          {variant === "pie" ? (
+            <div className={cn("w-full min-w-0", expanded ? "min-h-[300px] flex-1" : "h-[300px]")}>
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart margin={{ top: 28, right: 88, bottom: 28, left: 88 }}>
+                  <Tooltip content={<Top5PieTooltip />} />
+                  <Pie
+                    data={pieRows}
+                    dataKey="monto"
+                    nameKey="label"
+                    cx="50%"
+                    cy="50%"
+                    innerRadius="48%"
+                    outerRadius="78%"
+                    paddingAngle={2}
+                    minAngle={3}
+                    stroke={CHART.card}
+                    strokeWidth={2}
+                    label={narrow ? false : (props: PieLabelGeom) => <SlicePctLabel {...props} />}
+                    labelLine={false}
                     isAnimationActive={false}
                   >
-                    {narrow ? null : (
-                      <LabelList
-                        position="top"
-                        offset={TOTAL_LABEL_OFFSET}
-                        valueAccessor={(entry) => {
-                          const point = entry.payload as Top5StackedPoint | undefined;
-                          if (!point || stackTopKey(point, stackedKeys) !== key) {
-                            return "";
-                          }
-                          return totalMesLabel(point.totalMes);
-                        }}
-                        content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
+                    {pieRows.map((row, index) => (
+                      <Cell key={row.key} fill={colors.get(row.key) ?? seriesColor(index, row.key)} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <div className={cn("w-full min-w-0", expanded ? "min-h-[360px] flex-1" : "h-[360px]")}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={data} barCategoryGap="25%" margin={{ top: 36, right: 16, left: 8, bottom: 8 }}>
+                  <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
+                  <XAxis
+                    dataKey="mes"
+                    interval={narrow ? "preserveStartEnd" : 0}
+                    minTickGap={narrow ? 12 : 5}
+                    tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                    axisLine={{ stroke: CHART_AXIS.stroke }}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    width={64}
+                    domain={[0, yMax > 0 ? yMax * 1.3 : 1]}
+                    tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(value: number) => formatAxisTick(value, units)}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
+                    content={
+                      <Top5Tooltip
+                        restLabel={restLabel}
+                        entidades={series.entidades}
+                        includeResto={Boolean(series.resto)}
+                        colors={colors}
                       />
+                    }
+                  />
+                  {stackedKeys.map((key, index) => {
+                    const fill = colors.get(key) ?? seriesColor(index, key);
+                    const isLast = key === lastBarKey;
+                    return (
+                      <Bar
+                        key={key}
+                        dataKey={key}
+                        name={key === OTROS_KEY ? restLabel : series.entidades.find((actor) => actor.key === key)?.label}
+                        stackId={TOP5_STACK_ID}
+                        fill={fill}
+                        radius={isLast ? [4, 4, 0, 0] : [0, 0, 0, 0]}
+                        isAnimationActive={false}
+                      >
+                        {narrow ? null : (
+                          <LabelList
+                            position="top"
+                            offset={TOTAL_LABEL_OFFSET}
+                            valueAccessor={(entry) => {
+                              const point = entry.payload as Top5StackedPoint | undefined;
+                              if (!point || stackTopKey(point, stackedKeys) !== key) {
+                                return "";
+                              }
+                              return totalMesLabel(point.totalMes);
+                            }}
+                            content={(props) => <TotalStackLabel {...(props as LabelGeom)} />}
+                          />
+                        )}
+                      </Bar>
+                    );
+                  })}
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+
+          <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{methodNote}</p>
+          {showRestoNote ? (
+            <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{t("resultados.top5.restoClampedNote")}</p>
+          ) : null}
+
+          <ul className="mt-4 space-y-2">
+            {rows.map((row, index) => {
+              const color = colors.get(row.key) ?? seriesColor(index, row.key);
+              const negative = row.monto < -0.005;
+              return (
+                <li key={row.key} className={cn("flex min-w-0 items-center gap-2 text-sm", negative && "opacity-80")}>
+                  <span
+                    className="h-2.5 w-2.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: color,
+                      ...(row.isResto ? { outline: `1px dashed ${TOP5_RESTO}` } : {}),
+                    }}
+                  />
+                  <span
+                    className={cn("min-w-0 flex-1 truncate", row.isResto && "text-muted-foreground")}
+                    title={row.label}
+                  >
+                    {row.label}
+                  </span>
+                  <span className={cn("financial-nums", negative ? "text-muted-foreground" : "text-foreground")}>
+                    {formatMxn(row.monto)}
+                  </span>
+                  <span
+                    className={cn(
+                      "financial-nums w-14 text-right font-bold tabular-nums",
+                      negative ? "text-muted-foreground" : "text-foreground",
                     )}
-                  </Bar>
-                );
-              })}
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+                  >
+                    {row.pct.toFixed(1)}%
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </>
       )}
-
-      <p className="mt-2 text-[11px] leading-snug text-muted-foreground">{methodNote}</p>
-      {showRestoNote ? (
-        <p className="mt-1 text-[11px] leading-snug text-muted-foreground">{t("resultados.top5.restoClampedNote")}</p>
-      ) : null}
-
-      <ul className="mt-4 space-y-2">
-        {rows.map((row, index) => {
-          const color = colors.get(row.key) ?? seriesColor(index, row.key);
-          const negative = row.monto < -0.005;
-          return (
-            <li key={row.key} className={cn("flex min-w-0 items-center gap-2 text-sm", negative && "opacity-80")}>
-              <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full"
-                style={{
-                  backgroundColor: color,
-                  ...(row.isResto ? { outline: `1px dashed ${TOP5_RESTO}` } : {}),
-                }}
-              />
-              <span
-                className={cn("min-w-0 flex-1 truncate", row.isResto && "text-muted-foreground")}
-                title={row.label}
-              >
-                {row.label}
-              </span>
-              <span className={cn("financial-nums", negative ? "text-muted-foreground" : "text-foreground")}>
-                {formatMxn(row.monto)}
-              </span>
-              <span
-                className={cn(
-                  "financial-nums w-14 text-right font-bold tabular-nums",
-                  negative ? "text-muted-foreground" : "text-foreground",
-                )}
-              >
-                {row.pct.toFixed(1)}%
-              </span>
-            </li>
-          );
-        })}
-      </ul>
-    </section>
+    </ExpandableShell>
   );
 }
 

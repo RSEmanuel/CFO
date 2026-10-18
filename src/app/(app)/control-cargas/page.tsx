@@ -49,8 +49,7 @@ export default function ControlCargasPage() {
 
   const header = (
     <div>
-      <p className="text-lg font-bold tracking-tight text-clay">{t("nav.loadControl")}</p>
-      <p className="text-sm text-muted-foreground">{t("loads.intro", { company: empresa })}</p>
+      <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.loadControl")}</p>
     </div>
   );
 

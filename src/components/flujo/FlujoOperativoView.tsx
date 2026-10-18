@@ -1,8 +1,10 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
+import { cn } from "@/lib/utils";
 import { useFlujoOperativo } from "@/hooks/use-flujo-operativo";
 import { CHART, CHART_AXIS, CHART_VARS } from "@/lib/chart-theme";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
@@ -172,96 +174,101 @@ export function FlujoOperativoTablero({
   }));
 
   return (
-    <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-        <div className="flex flex-wrap items-baseline gap-2">
-          <h3 className="font-sans text-lg font-medium text-foreground">
-            {t("flujo.tabs.diaria")} · {data.periodo}
-          </h3>
-          <span className="text-sm text-muted-foreground">{t("flujo.operativo.help")}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.tabs.diaria")} />
-          <span className="text-xs text-muted-foreground">
-            {t("flujo.operativo.accountsCovered", {
-              count: data.cuentas.length,
-              moneda: data.moneda,
-            })}
-          </span>
-        </div>
-      </div>
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
+            <div className="flex flex-wrap items-baseline gap-2">
+              <h3 className="font-sans text-lg font-medium text-foreground">
+                {t("flujo.tabs.diaria")} · {data.periodo}
+              </h3>
+              <span className="text-sm text-muted-foreground">{t("flujo.operativo.help")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.tabs.diaria")} />
+              <span className="text-xs text-muted-foreground">
+                {t("flujo.operativo.accountsCovered", {
+                  count: data.cuentas.length,
+                  moneda: data.moneda,
+                })}
+              </span>
+              {toggle}
+            </div>
+          </div>
 
-      <div className="w-full min-w-0">
-        <ResponsiveContainer width="100%" height={400}>
-          <ComposedChart data={chartData} margin={{ top: 12, right: 28, left: 12, bottom: 0 }}>
-            <CartesianGrid vertical={false} stroke={CHART_VARS.axis} strokeOpacity={0.6} />
-            <XAxis
-              dataKey="dia"
-              tick={{ fill: CHART_VARS.mute, fontSize: 11 }}
-              axisLine={{ stroke: CHART_VARS.axis }}
-              tickLine={false}
-              interval="preserveStartEnd"
-              minTickGap={24}
-            />
-            <YAxis
-              yAxisId="left"
-              width={68}
-              tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => formatAxisTick(Number(value), units)}
-            />
-            <YAxis
-              yAxisId="right"
-              orientation="right"
-              width={68}
-              domain={[0, "auto"]}
-              tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value) => formatAxisTick(Number(value), units)}
-            />
-            <Tooltip cursor={{ fill: "rgb(196 93 62 / 0.06)" }} content={<OperativoTooltip />} />
-            <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={LEGEND_STYLE} />
-            <ReferenceLine y={0} yAxisId="left" stroke={CHART_VARS.axis} strokeDasharray="3 3" />
-            <Bar
-              yAxisId="left"
-              stackId="movimientos"
-              dataKey="entradas"
-              name={t("flujo.operativo.inflows")}
-              fill={COLOR_ENTRADAS}
-              barSize={12}
-              radius={[3, 3, 0, 0]}
-            />
-            <Bar
-              yAxisId="left"
-              stackId="movimientos"
-              dataKey="salidas"
-              name={t("flujo.operativo.outflows")}
-              fill={COLOR_SALIDAS}
-              barSize={12}
-              radius={[0, 0, 3, 3]}
-            />
-            <Line
-              yAxisId="right"
-              type="monotone"
-              dataKey="saldoAcumulado"
-              name={t("flujo.operativo.cashBalance")}
-              stroke={COLOR_SALDO}
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "var(--cifra-brand-contrast)", strokeWidth: 2 }}
-            />
-          </ComposedChart>
-        </ResponsiveContainer>
-      </div>
+          <div className={cn("w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[400px]")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart data={chartData} margin={{ top: 12, right: 28, left: 12, bottom: 0 }}>
+                <CartesianGrid vertical={false} stroke={CHART_VARS.axis} strokeOpacity={0.6} />
+                <XAxis
+                  dataKey="dia"
+                  tick={{ fill: CHART_VARS.mute, fontSize: 11 }}
+                  axisLine={{ stroke: CHART_VARS.axis }}
+                  tickLine={false}
+                  interval="preserveStartEnd"
+                  minTickGap={24}
+                />
+                <YAxis
+                  yAxisId="left"
+                  width={68}
+                  tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value) => formatAxisTick(Number(value), units)}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  width={68}
+                  domain={[0, "auto"]}
+                  tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value) => formatAxisTick(Number(value), units)}
+                />
+                <Tooltip cursor={{ fill: "rgb(196 93 62 / 0.06)" }} content={<OperativoTooltip />} />
+                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={LEGEND_STYLE} />
+                <ReferenceLine y={0} yAxisId="left" stroke={CHART_VARS.axis} strokeDasharray="3 3" />
+                <Bar
+                  yAxisId="left"
+                  stackId="movimientos"
+                  dataKey="entradas"
+                  name={t("flujo.operativo.inflows")}
+                  fill={COLOR_ENTRADAS}
+                  barSize={12}
+                  radius={[3, 3, 0, 0]}
+                />
+                <Bar
+                  yAxisId="left"
+                  stackId="movimientos"
+                  dataKey="salidas"
+                  name={t("flujo.operativo.outflows")}
+                  fill={COLOR_SALIDAS}
+                  barSize={12}
+                  radius={[0, 0, 3, 3]}
+                />
+                <Line
+                  yAxisId="right"
+                  type="monotone"
+                  dataKey="saldoAcumulado"
+                  name={t("flujo.operativo.cashBalance")}
+                  stroke={COLOR_SALDO}
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "var(--cifra-brand-contrast)", strokeWidth: 2 }}
+                />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
 
-      {data.totales.traspasos > 0 ? (
-        <p className="mt-3 text-xs text-muted-foreground">
-          {t("flujo.operativo.traspasosNote", { amount: formatMxn(data.totales.traspasos) })}
-        </p>
-      ) : null}
-    </article>
+          {data.totales.traspasos > 0 ? (
+            <p className="mt-3 text-xs text-muted-foreground">
+              {t("flujo.operativo.traspasosNote", { amount: formatMxn(data.totales.traspasos) })}
+            </p>
+          ) : null}
+        </>
+      )}
+    </ExpandableShell>
   );
 }
 

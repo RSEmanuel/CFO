@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { HERO_CHART_COLORS, HeroBarChart } from "@/components/charts/HeroBarChart";
 import { HeroLineChart } from "@/components/charts/HeroLineChart";
 import { IncomeBreakdownBars } from "@/components/charts/IncomeBreakdownBars";
@@ -128,74 +129,86 @@ export function CategorySeriesCard({
   const favoriteId = category === "Ingreso" ? RESULTADOS_FAVORITE.serieIngreso : RESULTADOS_FAVORITE.serieCosto;
 
   return (
-    <section className="flex flex-col gap-6 rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)] lg:flex-row">
-      <div className="flex w-full flex-col lg:w-[30%]">
-        <div className="mb-4 flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-            <LineChartIcon className="h-4 w-4" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h2 className="font-sans text-xl font-medium text-foreground">{categoryLabel}</h2>
-            <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-              {tempoLabel} | {units.toUpperCase()} | MXN
+    <ExpandableShell className="flex flex-col gap-6 p-6 lg:flex-row">
+      {(toggle, expanded) => (
+        <>
+          <div className="flex w-full flex-col lg:w-[30%]">
+            <div className="mb-4 flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+                <LineChartIcon className="h-4 w-4" />
+              </span>
+              <div className="min-w-0 flex-1">
+                <h2 className="font-sans text-xl font-medium text-foreground">{categoryLabel}</h2>
+                <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                  {tempoLabel} | {units.toUpperCase()} | MXN
+                </p>
+              </div>
+              <FavoriteStarButton widgetId={favoriteId} label={categoryLabel} />
+            </div>
+
+            <p className="font-sans text-lg text-muted-foreground">{headlineLabel}</p>
+            <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">
+              {headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units)}
             </p>
+            {comparableLabel && comparableTotal != null ? (
+              <p className="mt-2 text-xs text-muted-foreground">
+                {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal, units)}
+              </p>
+            ) : null}
           </div>
-          <FavoriteStarButton widgetId={favoriteId} label={categoryLabel} />
-        </div>
 
-        <p className="font-sans text-lg text-muted-foreground">{headlineLabel}</p>
-        <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">
-          {headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units)}
-        </p>
-        {comparableLabel && comparableTotal != null ? (
-          <p className="mt-2 text-xs text-muted-foreground">
-            {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal, units)}
-          </p>
-        ) : null}
-      </div>
-
-      <div className="flex w-full min-w-0 flex-col lg:w-[70%]">
-        {canToggleYear ? (
-          <div
-            role="group"
-            aria-label={t("resultados.chartViewLabel")}
-            className="inline-flex h-10 items-center self-end rounded-control border border-input bg-card p-0.5"
-          >
-            {(["month", "year"] as const).map((view) => (
-              <button
-                key={view}
-                type="button"
-                onClick={() => setChartView(view)}
-                aria-pressed={chartView === view}
-                className={cn(
-                  "h-9 rounded-control px-3 text-sm font-medium transition-colors",
-                  chartView === view
-                    ? "bg-secondary text-clay shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-              >
-                {t(view === "month" ? "resultados.chartByMonth" : "resultados.chartByYear")}
-              </button>
-            ))}
+          <div className={cn("flex w-full min-w-0 flex-col lg:w-[70%]", expanded && "min-h-0 flex-1")}>
+            <div className="flex items-center justify-end gap-1">
+              {canToggleYear ? (
+                <div
+                  role="group"
+                  aria-label={t("resultados.chartViewLabel")}
+                  className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5"
+                >
+                  {(["month", "year"] as const).map((view) => (
+                    <button
+                      key={view}
+                      type="button"
+                      onClick={() => setChartView(view)}
+                      aria-pressed={chartView === view}
+                      className={cn(
+                        "h-9 rounded-control px-3 text-sm font-medium transition-colors",
+                        chartView === view
+                          ? "bg-secondary text-clay shadow-sm"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                      )}
+                    >
+                      {t(view === "month" ? "resultados.chartByMonth" : "resultados.chartByYear")}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              {toggle}
+            </div>
+            <div
+              className={cn(
+                expanded ? "min-h-0 flex-1" : "h-[380px] lg:h-[420px]",
+                "w-full min-w-0 overflow-visible",
+              )}
+            >
+              {category === "Ingreso" ? (
+                <IncomeTotalChart
+                  data={showYearly && yearlyChartData ? yearlyChartData : chartData}
+                  series={seriesKeys}
+                  units={units}
+                  selectedLabel={showYearly ? (yearlySelectedLabel ?? headlineLabel) : headlineLabel}
+                />
+              ) : (
+                <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
+              )}
+            </div>
+            {showYearly && partialYearsNote ? (
+              <p className="mt-2 text-xs leading-snug text-muted-foreground">{partialYearsNote}</p>
+            ) : null}
           </div>
-        ) : null}
-        <div className="h-[380px] w-full min-w-0 overflow-visible lg:h-[420px]">
-          {category === "Ingreso" ? (
-            <IncomeTotalChart
-              data={showYearly && yearlyChartData ? yearlyChartData : chartData}
-              series={seriesKeys}
-              units={units}
-              selectedLabel={showYearly ? (yearlySelectedLabel ?? headlineLabel) : headlineLabel}
-            />
-          ) : (
-            <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
-          )}
-        </div>
-        {showYearly && partialYearsNote ? (
-          <p className="mt-2 text-xs leading-snug text-muted-foreground">{partialYearsNote}</p>
-        ) : null}
-      </div>
-    </section>
+        </>
+      )}
+    </ExpandableShell>
   );
 }
 
@@ -233,25 +246,30 @@ export function IncomeBreakdownCard({
   if (incomeBreakdown.length === 0) return null;
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="mb-4 flex items-center gap-2">
-        <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-          <BarChartHorizontal className="h-4 w-4" />
-        </span>
-        <div className="min-w-0 flex-1">
-          <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.incomeBreakdown")}</h2>
-          <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-            {headlineLabel} | {t("resultados.pctOfRevenue")}
-          </p>
-        </div>
-        <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoDesglose} label={t("resultados.incomeBreakdown")} />
-      </div>
-      <IncomeBreakdownBars
-        data={incomeBreakdown}
-        valueFormatter={formatMxn}
-        totalLabel={t("resultados.incomeBreakdownCenter")}
-      />
-    </section>
+    <ExpandableShell className="p-6">
+      {(toggle) => (
+        <>
+          <div className="mb-4 flex items-center gap-2">
+            <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+              <BarChartHorizontal className="h-4 w-4" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.incomeBreakdown")}</h2>
+              <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                {headlineLabel} | {t("resultados.pctOfRevenue")}
+              </p>
+            </div>
+            <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoDesglose} label={t("resultados.incomeBreakdown")} />
+            {toggle}
+          </div>
+          <IncomeBreakdownBars
+            data={incomeBreakdown}
+            valueFormatter={formatMxn}
+            totalLabel={t("resultados.incomeBreakdownCenter")}
+          />
+        </>
+      )}
+    </ExpandableShell>
   );
 }
 

@@ -265,7 +265,7 @@ export default function IngestaPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-6">
       <div>
-        <p className="text-lg font-bold tracking-tight text-clay">{t("nav.ingest")}</p>
+        <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.ingest")}</p>
         <p className="text-sm text-muted-foreground">
           {t("ingesta.sessionPeriod", { month: t(monthLabelKey(periodo - 1)), year: anio })}
         </p>

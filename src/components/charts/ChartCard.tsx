@@ -1,8 +1,6 @@
 "use client";
 
-import { FavoriteStar } from "@/components/favorites/favorite-star";
-import { InsightText } from "@/components/insight-text";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ExpandableChartCard } from "@/components/charts/ExpandableChartCard";
 import type { ReactNode } from "react";
 
 export function ChartCard({
@@ -20,15 +18,8 @@ export function ChartCard({
   children: ReactNode;
 }) {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-start justify-between space-y-0">
-        <div className="min-w-0">
-          <CardTitle>{title}</CardTitle>
-          <InsightText text={insightText} />
-        </div>
-        <FavoriteStar kind="chart" id={id} label={title} />
-      </CardHeader>
-      <CardContent className={heightClass}>{children}</CardContent>
-    </Card>
+    <ExpandableChartCard id={id} title={title} insightText={insightText} heightClass={heightClass}>
+      {children}
+    </ExpandableChartCard>
   );
 }

@@ -79,7 +79,7 @@ export function FlujoPage() {
         }}
       >
         <div>
-          <p className="mb-2 text-lg font-bold tracking-tight text-clay">{t("nav.cashflow")}</p>
+          <p className="mb-2 text-2xl font-bold tracking-tight text-clay">{t("nav.cashflow")}</p>
           <TabsList className="flex h-auto flex-nowrap justify-start gap-2 overflow-x-auto border-0 bg-transparent p-0 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {FLUJO_TABS.map((item) => (
               <TabsTrigger

@@ -19,3 +19,25 @@ canvas.json
 
 # Respaldos de base de datos (van en Drive, no en git)
 backup-*.sql
+
+# Landing scroll-world: los videos y fuentes pesadas NO van en git (ver docs/landing-scroll-world.md).
+# Solo se versionan posters ligeros (webp) en public/scroll-world/posters/.
+public/scroll-world/*
+!public/scroll-world/posters/
+!public/scroll-world/video/
+public/scroll-world/video/*
+!public/scroll-world/video/.gitkeep
+public/scroll-world/posters/*
+!public/scroll-world/posters/.gitkeep
+!public/scroll-world/posters/*.webp
+public/scroll-world/**/*.mp4
+public/scroll-world/**/*.mov
+
+# Vercel local y variables de entorno
+.vercel
+.env*
+!.env.example
+
+# Datos de clientes y artefactos locales de Claude Code: nunca al repo
+sample_data/
+.claude/

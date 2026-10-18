@@ -47,7 +47,7 @@
     "position": "Financial Position",
     "cashflow": "Cash Flow",
     "collections": "Collections",
-    "metrics": "Metrics catalog",
+    "metrics": "Financial metrics",
     "control": "Control Panel",
     "ingest": "Ingest",
     "simulator": "What-If Simulator",
@@ -104,7 +104,6 @@
     "resetFailed": "Could not complete. Try again."
   },
   "settings": {
-    "intro": "Companies and users in the portfolio. Each company sees only its own information.",
     "languageTitle": "Portal language",
     "languageHelp": "Select the language used in portal menus, metrics, and messages.",
     "languageAria": "Portal language",
@@ -193,7 +192,7 @@
     "verticalAnalysis": "Vertical analysis",
     "pctOfRevenue": "% of revenue",
     "others": "Other",
-    "goToCatalog": "Open metrics catalog",
+    "goToCatalog": "Open financial metrics",
     "cost": "Cost",
     "expense": "Expense",
     "ebitda": "EBITDA",
@@ -774,7 +773,6 @@
     },
     "libre": {
       "title": "From profit to cash",
-      "subtitle": "Reconciliation: why profit is not the money in the bank. It shows how customer credit and supplier debt change your real cash.",
       "estimated": "Cifra built this bridge from the monthly change in the trial balance. It is not the bank statement.",
       "emptyTitle": "Free cash flow is not available yet",
       "emptyMessage": "Upload this month's trial balance in Ingestion to build the reconciliation.",
@@ -1045,10 +1043,9 @@
   },
   "control": {
     "title": "Executive Control Panel",
-    "subtitle": "Priority metrics and visualizations pinned by finance leadership",
     "emptyTitle": "Your Control Panel is empty",
     "emptyMessage": "Pin KPIs, charts and tables with the star in any module to build your executive view here.",
-    "emptyCta": "Open metrics catalog",
+    "emptyCta": "Open financial metrics",
     "emptyCtaResults": "Go to Results",
     "emptyCtaFlujo": "Go to Cash Flow",
     "emptyCtaCobranza": "Go to Receivables",
@@ -1058,7 +1055,51 @@
       "FLUJO": "Cash Flow & Treasury",
       "COBRANZA": "Receivables & Collections",
       "POSICION": "Financial Position",
-      "METRICAS": "Other Catalog Metrics"
+      "METRICAS": "Other financial metrics"
+    },
+    "portada": {
+      "titulo": "{mes}: how your month closed",
+      "frase": {
+        "ventasUtilidad": "You sold {ventas} and kept {utilidad} as profit.",
+        "ventasPerdida": "You sold {ventas} and lost {perdida}.",
+        "respiro": "Your cash lasts {meses} months."
+      },
+      "utilidad": {
+        "label": "Profit for the month",
+        "anterior": "Previous month: {monto}",
+        "sinAnterior": "No previous month to compare.",
+        "sinDato": "Upload this month's trial balance to see it."
+      },
+      "caja": {
+        "label": "Your cash",
+        "fuente": "Cash and bank accounts from your trial balance at month end.",
+        "sinDato": "Your trial balance has no cash or bank accounts."
+      },
+      "sello": {
+        "estimada": "Estimated"
+      },
+      "respiro": {
+        "label": "Months of runway",
+        "fuente": "Cifra calculated: your cash ÷ what it costs you to operate each month.",
+        "sinDato": "The trial balance or operating spend is missing."
+      },
+      "clientes": {
+        "vencido": "Invoices already overdue from your sales auxiliary.",
+        "sinCobrar": "Estimated from your customer movements; no credit terms.",
+        "sinDato": "Upload sales or your customer movements."
+      },
+      "gasto": {
+        "label": "Costs and expenses for the month",
+        "mas": "{pct}% more than last month.",
+        "menos": "{pct}% less than last month.",
+        "igual": "Same as last month.",
+        "sinAnterior": "No previous month to compare.",
+        "sinDato": "Upload this month's trial balance to see them."
+      },
+      "alertas": {
+        "perdida": "This month you lost {monto}. Review your biggest costs and expenses and cut what doesn't drive sales.",
+        "gastoSube": "Your costs and expenses rose {pct}% ({monto}) versus last month. Review what drove the increase."
+      }
     }
   },
   "favorites": {
@@ -1067,7 +1108,6 @@
   },
   "simulator": {
     "title": "Financial Sensitivity & What-If Scenario Simulator",
-    "subtitle": "Projects the period's P&L, cash and working capital by moving six drivers; the baseline is the actual accounting close.",
     "loadError": "The simulator baseline could not be loaded",
     "units": {
       "days": "days",
@@ -1076,7 +1116,6 @@
     },
     "drivers": {
       "title": "Scenario drivers",
-      "subtitle": "Move the controls to simulate; the baseline follows the active period.",
       "groups": {
         "commercial": "Commercial strategy",
         "efficiency": "Operating efficiency",
@@ -1177,15 +1216,14 @@
     }
   },
   "metrics": {
-    "emptyTitle": "Catalog not available yet",
+    "emptyTitle": "Financial metrics not available yet",
     "emptyMessage": "Upload a trial balance to calculate the 50 metrics.",
     "loadError": "Could not load metrics",
     "loading": "Loading metrics",
     "eyebrow": "Financial intelligence",
-    "intro": "50 indicators to understand profitability, efficiency, liquidity, and value creation.",
     "available": "{count} of {total} with data this month",
     "retry": "Retry",
-    "highlights": "Highlights",
+    "highlights": "Favorites",
     "customizeHelp": "Star any metric or chart to customize this panel.",
     "favorites": "Favorite metrics",
     "none": "No metrics are available for the selected cutoff.",
@@ -1640,6 +1678,8 @@
     }
   },
   "charts": {
+    "expand": "Expand chart",
+    "collapse": "Close",
     "copyInsight": "Copy insight",
     "copied": "Insight copied",
     "downloadChart": "Download chart",
@@ -1696,7 +1736,6 @@
     "columns": "Columns"
   },
   "users": {
-    "intro": "Who can sign in to {company} and what they can do.",
     "selectCompany": "Pick a company in the selector above to see its people.",
     "viewerOnly": "This section is for administrators. Ask your administrator for any access change.",
     "loadFailed": "We couldn't load the people list. Reload the page to try again.",
@@ -1760,7 +1799,6 @@
     }
   },
   "loads": {
-    "intro": "Every file uploaded to {company}: who, when and whether it actually made it into your numbers.",
     "selectCompany": "Pick a company in the selector above to see its uploads.",
     "viewerOnly": "This section is for people who upload files. Ask your administrator about any upload.",
     "loadFailed": "We couldn't read the history. Reload the page to try again.",
@@ -1789,5 +1827,107 @@
     "noMonth": "No month",
     "empty": "No files have been uploaded to this company yet. Upload one from Ingest.",
     "truncated": "Showing the {count} most recent files."
+  },
+  "landing": {
+    "meta": {
+      "title": "Cifra · Virtual CFO"
+    },
+    "skip": "Skip to content",
+    "nav": {
+      "label": "Page sections",
+      "sceneOf": "Scene {n} of {total}"
+    },
+    "header": {
+      "login": "Sign in",
+      "demo": "Request a demo"
+    },
+    "hint": "Scroll to explore",
+    "staticToggle": "View without animations",
+    "sampleNote": "Sample illustration. Real figures appear once you upload your accounting.",
+    "poster": {
+      "confirmed": "From your accounting",
+      "estimated": "Estimated by Cifra",
+      "missing": "No data",
+      "months": "months of runway"
+    },
+    "scenes": {
+      "torre": {
+        "label": "Start",
+        "eyebrow": "Cifra · Virtual CFO",
+        "title": "Your numbers, made clear.",
+        "body": "Results, cash and collections for your company in one place, explained for the person who runs it, not the one who does the books.",
+        "tagA": "Mexican accounting",
+        "tagB": "CONTPAQi or template"
+      },
+      "resultados": {
+        "label": "Results",
+        "eyebrow": "Results",
+        "title": "What you really earned.",
+        "body": "Your income statement, month over month and jargon-free. See what went up, what went down and what to review first.",
+        "tagA": "Income and expenses",
+        "tagB": "Margin"
+      },
+      "caja": {
+        "label": "Cash and flow",
+        "eyebrow": "Cash and flow",
+        "title": "How much runway you have left.",
+        "body": "Your cash today and how many months of runway it buys. If it will run short, you see it early enough to decide.",
+        "tagA": "Months of runway",
+        "tagB": "Cash flow"
+      },
+      "cobranza": {
+        "label": "Collections",
+        "eyebrow": "Collections",
+        "title": "Who to chase first.",
+        "body": "The customers who are not paying you, ranked by how much they weigh on your cash. Start with the first one and collect.",
+        "tagA": "Unpaid invoices",
+        "tagB": "Actionable list"
+      },
+      "salud": {
+        "label": "Financial health",
+        "eyebrow": "Financial health",
+        "title": "One glance, one decision.",
+        "body": "Liquidity, profitability and debt as indicators you can understand. Each one says what it means and what to do.",
+        "tagA": "Clear indicators",
+        "tagB": "Scenarios"
+      },
+      "mundo": {
+        "label": "Get started",
+        "eyebrow": "Start today",
+        "title": "Upload your accounting. Cifra does the rest.",
+        "body": "Sign in with your account or request a demo and we will show you your own figures.",
+        "primary": "Sign in",
+        "secondary": "Request a demo"
+      }
+    },
+    "how": {
+      "eyebrow": "How it works",
+      "title": "From your accounting to a decision.",
+      "lede": "Today your numbers live in the accounting system, in Excel and in your accountant's head. Cifra brings them together and explains them.",
+      "one": {
+        "title": "Upload your accounting",
+        "body": "Upload your CONTPAQi trial balance or our template."
+      },
+      "two": {
+        "title": "Cifra organizes and calculates",
+        "body": "Every number says whether it comes from your accounting or is an estimate."
+      },
+      "three": {
+        "title": "Decide with clarity",
+        "body": "Results, cash and collections in dashboards. Every alert ends in an action."
+      }
+    },
+    "demo": {
+      "eyebrow": "Request a demo",
+      "title": "We show you your own figures.",
+      "body": "Write to us and we will schedule a demo with your company's accounting.",
+      "button": "Write to request a demo",
+      "subject": "Cifra demo request",
+      "login": "Already have an account? Sign in"
+    },
+    "footer": {
+      "tagline": "Your numbers, made clear.",
+      "endorsement": "A Data Frontier product"
+    }
   }
 }

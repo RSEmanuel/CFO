@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
@@ -146,119 +147,126 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
   ];
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-start gap-2">
-          <div>
-            <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.cogs.analisisTitle")}</h3>
-            <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("resultados.cogs.analisisHelp")}</p>
+    <ExpandableShell className="p-6">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div className="flex items-start gap-2">
+              <div>
+                <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.cogs.analisisTitle")}</h3>
+                <p className="mt-1 max-w-3xl text-sm text-muted-foreground">{t("resultados.cogs.analisisHelp")}</p>
+              </div>
+              <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.cogsAnalisis} label={t("resultados.cogs.analisisTitle")} />
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
+                {modes.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setMode(option.value)}
+                    className={cn(
+                      "h-9 rounded-control px-3 text-sm font-medium transition-colors",
+                      mode === option.value
+                        ? "bg-secondary text-clay shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                    aria-pressed={mode === option.value}
+                  >
+                    {t(option.labelKey)}
+                  </button>
+                ))}
+              </div>
+              {toggle}
+            </div>
           </div>
-          <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.cogsAnalisis} label={t("resultados.cogs.analisisTitle")} />
-        </div>
-        <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
-          {modes.map((option) => (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => setMode(option.value)}
-              className={cn(
-                "h-9 rounded-control px-3 text-sm font-medium transition-colors",
-                mode === option.value
-                  ? "bg-secondary text-clay shadow-sm"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
-              )}
-              aria-pressed={mode === option.value}
-            >
-              {t(option.labelKey)}
-            </button>
-          ))}
-        </div>
-      </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]">
-        <div className="h-[280px] w-full min-w-0">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
-              <XAxis dataKey="name" tick={{ fill: CHART.mute, fontSize: 11 }} axisLine={{ stroke: CHART.mute, opacity: 0.3 }} tickLine={false} />
-              <YAxis
-                domain={[0, 100]}
-                tick={{ fill: CHART.mute, fontSize: 11 }}
-                tickFormatter={(value: number) => `${value}%`}
-                axisLine={false}
-                tickLine={false}
-                width={40}
-              />
-              <Tooltip
-                cursor={{ fill: "rgba(26,25,21,0.04)" }}
-                formatter={(_value, _name, item) => {
-                  const entry = item as { dataKey?: unknown; payload?: { mix?: CogsStackedMix } };
-                  const mix = entry.payload?.mix;
-                  const dataKey = String(entry.dataKey ?? "");
-                  if (!mix) {
-                    return ["", ""];
-                  }
-                  if (dataKey === "utilidadPct") {
-                    return [`${formatPct(mix.pctUtilidad)} · ${formatMxn(mix.utilidad)}`, t("resultados.cogs.chartUtilidad")];
-                  }
-                  const segment = mix.segmentos.find((candidate) => candidate.id === dataKey);
-                  const label = segment ? lineLabel(segment, t) : dataKey;
-                  return [`${formatPct(segment?.pct ?? null)} · ${formatMxn(segment?.monto ?? 0)}`, label];
-                }}
-              />
-              <Legend wrapperStyle={{ fontSize: 11 }} />
-              {data.analisis.stacked.mesActual.segmentos.map((segment, index) => (
-                <Bar
-                  key={segment.id}
-                  dataKey={segment.id}
-                  name={lineLabel(segment, t)}
-                  stackId="mix"
-                  fill={COGS_LINE_PALETTE[index % COGS_LINE_PALETTE.length]}
-                  isAnimationActive={false}
-                />
-              ))}
-              <Bar
-                dataKey="utilidadPct"
-                name={t("resultados.cogs.chartUtilidad")}
-                stackId="mix"
-                fill={COGS_STACK.utilidad}
-                isAnimationActive={false}
-                radius={[4, 4, 0, 0]}
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        <TableScroll>
-          <table className="w-full min-w-[640px] text-sm">
-            <thead>
-              <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                <th className="pb-2 pr-3 font-medium">{t("resultados.cogs.concepto")}</th>
-                <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.acumulado")}</th>
-                <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.mesActual")}</th>
-                <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.mesAnterior")}</th>
-                <th className="pb-2 text-right font-medium">{t("resultados.cogs.variacion")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.analisis.filas.map((row) => {
-                const variation = variationLines(row, mode, t("resultados.cogs.pp"));
-                const toneValue = mode === "mxn" ? row.variacionMonto : row.variacionPp;
-                return (
-                  <AnalisisRow
-                    key={row.key}
-                    row={row}
-                    mode={mode}
-                    label={row.line ? lineLabel(row.line, t) : t(`resultados.cogs.rows.${row.key}`)}
-                    variation={variation}
-                    tone={deltaTone(toneValue, row.invertDelta)}
+          <div className={cn("grid gap-6 lg:grid-cols-[minmax(0,340px)_minmax(0,1fr)]", expanded && "min-h-0 flex-1")}>
+            <div className={cn(expanded ? "min-h-[280px]" : "h-[280px]", "w-full min-w-0")}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 4, left: 0 }}>
+                  <XAxis dataKey="name" tick={{ fill: CHART.mute, fontSize: 11 }} axisLine={{ stroke: CHART.mute, opacity: 0.3 }} tickLine={false} />
+                  <YAxis
+                    domain={[0, 100]}
+                    tick={{ fill: CHART.mute, fontSize: 11 }}
+                    tickFormatter={(value: number) => `${value}%`}
+                    axisLine={false}
+                    tickLine={false}
+                    width={40}
                   />
-                );
-              })}
-            </tbody>
-          </table>
-        </TableScroll>
-      </div>
-    </section>
+                  <Tooltip
+                    cursor={{ fill: "rgba(26,25,21,0.04)" }}
+                    formatter={(_value, _name, item) => {
+                      const entry = item as { dataKey?: unknown; payload?: { mix?: CogsStackedMix } };
+                      const mix = entry.payload?.mix;
+                      const dataKey = String(entry.dataKey ?? "");
+                      if (!mix) {
+                        return ["", ""];
+                      }
+                      if (dataKey === "utilidadPct") {
+                        return [`${formatPct(mix.pctUtilidad)} · ${formatMxn(mix.utilidad)}`, t("resultados.cogs.chartUtilidad")];
+                      }
+                      const segment = mix.segmentos.find((candidate) => candidate.id === dataKey);
+                      const label = segment ? lineLabel(segment, t) : dataKey;
+                      return [`${formatPct(segment?.pct ?? null)} · ${formatMxn(segment?.monto ?? 0)}`, label];
+                    }}
+                  />
+                  <Legend wrapperStyle={{ fontSize: 11 }} />
+                  {data.analisis.stacked.mesActual.segmentos.map((segment, index) => (
+                    <Bar
+                      key={segment.id}
+                      dataKey={segment.id}
+                      name={lineLabel(segment, t)}
+                      stackId="mix"
+                      fill={COGS_LINE_PALETTE[index % COGS_LINE_PALETTE.length]}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                  <Bar
+                    dataKey="utilidadPct"
+                    name={t("resultados.cogs.chartUtilidad")}
+                    stackId="mix"
+                    fill={COGS_STACK.utilidad}
+                    isAnimationActive={false}
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            <TableScroll>
+              <table className="w-full min-w-[640px] text-sm">
+                <thead>
+                  <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                    <th className="pb-2 pr-3 font-medium">{t("resultados.cogs.concepto")}</th>
+                    <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.acumulado")}</th>
+                    <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.mesActual")}</th>
+                    <th className="pb-2 pr-3 text-right font-medium">{t("resultados.cogs.mesAnterior")}</th>
+                    <th className="pb-2 text-right font-medium">{t("resultados.cogs.variacion")}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.analisis.filas.map((row) => {
+                    const variation = variationLines(row, mode, t("resultados.cogs.pp"));
+                    const toneValue = mode === "mxn" ? row.variacionMonto : row.variacionPp;
+                    return (
+                      <AnalisisRow
+                        key={row.key}
+                        row={row}
+                        mode={mode}
+                        label={row.line ? lineLabel(row.line, t) : t(`resultados.cogs.rows.${row.key}`)}
+                        variation={variation}
+                        tone={deltaTone(toneValue, row.invertDelta)}
+                      />
+                    );
+                  })}
+                </tbody>
+              </table>
+            </TableScroll>
+          </div>
+        </>
+      )}
+    </ExpandableShell>
   );
 }
 

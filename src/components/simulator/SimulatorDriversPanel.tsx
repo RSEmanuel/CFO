@@ -72,7 +72,6 @@ export function SimulatorDriversPanel({
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-sans text-lg font-medium text-foreground">{t("simulator.drivers.title")}</h2>
-          <p className="mt-0.5 text-xs text-muted-foreground">{t("simulator.drivers.subtitle")}</p>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={onReset}>
