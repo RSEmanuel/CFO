@@ -82,7 +82,14 @@ function RatioBullet({
   const zone = value == null ? null : ratioGaugeZone(id, value);
   const formatted = formatStatementRatio(value, GAUGE_FORMAT[id]);
   const marker = value == null ? 0 : Math.min(Math.max(value, 0), scaleMax);
-  const data = [{ name: title, value: marker }];
+  // El relleno recorre las mismas bandas del fondo: cada tramo llega hasta el valor o hasta el fin de su banda.
+  const segments = bands.map((band) => Math.max(0, Math.min(band.to, marker) - band.from));
+  const lastSegment = segments.reduce((last, length, index) => (length > 0 ? index : last), -1);
+  const data = [
+    segments.reduce<Record<string, string | number>>((row, length, index) => ({ ...row, [`seg${index}`]: length }), {
+      name: title,
+    }),
+  ];
   const zoneLabel =
     zone == null ? t("posicionFinanciera.gauges.na") : t(`posicionFinanciera.gauges.zones.${zone}`);
 
@@ -120,7 +127,15 @@ function RatioBullet({
                   ifOverflow="visible"
                 />
               ))}
-              <Bar dataKey="value" fill={zone ? ZONE_FILL[zone] : CHART_VARS.mute} barSize={18} radius={[4, 4, 4, 4]} maxBarSize={20} />
+              {bands.map((band, index) => (
+                <Bar
+                  key={`${id}-fill-${band.zone}-${band.from}`}
+                  dataKey={`seg${index}`}
+                  stackId="valor"
+                  fill={ZONE_FILL[band.zone]}
+                  radius={index === lastSegment ? [0, 4, 4, 0] : 0}
+                />
+              ))}
               <Tooltip
                 cursor={false}
                 content={
