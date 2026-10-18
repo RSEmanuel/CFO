@@ -52,13 +52,13 @@ const PARETO_MAX_BARRAS = 15;
 
 const HHI_BADGE_TONE: Record<HhiNivel, string> = {
   baja: "bg-category-margins text-category-marginsFg",
-  moderada: "bg-category-efficiency text-category-efficiencyFg",
+  moderada: "bg-category-efficiency text-category-efficiencyInk",
   alta: "bg-category-solvency text-category-solvencyFg",
 };
 
 const RIESGO_BADGE_TONE: Record<RiesgoClasificacion, string> = {
   diversificado: "bg-category-margins text-category-marginsFg",
-  estrategico: "bg-category-efficiency text-category-efficiencyFg",
+  estrategico: "bg-category-efficiency text-category-efficiencyInk",
   vulnerable: "bg-category-solvency text-category-solvencyFg",
 };
 

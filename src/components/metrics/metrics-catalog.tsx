@@ -126,7 +126,7 @@ export function MetricsCatalog() {
       <MetricsFilterBar filters={filters} onChange={setFilters} />
 
       {limitations.length > 0 ? (
-        <div className="rounded-card border border-category-efficiencyFg/25 bg-category-efficiency px-4 py-3 text-sm text-category-efficiencyFg">
+        <div className="rounded-card border border-category-efficiencyFg/25 bg-category-efficiency px-4 py-3 text-sm text-category-efficiencyInk">
           {limitations.map((message) => (
             <p key={message} className="flex gap-2">
               <Info className="mt-0.5 h-4 w-4 shrink-0" />

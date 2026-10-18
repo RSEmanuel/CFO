@@ -14,7 +14,7 @@ export const CATEGORY_META: Record<
     cardClass: "border-category-returnFg/20 bg-category-return",
   },
   eficiencia: {
-    badgeClass: "bg-category-efficiencyFg/15 text-category-efficiencyFg",
+    badgeClass: "bg-category-efficiencyFg/15 text-category-efficiencyInk",
     cardClass: "border-category-efficiencyFg/20 bg-category-efficiency",
   },
   liquidez: {

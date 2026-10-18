@@ -21,8 +21,9 @@
   /* ---- Senal (semaforo). SOLO estados, nunca decoracion ---- */
   --cifra-good:         #0D7350;
   --cifra-good-soft:    #D9EDE5;
-  --cifra-warn:         #8A5A05;
-  --cifra-warn-soft:    #F4E9D3;
+  --cifra-warn:         #CA8A04; /* ambar claro, menos cafe */
+  --cifra-warn-soft:    #FEF9C3;
+  --cifra-warn-ink:     #854D0E; /* texto de advertencia sobre warn-soft o blanco (6.4:1) */
   --cifra-bad:          #9B2C20;
   --cifra-bad-soft:     #F5DEDA;
 
@@ -50,8 +51,9 @@
     --cifra-line-2:      #1C2239;
     --cifra-good:        #4BC698;
     --cifra-good-soft:   #0C2C23;
-    --cifra-warn:        #D8A455;
-    --cifra-warn-soft:   #2E2410;
+    --cifra-warn:        #EAB308;
+    --cifra-warn-soft:   #33300A;
+    --cifra-warn-ink:    #EAB308;
     --cifra-bad:         #EC8579;
     --cifra-bad-soft:    #361A17;
   }
@@ -71,8 +73,9 @@
   --cifra-line-2:      #1C2239;
   --cifra-good:        #4BC698;
   --cifra-good-soft:   #0C2C23;
-  --cifra-warn:        #D8A455;
-  --cifra-warn-soft:   #2E2410;
+  --cifra-warn:        #EAB308;
+  --cifra-warn-soft:   #33300A;
+  --cifra-warn-ink:    #EAB308;
   --cifra-bad:         #EC8579;
   --cifra-bad-soft:    #361A17;
 }

@@ -214,7 +214,7 @@ function LoadStatus({ row, t }: { row: LoadHistoryRow; t: TranslateFn }) {
       <span
         className={cn(
           "inline-flex items-center gap-2 whitespace-nowrap font-medium",
-          saved ? "text-foreground" : row.pending ? "text-[var(--cifra-warn)]" : "text-muted-foreground",
+          saved ? "text-foreground" : row.pending ? "text-[var(--cifra-warn-ink)]" : "text-muted-foreground",
         )}
       >
         <span aria-hidden="true">
