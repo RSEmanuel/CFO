@@ -5,7 +5,6 @@ import {
   formatCatalogMetric,
   isImprovement,
 } from "@/components/metrics/catalog-presenter";
-import { CifraMark } from "@/components/brand/CifraMark";
 import { FavoriteStar } from "@/components/favorites/favorite-star";
 import { InfoDialog } from "@/components/ui/info-dialog";
 import { cn } from "@/lib/utils";
@@ -55,13 +54,12 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
             // Sin dato: el óvalo punteado de la marca y el motivo. Nunca un 0.
             <span
               className={cn(
-                "inline-flex items-start gap-1.5 rounded-2xl px-2.5 py-1 text-xs font-medium",
+                "inline-block rounded-2xl px-2.5 py-1 text-xs font-medium",
                 metric.nullReason === "negativeCapital"
                   ? "bg-desfavorable/10 text-desfavorable"
                   : "bg-card/70 text-muted-foreground",
               )}
             >
-              <CifraMark state="missing" size={14} className="mt-px shrink-0" />
               {t(`metrics.nullReasons.${metric.nullReason ?? "unknown"}`)}
             </span>
           ) : metric.deltaPct == null ? (
