@@ -15,11 +15,11 @@ import {
   type FlujoOperativoPunto,
 } from "@/services/flujoOperativo";
 import {
-  Bar,
+  Area,
+  AreaChart,
   CartesianGrid,
-  ComposedChart,
-  Legend,
-  Line,
+  ReferenceArea,
+  ReferenceDot,
   ReferenceLine,
   ResponsiveContainer,
   Tooltip,
@@ -29,7 +29,7 @@ import {
 
 const COLOR_ENTRADAS = "var(--cifra-good)";
 const COLOR_SALIDAS = "var(--cifra-bad)";
-const COLOR_SALDO = "var(--cifra-ink)";
+const COLOR_SALDO = CHART.clay;
 
 const TOOLTIP_STYLE = {
   background: CHART_VARS.card,
@@ -38,21 +38,8 @@ const TOOLTIP_STYLE = {
   boxShadow: "0 4px 16px rgb(40 30 20 / 0.08)",
 } as const;
 
-const LEGEND_STYLE = {
-  width: "100%",
-  display: "flex",
-  flexWrap: "wrap" as const,
-  justifyContent: "flex-end",
-  gap: 16,
-  paddingBottom: 16,
-  fontSize: 12,
-};
-
 type OperativoRow = {
   dia: string;
-  entradas: number;
-  /** Salidas en negativo para que la barra baje desde 0. */
-  salidas: number;
   saldoAcumulado: number;
   punto: FlujoOperativoPunto;
 };
@@ -156,7 +143,21 @@ function OperativoTooltip({ active, payload }: { active?: boolean; payload?: Arr
   );
 }
 
-/** Tablero diario: barras de entradas/salidas y línea de saldo de caja. */
+function SaldoStat({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <div className="min-w-0">
+      <p className="text-xs font-medium text-muted-foreground">{label}</p>
+      <p className="cifra-num mt-0.5 text-xl font-semibold tracking-tight text-foreground">{value}</p>
+      {detail ? <p className="text-xs text-muted-foreground">{detail}</p> : null}
+    </div>
+  );
+}
+
+/**
+ * "Tu caja día a día": saldo de caja y bancos al cierre de cada día (cuadra con el auxiliar de
+ * bancos), con el día más bajo marcado y qué hacer al respecto. Entradas y salidas del día se
+ * quedan en el tooltip: la pregunta es cuándo estuvo más apretada la caja, no qué se movió cada día.
+ */
 export function FlujoOperativoTablero({
   data,
   units,
@@ -167,25 +168,33 @@ export function FlujoOperativoTablero({
   const { t } = useLocale();
   const chartData: OperativoRow[] = data.puntos.map((punto) => ({
     dia: punto.label.slice(8),
-    entradas: punto.entradas,
-    salidas: -punto.salidas,
     saldoAcumulado: punto.saldoAcumulado,
     punto,
   }));
+  // Primer día con el saldo más bajo del mes.
+  const minimo = chartData.reduce<OperativoRow | null>(
+    (low, row) => (low == null || row.saldoAcumulado < low.saldoAcumulado ? row : low),
+    null,
+  );
+  const enNegativo = minimo != null && minimo.saldoAcumulado < 0;
+  const diaMinimo = minimo ? String(Number(minimo.dia)) : "";
+  // Etiquetas del eje cada 5 días (01, 05, 10…) en lugar de días alternos.
+  const ticks = chartData.map((row) => row.dia).filter((dia) => Number(dia) === 1 || Number(dia) % 5 === 0);
+  const yMin = Math.min(0, minimo?.saldoAcumulado ?? 0);
 
   return (
     <ExpandableShell className="p-5">
       {(toggle, expanded) => (
         <>
-          <div className="mb-4 flex flex-wrap items-baseline justify-between gap-3">
-            <div className="flex flex-wrap items-baseline gap-2">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0">
               <h3 className="font-sans text-lg font-medium text-foreground">
-                {t("flujo.tabs.diaria")} · {data.periodo}
+                {t("flujo.operativo.saldoDiario.title")} · {data.periodo}
               </h3>
-              <span className="text-sm text-muted-foreground">{t("flujo.operativo.help")}</span>
+              <p className="text-sm text-muted-foreground">{t("flujo.operativo.saldoDiario.help")}</p>
             </div>
             <div className="flex items-center gap-2">
-              <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.tabs.diaria")} />
+              <FavoriteStarButton widgetId="chart-tablero-diario" label={t("flujo.operativo.saldoDiario.title")} />
               <span className="text-xs text-muted-foreground">
                 {t("flujo.operativo.accountsCovered", {
                   count: data.cuentas.length,
@@ -196,68 +205,85 @@ export function FlujoOperativoTablero({
             </div>
           </div>
 
-          <div className={cn("w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[400px]")}>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <SaldoStat label={t("flujo.operativo.saldoDiario.opening")} value={formatMxn(data.saldoInicial)} />
+            <SaldoStat label={t("flujo.operativo.saldoDiario.closing")} value={formatMxn(data.saldoFinal)} />
+            {minimo ? (
+              <SaldoStat
+                label={t("flujo.operativo.saldoDiario.lowest")}
+                value={formatMxn(minimo.saldoAcumulado)}
+                detail={t("flujo.operativo.saldoDiario.lowestDay", { dia: diaMinimo })}
+              />
+            ) : null}
+          </div>
+
+          {minimo ? (
+            <p className="mt-3 text-sm text-foreground">
+              {enNegativo
+                ? t("flujo.operativo.saldoDiario.insightNegative", {
+                    dia: diaMinimo,
+                    monto: formatMxn(-minimo.saldoAcumulado),
+                  })
+                : t("flujo.operativo.saldoDiario.insightLowest", {
+                    dia: diaMinimo,
+                    monto: formatMxn(minimo.saldoAcumulado),
+                  })}
+            </p>
+          ) : null}
+
+          <div className={cn("mt-4 w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[340px]")}>
             <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={chartData} margin={{ top: 12, right: 28, left: 12, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 16, right: 16, left: 12, bottom: 0 }}>
                 <CartesianGrid vertical={false} stroke={CHART_VARS.axis} strokeOpacity={0.6} />
                 <XAxis
                   dataKey="dia"
-                  tick={{ fill: CHART_VARS.mute, fontSize: 11 }}
+                  ticks={ticks}
+                  interval={0}
+                  tick={{ fill: CHART_VARS.mute, fontSize: 12, fontFamily: "var(--cifra-font-mono)" }}
                   axisLine={{ stroke: CHART_VARS.axis }}
                   tickLine={false}
-                  interval="preserveStartEnd"
-                  minTickGap={24}
                 />
                 <YAxis
-                  yAxisId="left"
-                  width={68}
-                  tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
+                  width={76}
+                  domain={[yMin, "auto"]}
+                  tick={{ fill: CHART_VARS.mute, fontSize: 12, fontFamily: "var(--cifra-font-mono)" }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(value) => formatAxisTick(Number(value), units)}
                 />
-                <YAxis
-                  yAxisId="right"
-                  orientation="right"
-                  width={68}
-                  domain={[0, "auto"]}
-                  tick={{ fill: CHART_VARS.mute, fontSize: 12 }}
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => formatAxisTick(Number(value), units)}
-                />
-                <Tooltip cursor={{ fill: "rgb(196 93 62 / 0.06)" }} content={<OperativoTooltip />} />
-                <Legend verticalAlign="top" align="right" iconType="circle" wrapperStyle={LEGEND_STYLE} />
-                <ReferenceLine y={0} yAxisId="left" stroke={CHART_VARS.axis} strokeDasharray="3 3" />
-                <Bar
-                  yAxisId="left"
-                  stackId="movimientos"
-                  dataKey="entradas"
-                  name={t("flujo.operativo.inflows")}
-                  fill={COLOR_ENTRADAS}
-                  barSize={12}
-                  radius={[3, 3, 0, 0]}
-                />
-                <Bar
-                  yAxisId="left"
-                  stackId="movimientos"
-                  dataKey="salidas"
-                  name={t("flujo.operativo.outflows")}
-                  fill={COLOR_SALIDAS}
-                  barSize={12}
-                  radius={[0, 0, 3, 3]}
-                />
-                <Line
-                  yAxisId="right"
+                {enNegativo ? (
+                  <ReferenceArea
+                    y1={yMin}
+                    y2={0}
+                    fill="color-mix(in srgb, var(--cifra-bad) 12%, transparent)"
+                    fillOpacity={1}
+                  />
+                ) : null}
+                <ReferenceLine y={0} stroke={CHART_VARS.axis} strokeDasharray="3 3" />
+                <Tooltip cursor={{ stroke: CHART_VARS.axis }} content={<OperativoTooltip />} />
+                <Area
                   type="monotone"
                   dataKey="saldoAcumulado"
                   name={t("flujo.operativo.cashBalance")}
                   stroke={COLOR_SALDO}
                   strokeWidth={2.5}
+                  fill="color-mix(in srgb, var(--cifra-brand) 10%, transparent)"
+                  fillOpacity={1}
+                  baseValue={yMin}
                   dot={false}
-                  activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "var(--cifra-brand-contrast)", strokeWidth: 2 }}
+                  activeDot={{ r: 4, fill: COLOR_SALDO, stroke: "var(--cifra-surface)", strokeWidth: 2 }}
                 />
-              </ComposedChart>
+                {minimo ? (
+                  <ReferenceDot
+                    x={minimo.dia}
+                    y={minimo.saldoAcumulado}
+                    r={5}
+                    fill={enNegativo ? "var(--cifra-bad)" : COLOR_SALDO}
+                    stroke="var(--cifra-surface)"
+                    strokeWidth={2}
+                  />
+                ) : null}
+              </AreaChart>
             </ResponsiveContainer>
           </div>
 
@@ -273,8 +299,8 @@ export function FlujoOperativoTablero({
 }
 
 /**
- * Tablero diario de tesorería: barras de entradas/salidas reales del auxiliar
- * de caja y bancos CONTPAQi (reportes 06/07) y línea del saldo de caja al
+ * Tablero diario de tesorería: KPIs de entradas/salidas reales del auxiliar
+ * de caja y bancos CONTPAQi (reportes 06/07) y la línea del saldo de caja al
  * cierre de cada día (saldo inicial del mes del auxiliar + acumulado diario;
  * cuadra con el saldo final de bancos del periodo). Sin datos del periodo,
  * muestra estado vacío: no hay generadores ni fallbacks numéricos.
@@ -409,7 +435,7 @@ export function FlujoResumenKpis({ periodo }: { periodo: string }) {
   );
 }
 
-/** Movimientos diarios de caja: entradas contra salidas, sin los KPI de resumen. */
+/** "Tu caja día a día" (pestaña Dinámica diaria), sin los KPI de resumen. */
 export function FlujoDinamicaDiariaView({ periodo, units }: { periodo: string; units: DisplayUnits }) {
   const { t } = useLocale();
   const { data, loading, error } = useFlujoOperativo(periodo);

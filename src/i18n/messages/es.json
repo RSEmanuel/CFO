@@ -729,6 +729,16 @@
       "help": "Movimientos diarios reales de caja y bancos: cobranza, nómina, proveedores, renta, impuestos y deuda.",
       "accountsCovered": "{count} cuentas de efectivo · {moneda}",
       "traspasosNote": "Traspasos entre cuentas propias: {amount}. Se excluyen de entradas y salidas operativas.",
+      "saldoDiario": {
+        "title": "Tu caja día a día",
+        "help": "Saldo de caja y bancos al cierre de cada día, según tu auxiliar de bancos.",
+        "opening": "Saldo al inicio del mes",
+        "closing": "Saldo al cierre del mes",
+        "lowest": "Saldo más bajo del mes",
+        "lowestDay": "Día {dia}",
+        "insightLowest": "Tu caja tocó su punto más bajo el día {dia}, con {monto}. Programa tus pagos grandes después de tus días de cobro.",
+        "insightNegative": "Tu caja quedó en negativo el día {dia} por {monto}. Adelanta tu cobranza o mueve ese pago."
+      },
       "daily": "Día",
       "weekly": "Semana",
       "inflows": "Entradas",

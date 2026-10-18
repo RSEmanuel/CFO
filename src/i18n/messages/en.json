@@ -729,6 +729,16 @@
       "help": "Real daily cash and bank movements: collections, payroll, vendors, rent, taxes and debt.",
       "accountsCovered": "{count} cash accounts · {moneda}",
       "traspasosNote": "Transfers between own accounts: {amount}. Excluded from operating inflows and outflows.",
+      "saldoDiario": {
+        "title": "Your cash day by day",
+        "help": "Cash and bank balance at the end of each day, per your bank ledger.",
+        "opening": "Balance at start of month",
+        "closing": "Balance at end of month",
+        "lowest": "Lowest balance of the month",
+        "lowestDay": "Day {dia}",
+        "insightLowest": "Your cash hit its lowest point on day {dia}, at {monto}. Schedule large payments after your collection days.",
+        "insightNegative": "Your cash went negative on day {dia} by {monto}. Speed up collections or move that payment."
+      },
       "daily": "Day",
       "weekly": "Week",
       "inflows": "Inflows",
