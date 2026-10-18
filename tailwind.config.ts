@@ -82,6 +82,7 @@ const config: Config = {
           returnFg: "hsl(var(--metric-return-fg))",
           efficiency: "hsl(var(--metric-efficiency-bg))",
           efficiencyFg: "hsl(var(--metric-efficiency-fg))",
+          efficiencyInk: "hsl(var(--metric-efficiency-ink))",
           solvency: "hsl(var(--metric-solvency-bg))",
           solvencyFg: "hsl(var(--metric-solvency-fg))",
           management: "hsl(var(--metric-management-bg))",

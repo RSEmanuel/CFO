@@ -152,7 +152,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
                   "inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-[11px] font-medium",
                   calidad.badge === "verde"
                     ? "bg-category-margins text-favorable"
-                    : "bg-category-efficiency text-[var(--cifra-warn)]",
+                    : "bg-category-efficiency text-[var(--cifra-warn-ink)]",
                 )}
               >
                 {t("resultados.ingreso.erosion")}: {calidad.tasaErosionPct?.toFixed(1)}% ·{" "}

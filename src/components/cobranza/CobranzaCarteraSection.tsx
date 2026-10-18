@@ -150,7 +150,7 @@ function PlazosComercialesRow({ plazos }: { plazos: PlazosComerciales }) {
       </div>
       {kind === "deficit" ? (
         <p
-          className="rounded-xl border border-category-efficiencyFg/25 bg-category-efficiency px-3 py-2 text-sm font-medium text-category-efficiencyFg"
+          className="rounded-xl border border-category-efficiencyFg/25 bg-category-efficiency px-3 py-2 text-sm font-medium text-category-efficiencyInk"
           role="status"
         >
           {t("cobranza.cartera.brechaDeficit", { days: formatPlazoDias(plazos.brecha, na) })}
