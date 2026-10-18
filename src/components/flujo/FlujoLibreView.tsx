@@ -60,10 +60,12 @@ function toChartRows(steps: FlujoLibreStep[], t: (key: string) => string): Chart
   });
 }
 
-const TICK_FONT_SIZE = 11;
-const TICK_CHAR_WIDTH = 6.4;
-const TICK_LINE_HEIGHT = 13;
+const TICK_FONT_SIZE = 14;
+const TICK_CHAR_WIDTH = 8.2;
+const TICK_LINE_HEIGHT = 17;
 const TICK_MAX_LINES = 5;
+/** Si la palabra más larga no cabe en su barra a TICK_FONT_SIZE, la etiqueta baja hasta este tamaño. */
+const TICK_MIN_FONT_SIZE = 10;
 
 /** Parte la etiqueta en renglones que caben en el ancho de su barra, para que no se encimen. */
 function wrapLabel(label: string, maxChars: number): string[] {
@@ -91,20 +93,30 @@ function WaterfallXTick({
   payload,
   width,
   visibleTicksCount,
+  longestWord = 1,
 }: {
   x?: number;
   y?: number;
   payload?: { value?: string };
   width?: number;
   visibleTicksCount?: number;
+  /** Palabra más larga de todas las etiquetas: fija un solo tamaño de letra para todo el eje. */
+  longestWord?: number;
 }) {
   const band = width && visibleTicksCount ? width / visibleTicksCount : 120;
-  const maxChars = Math.max(6, Math.floor((band - 6) / TICK_CHAR_WIDTH));
-  const lines = wrapLabel(String(payload?.value ?? ""), maxChars);
+  const label = String(payload?.value ?? "");
+  // El wrap no parte palabras: en barras angostas se achica la letra (igual en todo el eje) hasta que la palabra más larga quepa.
+  const scale = Math.max(
+    TICK_MIN_FONT_SIZE / TICK_FONT_SIZE,
+    Math.min(1, (band - 6) / (longestWord * TICK_CHAR_WIDTH)),
+  );
+  const fontSize = TICK_FONT_SIZE * scale;
+  const maxChars = Math.max(6, Math.floor((band - 6) / (TICK_CHAR_WIDTH * scale)));
+  const lines = wrapLabel(label, maxChars);
   return (
-    <text x={x} y={y} textAnchor="middle" fill="var(--cifra-ink-3)" fontSize={TICK_FONT_SIZE} fontWeight={500}>
+    <text x={x} y={y} textAnchor="middle" fill="var(--cifra-ink-3)" fontSize={fontSize} fontWeight={500} fontFamily="var(--cifra-font-sans)">
       {lines.map((line, index) => (
-        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 14 : TICK_LINE_HEIGHT}>
+        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 14 : TICK_LINE_HEIGHT * scale}>
           {line}
         </tspan>
       ))}
@@ -116,6 +128,10 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
   const { t } = useLocale();
   const { data, loading, error } = useFlujoLibre(periodo);
   const rows = useMemo(() => (data ? toChartRows(data.steps, t) : []), [data, t]);
+  const longestWord = useMemo(
+    () => Math.max(1, ...rows.flatMap((row) => row.label.split(/\s+/).map((word) => word.length))),
+    [rows],
+  );
 
   if (loading) {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
@@ -147,7 +163,7 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
                 <XAxis
                   dataKey="label"
                   interval={0}
-                  tick={<WaterfallXTick />}
+                  tick={<WaterfallXTick longestWord={longestWord} />}
                   axisLine={{ stroke: CHART_AXIS.stroke }}
                   tickLine={false}
                   height={14 + TICK_LINE_HEIGHT * TICK_MAX_LINES}
@@ -202,15 +218,6 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
               </BarChart>
             </ResponsiveContainer>
           </div>
-
-          <p className="mt-3 text-sm text-muted-foreground">{t("flujo.libre.estimated")}</p>
-          {data.insight ? (
-            <p className="mt-2 text-sm text-foreground">
-              {t(`flujo.libre.insight.${data.insight.bucket}.${data.insight.direction}`, {
-                amount: formatMxn(data.insight.amount),
-              })}
-            </p>
-          ) : null}
         </>
       )}
     </ExpandableShell>
