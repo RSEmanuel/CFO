@@ -3,6 +3,7 @@ import {
   adminCreateCognitoUser,
   disableCognitoUser,
   initiatePasswordLogin,
+  sendWelcomeCode,
 } from "@/auth/cognito";
 import {
   buildDevAccessToken,
@@ -14,7 +15,6 @@ import { assertCanRegisterRole } from "@/auth/rbac";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
 import { planDevBypassLogin } from "@/auth/devBypass";
-import { generateTemporaryPassword } from "@/auth/temporaryPassword";
 
 export type PublicUser = {
   id: string;
@@ -132,15 +132,16 @@ export async function loginWithPassword(email: string, password: string): Promis
   };
 }
 
+/** sent: Cognito mandó el correo de bienvenida; failed: el alta quedó pero el correo no salió (se puede reenviar); skipped: modo desarrollo, sin correo. */
+export type WelcomeEmailStatus = "sent" | "failed" | "skipped";
+
 export type RegisterUserResult = PublicUser & {
-  /** Solo cuando el servidor generó la contraseña. Se devuelve una vez y no se guarda. */
-  temporaryPassword: string | null;
+  welcomeEmail: WelcomeEmailStatus;
 };
 
 export async function registerUser(input: {
   actor: { userId: string; email: string; role: UserRole };
   email: string;
-  password?: string;
   role: UserRole;
   tenantId: string;
 }): Promise<RegisterUserResult> {
@@ -186,24 +187,31 @@ export async function registerUser(input: {
 
   if (isDevAuthBypassEnabled()) {
     const created = await createWithAudit(buildDevCognitoSub(input.email));
-    return { ...toPublicUser(created), temporaryPassword: null };
+    return { ...toPublicUser(created), welcomeEmail: "skipped" };
   }
 
-  const temporaryPassword = input.password ? null : generateTemporaryPassword();
   const cognitoUser = await adminCreateCognitoUser({
     email: input.email,
-    password: input.password ?? (temporaryPassword as string),
     role: input.role,
     tenantId: input.tenantId,
   });
 
+  let created;
   try {
-    const created = await createWithAudit(cognitoUser.cognitoSub);
-    return { ...toPublicUser(created), temporaryPassword };
+    created = await createWithAudit(cognitoUser.cognitoSub);
   } catch (error) {
     await disableCognitoUser(cognitoUser.username);
     throw error;
   }
+
+  // El correo sale hasta que el alta quedó completa. Si falla, el usuario ya existe y se reenvía desde el portal.
+  let welcomeEmail: WelcomeEmailStatus = "sent";
+  try {
+    await sendWelcomeCode(input.email);
+  } catch {
+    welcomeEmail = "failed";
+  }
+  return { ...toPublicUser(created), welcomeEmail };
 }
 
 export async function getMeByCognitoSub(cognitoSub: string) {

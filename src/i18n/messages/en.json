@@ -1845,13 +1845,7 @@
     },
     "add": "Add person",
     "adding": "Adding…",
-    "added": "Done: {email} can now sign in to {company}.",
-    "tempTitle": "Temporary password for {email}",
-    "tempHelp": "Copy it now and share it privately. It won't be shown again.",
-    "tempCopy": "Copy",
-    "tempCopied": "Copied",
-    "tempDone": "I've shared it",
-    "devNoPassword": "In this test environment people sign in with their email only. No password needed.",
+    "added": "Done: {email} was added to {company}.",
     "roleChanged": "{email} is now: {role}.",
     "accessOff": "{email} can no longer sign in.",
     "accessOn": "{email} can sign in again.",
@@ -1861,7 +1855,10 @@
       "TARGET_ABOVE": "Only an administrator can change another administrator. Ask one.",
       "ROLE_NOT_ALLOWED": "Your role can't grant that permission. Ask an administrator to do it.",
       "CONFLICT": "That email already has access to Cifra. Find it in the list or use another email.",
-      "VALIDATION_ERROR": "Check the email: it doesn't look valid."
+      "VALIDATION_ERROR": "Check the email: it doesn't look valid.",
+      "welcomeFailed": "The welcome email could not be sent. Try again in a few minutes.",
+      "inactiveUser": "This person has no active access. Turn access on before resending the email.",
+      "tooManyAttempts": "Too many attempts. Wait a few minutes and try again."
     },
     "auditTitle": "Recent changes",
     "auditHelp": "Who added people, turned access off or changed roles. Passwords are never stored.",
@@ -1871,7 +1868,16 @@
       "USER_DEACTIVATED": "{actor} turned off access for {target}.",
       "USER_REACTIVATED": "{actor} restored access for {target}.",
       "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}."
-    }
+    },
+    "welcomeSent": "Welcome email sent to {email}.",
+    "welcomeFailed": "{email} was added, but the welcome email did not go out. Resend it.",
+    "welcomeHelp": "They get a code to create their Cifra password. The code expires in one hour; if they miss it, resend the email.",
+    "welcomeSkipped": "No emails are sent in this test environment: sign-in uses only the email, no password.",
+    "welcomeDone": "Got it",
+    "resend": "Resend email",
+    "resending": "Resending…",
+    "resent": "We resent the welcome email to {email}.",
+    "resendFailed": "The email could not be resent. Try again in a few minutes."
   },
   "loads": {
     "selectCompany": "Pick a company in the selector above to see its uploads.",
@@ -2004,5 +2010,14 @@
       "tagline": "Your numbers, made clear.",
       "endorsement": "A Data Frontier product"
     }
+  },
+  "setPassword": {
+    "title": "Set your password",
+    "help": "Enter your email, the 6-digit code from your welcome email and your new password.",
+    "submit": "Save password",
+    "emailFirst": "Enter your email first.",
+    "doneTitle": "Password ready",
+    "doneHelp": "You can now sign in to Cifra with {email} and the password you just created.",
+    "goLogin": "Go to sign in"
   }
 }

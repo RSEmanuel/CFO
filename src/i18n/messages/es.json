@@ -1845,13 +1845,7 @@
     },
     "add": "Agregar persona",
     "adding": "Agregando…",
-    "added": "Listo: {email} ya puede entrar a {company}.",
-    "tempTitle": "Contraseña temporal de {email}",
-    "tempHelp": "Cópiala ahora y compártela por un canal privado. No se vuelve a mostrar.",
-    "tempCopy": "Copiar",
-    "tempCopied": "Copiada",
-    "tempDone": "Ya la compartí",
-    "devNoPassword": "En este entorno de pruebas se entra solo con el correo. No hace falta contraseña.",
+    "added": "Listo: dimos de alta a {email} en {company}.",
     "roleChanged": "{email} ahora es: {role}.",
     "accessOff": "{email} ya no puede entrar.",
     "accessOn": "{email} puede volver a entrar.",
@@ -1861,7 +1855,10 @@
       "TARGET_ABOVE": "Solo un administrador puede cambiar a otro administrador. Pídeselo a uno.",
       "ROLE_NOT_ALLOWED": "Tu rol no puede dar ese permiso. Pide a un administrador que lo haga.",
       "CONFLICT": "Ese correo ya tiene acceso a Cifra. Búscalo en la lista o usa otro correo.",
-      "VALIDATION_ERROR": "Revisa el correo: no parece válido."
+      "VALIDATION_ERROR": "Revisa el correo: no parece válido.",
+      "welcomeFailed": "No se pudo enviar el correo de bienvenida. Intenta de nuevo en unos minutos.",
+      "inactiveUser": "Esa persona no tiene acceso activo. Dale acceso antes de reenviar el correo.",
+      "tooManyAttempts": "Demasiados intentos. Espera unos minutos y vuelve a intentar."
     },
     "auditTitle": "Cambios recientes",
     "auditHelp": "Quién agregó personas, quitó accesos o cambió roles. Nunca se guardan contraseñas.",
@@ -1871,7 +1868,16 @@
       "USER_DEACTIVATED": "{actor} le quitó el acceso a {target}.",
       "USER_REACTIVATED": "{actor} le devolvió el acceso a {target}.",
       "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to}."
-    }
+    },
+    "welcomeSent": "Correo de bienvenida enviado a {email}.",
+    "welcomeFailed": "Dimos de alta a {email}, pero el correo de bienvenida no salió. Reenvíalo.",
+    "welcomeHelp": "Le llega un código para crear su contraseña en Cifra. El código vence en una hora; si no lo usa a tiempo, reenvía el correo.",
+    "welcomeSkipped": "En este entorno de pruebas no se envían correos: se entra solo con el correo, sin contraseña.",
+    "welcomeDone": "Entendido",
+    "resend": "Reenviar correo",
+    "resending": "Reenviando…",
+    "resent": "Reenviamos el correo de bienvenida a {email}.",
+    "resendFailed": "No se pudo reenviar el correo. Intenta de nuevo en unos minutos."
   },
   "loads": {
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
@@ -2004,5 +2010,14 @@
       "tagline": "Tus cifras, en claro.",
       "endorsement": "Un producto de Data Frontier"
     }
+  },
+  "setPassword": {
+    "title": "Establece tu contraseña",
+    "help": "Escribe tu correo, el código de 6 dígitos que te llegó en el correo de bienvenida y tu nueva contraseña.",
+    "submit": "Guardar contraseña",
+    "emailFirst": "Escribe primero tu correo.",
+    "doneTitle": "Contraseña lista",
+    "doneHelp": "Ya puedes entrar a Cifra con {email} y la contraseña que acabas de crear.",
+    "goLogin": "Ir a iniciar sesión"
   }
 }

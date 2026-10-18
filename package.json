@@ -28,7 +28,7 @@
     "test:estado-operativo": "tsx --test src/services/estadoOperativo.test.ts",
     "test:ledger": "tsx --test src/services/metricsLedger.test.ts",
     "test:tenants": "tsx --test src/services/tenants/tenant.test.ts",
-    "test:admin": "tsx --test src/auth/rbac.test.ts",
+    "test:admin": "tsx --test src/auth/rbac.test.ts src/auth/welcomeEmail.test.ts",
     "seed:compac-history": "tsx scripts/seed-compac-history.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",

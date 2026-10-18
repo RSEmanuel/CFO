@@ -27,20 +27,28 @@ function errorMessageKey(error: unknown): string {
 /**
  * Dos pasos dentro de la tarjeta de login: pedir el código por correo y luego
  * capturar código + contraseña nueva. Al terminar regresa al login con el correo.
+ *
+ * variant="welcome" (pantalla /set-password del correo de bienvenida): empieza directo en el
+ * paso del código, pide también el correo y usa los textos de "Establece tu contraseña".
  */
 export function ForgotPasswordFlow({
   initialEmail,
+  initialCode = "",
+  variant = "reset",
   onDone,
   onCancel,
 }: {
   initialEmail: string;
+  initialCode?: string;
+  variant?: "reset" | "welcome";
   onDone: (email: string) => void;
   onCancel: () => void;
 }) {
   const { t } = useLocale();
-  const [step, setStep] = useState<"request" | "reset">("request");
+  const welcome = variant === "welcome";
+  const [step, setStep] = useState<"request" | "reset">(welcome ? "reset" : "request");
   const [email, setEmail] = useState(initialEmail);
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(initialCode);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -73,6 +81,10 @@ export function ForgotPasswordFlow({
   }
 
   async function onResend() {
+    if (welcome && !email.trim()) {
+      setError(t("setPassword.emailFirst"));
+      return;
+    }
     if (await requestCode()) {
       setNotice(t("auth.resetResent"));
     }
@@ -83,6 +95,10 @@ export function ForgotPasswordFlow({
     setError(null);
     setNotice(null);
 
+    if (welcome && !email.trim()) {
+      setError(t("setPassword.emailFirst"));
+      return;
+    }
     const cleanCode = code.replace(/\s/g, "");
     if (!/^[0-9]{6}$/.test(cleanCode)) {
       setError(t("auth.resetCodeFormat"));
@@ -162,14 +178,28 @@ export function ForgotPasswordFlow({
     <>
       <div className="flex flex-col gap-2">
         <h2 className="font-sans text-[26px] font-normal tracking-[-0.01em] text-foreground">
-          {t("auth.resetTitle")}
+          {welcome ? t("setPassword.title") : t("auth.resetTitle")}
         </h2>
         <p className="break-words text-sm leading-[1.5] text-muted-foreground">
-          {t("auth.resetHelp", { email })}
+          {welcome ? t("setPassword.help") : t("auth.resetHelp", { email })}
         </p>
       </div>
       <form className="flex flex-col gap-6" onSubmit={onReset}>
         <div className="flex flex-col gap-4">
+          {welcome ? (
+            <label className="flex flex-col gap-[7px]" htmlFor="reset-email">
+              <span className={LABEL_CLASS}>{t("auth.email")}</span>
+              <Input
+                id="reset-email"
+                type="email"
+                autoComplete="username"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                className="h-[46px] bg-background"
+              />
+            </label>
+          ) : null}
           <label className="flex flex-col gap-[7px]" htmlFor="reset-code">
             <span className={LABEL_CLASS}>{t("auth.resetCode")}</span>
             <Input
@@ -215,7 +245,7 @@ export function ForgotPasswordFlow({
         {feedback}
         <div className="flex flex-col gap-4">
           <button type="submit" disabled={pending} className={PRIMARY_BUTTON_CLASS}>
-            {pending ? t("auth.resetSubmitting") : t("auth.resetSubmit")}
+            {pending ? t("auth.resetSubmitting") : welcome ? t("setPassword.submit") : t("auth.resetSubmit")}
           </button>
           <button type="button" onClick={onResend} disabled={pending} className={LINK_BUTTON_CLASS}>
             {t("auth.resetResend")}

@@ -7,9 +7,9 @@ const SYMBOLS = "!@#$%*-_=+?";
 const ALL = UPPER + LOWER + DIGITS + SYMBOLS;
 
 /**
- * Contraseña temporal para altas desde el portal. Cumple la política por defecto
- * de Cognito (mayúscula, minúscula, número y símbolo) y evita caracteres que se
- * confunden al dictarla (0/O, 1/l/I). Se muestra una sola vez y nunca se guarda.
+ * Contraseña interna aleatoria para dar de alta en Cognito. Cumple la política por defecto
+ * (mayúscula, minúscula, número y símbolo). Nunca se muestra ni se guarda: la persona crea
+ * su contraseña con el código del correo de bienvenida.
  */
 export function generateTemporaryPassword(length = 16): string {
   const required = [UPPER, LOWER, DIGITS, SYMBOLS].map((set) => set[randomInt(set.length)]);
