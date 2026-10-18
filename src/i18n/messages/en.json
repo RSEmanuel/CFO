@@ -52,7 +52,8 @@
     "ingest": "Ingest",
     "simulator": "What-If Simulator",
     "settings": "Settings",
-    "loadControl": "Load history"
+    "loadControl": "Load history",
+    "errorLog": "Portal errors"
   },
   "auth": {
     "title": "Sign in",
@@ -1713,7 +1714,71 @@
     "COGNITO_CHALLENGE": "An additional authentication step is required.",
     "INTERNAL_ERROR": "An internal error occurred.",
     "prismaClientStale": "Cifra couldn't read the information right now. Try again in a few minutes.",
-    "generic": "Something went wrong."
+    "generic": "Something went wrong.",
+    "viewerOnly": "Only the Cifra team (admins and partners) can see portal errors.",
+    "tableTitle": "Logged errors",
+    "tableHelp": "Newest first. Open a row to see where it happened and its technical detail.",
+    "empty": "No errors match these filters.",
+    "loadFailed": "Errors could not be loaded. Reload the page.",
+    "updateFailed": "The error could not be updated. Try again.",
+    "markedResolved": "Error marked as resolved.",
+    "markedPending": "Error marked as pending.",
+    "markResolved": "Mark resolved",
+    "markPending": "Mark pending",
+    "pageOf": "Page {page} of {pages}",
+    "prev": "Previous",
+    "next": "Next",
+    "kpis": {
+      "last24h": "Last 24 hours",
+      "unresolved": "Unresolved",
+      "total": "Total in period"
+    },
+    "filters": {
+      "status": "Status",
+      "source": "Source",
+      "severity": "Severity",
+      "company": "Company",
+      "from": "From",
+      "to": "To",
+      "search": "Search",
+      "searchPlaceholder": "Message text",
+      "all": "All",
+      "allCompanies": "All companies"
+    },
+    "status": {
+      "all": "All",
+      "unresolved": "Unresolved",
+      "resolved": "Resolved"
+    },
+    "source": {
+      "client": "Browser",
+      "server": "Server"
+    },
+    "severity": {
+      "error": "Error",
+      "warn": "Warning"
+    },
+    "columns": {
+      "date": "Date and time",
+      "source": "Source",
+      "severity": "Severity",
+      "message": "Message",
+      "company": "Company",
+      "user": "User",
+      "status": "Status"
+    },
+    "detail": {
+      "url": "Where",
+      "digest": "Digest",
+      "userAgent": "Browser",
+      "resolvedBy": "Resolved by",
+      "noStack": "No technical detail."
+    },
+    "boundary": {
+      "title": "Something failed on this screen",
+      "message": "Cifra logged the error for review. Reload the page to keep working.",
+      "reload": "Reload page"
+    }
   },
   "emptyStates": {
     "noSource": "The selected company does not have this data source."

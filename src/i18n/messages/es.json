@@ -52,7 +52,8 @@
     "ingest": "Ingesta",
     "simulator": "Simulador What-If",
     "settings": "Configuración",
-    "loadControl": "Control de cargas"
+    "loadControl": "Control de cargas",
+    "errorLog": "Errores del portal"
   },
   "auth": {
     "title": "Iniciar sesión",
@@ -1713,7 +1714,71 @@
     "COGNITO_CHALLENGE": "Se requiere un paso adicional de autenticación.",
     "INTERNAL_ERROR": "Ocurrió un error interno.",
     "prismaClientStale": "Cifra no pudo leer la información en este momento. Intenta de nuevo en unos minutos.",
-    "generic": "Ocurrió un error."
+    "generic": "Ocurrió un error.",
+    "viewerOnly": "Solo el equipo de Cifra (administración y socios) puede ver los errores del portal.",
+    "tableTitle": "Errores registrados",
+    "tableHelp": "Del más reciente al más antiguo. Abre un renglón para ver dónde ocurrió y su detalle técnico.",
+    "empty": "No hay errores con estos filtros.",
+    "loadFailed": "No se pudieron cargar los errores. Recarga la página.",
+    "updateFailed": "No se pudo actualizar el error. Intenta de nuevo.",
+    "markedResolved": "Error marcado como resuelto.",
+    "markedPending": "Error marcado como pendiente.",
+    "markResolved": "Marcar resuelto",
+    "markPending": "Marcar pendiente",
+    "pageOf": "Página {page} de {pages}",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "kpis": {
+      "last24h": "Últimas 24 horas",
+      "unresolved": "Sin resolver",
+      "total": "Total del periodo"
+    },
+    "filters": {
+      "status": "Estado",
+      "source": "Origen",
+      "severity": "Severidad",
+      "company": "Empresa",
+      "from": "Desde",
+      "to": "Hasta",
+      "search": "Buscar",
+      "searchPlaceholder": "Texto del mensaje",
+      "all": "Todos",
+      "allCompanies": "Todas las empresas"
+    },
+    "status": {
+      "all": "Todos",
+      "unresolved": "Sin resolver",
+      "resolved": "Resuelto"
+    },
+    "source": {
+      "client": "Navegador",
+      "server": "Servidor"
+    },
+    "severity": {
+      "error": "Error",
+      "warn": "Aviso"
+    },
+    "columns": {
+      "date": "Fecha y hora",
+      "source": "Origen",
+      "severity": "Severidad",
+      "message": "Mensaje",
+      "company": "Empresa",
+      "user": "Usuario",
+      "status": "Estado"
+    },
+    "detail": {
+      "url": "Dónde",
+      "digest": "Digest",
+      "userAgent": "Navegador",
+      "resolvedBy": "Resuelto por",
+      "noStack": "Sin detalle técnico."
+    },
+    "boundary": {
+      "title": "Algo falló en esta pantalla",
+      "message": "Cifra registró el error para revisarlo. Recarga la página para seguir trabajando.",
+      "reload": "Recargar página"
+    }
   },
   "emptyStates": {
     "noSource": "La empresa seleccionada no tiene esta fuente de datos."

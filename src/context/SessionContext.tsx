@@ -2,6 +2,7 @@
 
 import { ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, apiRequest } from "@/lib/api";
 import { DEV_PARTNER_EMAIL, isClientDevAuthBypass } from "@/lib/dev-flags";
+import { setErrorReportTenant } from "@/lib/report-client-error";
 import type { PeriodView, SessionUser, TenantOption } from "@/lib/session-types";
 import type { LedgerPeriodPayload } from "@/services/ledgerPeriodService";
 import { useRouter } from "next/navigation";
@@ -45,6 +46,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [periodsLoading, setPeriodsLoading] = useState(false);
   const [periodRefreshKey, setPeriodRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
+
+  // Los errores del navegador se atribuyen a la empresa que se está consultando.
+  useEffect(() => {
+    setErrorReportTenant(tenantId);
+  }, [tenantId]);
 
   const refreshMe = useCallback(async () => {
     const me = await apiRequest<SessionUser>("/api/auth/me");

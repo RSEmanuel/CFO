@@ -1,5 +1,6 @@
 "use client";
 
+import { ErrorBoundary } from "@/components/error-boundary";
 import { FavoritesProvider } from "@/context/FavoritesContext";
 import { LocaleProvider } from "@/context/LocaleContext";
 import { SessionProvider } from "@/context/SessionContext";
@@ -8,13 +9,15 @@ import type { ReactNode } from "react";
 
 export function AppProviders({ children }: { children: ReactNode }) {
   return (
-    <SessionProvider>
-      <LocaleProvider>
-        <FavoritesProvider>
-          {children}
-          <Toaster />
-        </FavoritesProvider>
-      </LocaleProvider>
-    </SessionProvider>
+    <ErrorBoundary>
+      <SessionProvider>
+        <LocaleProvider>
+          <FavoritesProvider>
+            {children}
+            <Toaster />
+          </FavoritesProvider>
+        </LocaleProvider>
+      </SessionProvider>
+    </ErrorBoundary>
   );
 }
