@@ -35,7 +35,8 @@ const ZONE_FILL: Record<RatioGaugeZone, string> = {
   green: "var(--cifra-good)",
 };
 
-const GAUGE_IDS: RatioGaugeId[] = ["currentRatio", "operatingMargin", "roe", "dso"];
+// ROE no lleva tarjeta: sigue en la tabla de razones de abajo.
+const GAUGE_IDS: RatioGaugeId[] = ["currentRatio", "operatingMargin", "dso"];
 
 const GAUGE_FORMAT: Record<RatioGaugeId, "x" | "pct" | "days"> = {
   currentRatio: "x",
@@ -94,18 +95,21 @@ function RatioBullet({
     zone == null ? t("posicionFinanciera.gauges.na") : t(`posicionFinanciera.gauges.zones.${zone}`);
 
   return (
-    <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+    <article className="flex h-full flex-col rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className="font-sans text-base font-bold tracking-tight text-foreground">{title}</h3>
-          <InsightText text={t(`posicionFinanciera.gauges.insights.${id}`)} />
+          {/* Alto fijo de tres renglones: la gráfica empieza a la misma altura en todas las tarjetas. */}
+          <div className="min-h-[4.5rem]">
+            <InsightText text={t(`posicionFinanciera.gauges.insights.${id}`)} />
+          </div>
         </div>
         <p className="financial-nums text-lg font-semibold tabular-nums text-foreground">{formatted}</p>
       </div>
       {value == null ? (
-        <p className="mt-6 text-sm text-muted-foreground">{t("posicionFinanciera.gauges.na")}</p>
+        <p className="mt-auto flex h-[80px] items-center text-sm text-muted-foreground">{t("posicionFinanciera.gauges.na")}</p>
       ) : (
-        <div className="mt-3 h-[80px] w-full">
+        <div className="mt-auto h-[80px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} layout="vertical" margin={{ top: 6, right: 12, left: 4, bottom: 2 }} barCategoryGap={0}>
               <XAxis
@@ -181,7 +185,7 @@ export function RatioGaugeGrid({ nodes, yearKey, loading, empty }: RatioGaugeGri
         <p className="mt-1 text-sm text-muted-foreground">{t("posicionFinanciera.gauges.help")}</p>
       </div>
       {loading ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {GAUGE_IDS.map((id) => (
             <div key={id} className="h-36 animate-pulse rounded-card bg-muted" />
           ))}
@@ -191,7 +195,7 @@ export function RatioGaugeGrid({ nodes, yearKey, loading, empty }: RatioGaugeGri
           {t("posicionFinanciera.gauges.empty")}
         </p>
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           {GAUGE_IDS.map((id) => (
             <RatioBullet
               key={id}
