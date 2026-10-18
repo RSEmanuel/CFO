@@ -94,7 +94,6 @@ describe("i18n catalogs", () => {
       "ingesta.commitBlockedProfile",
       "nav.control",
       "control.title",
-      "control.subtitle",
       "control.emptyTitle",
       "control.emptyMessage",
       "control.emptyCta",

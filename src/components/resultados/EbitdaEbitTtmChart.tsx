@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
@@ -20,6 +21,7 @@ import {
   YAxis,
 } from "recharts";
 import { useNarrowScreen } from "@/hooks/use-narrow-screen";
+import { cn } from "@/lib/utils";
 
 /**
  * EBITDA vs EBIT — barras agrupadas TTM (tab Estado Operativo, arriba de la
@@ -100,44 +102,51 @@ export function EbitdaEbitTtmChart({
   }
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-3">
-        <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.ttm.title")}</h3>
-        <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ebitdaEbitTtm} label={t("resultados.operativo.ttm.title")} />
-      </div>
-      <InsightText text={insightText ?? t("resultados.operativo.ttm.help")} />
-      <div className="mt-4 h-[320px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} barCategoryGap="22%" barGap={3} margin={{ top: 12, right: 16, left: 8, bottom: 4 }}>
-            <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
-            <XAxis
-              dataKey="mesLabel"
-              interval={narrow ? "preserveStartEnd" : 0}
-              minTickGap={narrow ? 12 : 5}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-              axisLine={{ stroke: CHART_AXIS.stroke }}
-              tickLine={false}
-            />
-            <YAxis
-              width={64}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: number) => formatCompactAxis(value)}
-            />
-            <Tooltip cursor={{ fill: "rgb(196 93 62 / 0.06)" }} content={<TtmTooltip />} />
-            <Legend
-              formatter={(value: string) =>
-                value === "ebitda" ? t("resultados.operativo.ttm.seriesEbitda") : t("resultados.operativo.ttm.seriesEbit")
-              }
-              wrapperStyle={{ fontSize: 12 }}
-            />
-            <ReferenceLine y={0} stroke="var(--cifra-ink-3)" strokeDasharray="3 3" />
-            <Bar dataKey="ebitda" fill={COLOR_EBITDA} radius={[3, 3, 0, 0]} isAnimationActive={false} />
-            <Bar dataKey="ebit" fill={COLOR_EBIT} radius={[3, 3, 0, 0]} isAnimationActive={false} />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </section>
+    <ExpandableShell className="p-6">
+      {(toggle, expanded) => (
+        <>
+          <div className="flex items-start justify-between gap-3">
+            <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.ttm.title")}</h3>
+            <div className="flex shrink-0 items-center gap-1">
+              <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ebitdaEbitTtm} label={t("resultados.operativo.ttm.title")} />
+              {toggle}
+            </div>
+          </div>
+          <InsightText text={insightText ?? t("resultados.operativo.ttm.help")} />
+          <div className={cn("mt-4 w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[320px]")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={data} barCategoryGap="22%" barGap={3} margin={{ top: 12, right: 16, left: 8, bottom: 4 }}>
+                <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
+                <XAxis
+                  dataKey="mesLabel"
+                  interval={narrow ? "preserveStartEnd" : 0}
+                  minTickGap={narrow ? 12 : 5}
+                  tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                  axisLine={{ stroke: CHART_AXIS.stroke }}
+                  tickLine={false}
+                />
+                <YAxis
+                  width={64}
+                  tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value: number) => formatCompactAxis(value)}
+                />
+                <Tooltip cursor={{ fill: "rgb(196 93 62 / 0.06)" }} content={<TtmTooltip />} />
+                <Legend
+                  formatter={(value: string) =>
+                    value === "ebitda" ? t("resultados.operativo.ttm.seriesEbitda") : t("resultados.operativo.ttm.seriesEbit")
+                  }
+                  wrapperStyle={{ fontSize: 12 }}
+                />
+                <ReferenceLine y={0} stroke="var(--cifra-ink-3)" strokeDasharray="3 3" />
+                <Bar dataKey="ebitda" fill={COLOR_EBITDA} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+                <Bar dataKey="ebit" fill={COLOR_EBIT} radius={[3, 3, 0, 0]} isAnimationActive={false} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
+    </ExpandableShell>
   );
 }

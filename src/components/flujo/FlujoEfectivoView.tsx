@@ -1,11 +1,13 @@
 "use client";
 
 import { ChartErrorBoundary } from "@/components/chart-error-boundary";
+import { ExpandableShell, useChartExpanded } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { FlujoEfectivoSankey } from "@/components/flujo/FlujoEfectivoSankey";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocale } from "@/context/LocaleContext";
+import { cn } from "@/lib/utils";
 import { useFlujoEfectivo } from "@/hooks/use-flujo-efectivo";
 import { CHART, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import type { FlujoEfectivoPeriodo, FlujoLinea } from "@/services/flujoEfectivo";
@@ -30,6 +32,7 @@ function FlujoEfectivoWaterfallFallback({
   units: DisplayUnits;
 }) {
   const { t } = useLocale();
+  const expanded = useChartExpanded();
   const rows = [
     { name: t("flujo.efectivo.saldoInicial"), base: 0, amount: data.saldoInicial, kind: "total" },
     {
@@ -54,7 +57,7 @@ function FlujoEfectivoWaterfallFallback({
         ? WATERFALL_TONE.loss
         : WATERFALL_TONE.profit;
   return (
-    <ResponsiveContainer width="100%" height={380}>
+    <ResponsiveContainer width="100%" height={expanded ? "100%" : 380}>
       <BarChart data={rows} margin={{ top: 16, right: 24, bottom: 8, left: 8 }}>
         <XAxis
           dataKey="name"
@@ -144,42 +147,47 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
   const hasTraspasos = flujo.traspasos > 0;
 
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
-        <div>
-          <CardTitle>{t("flujo.efectivo.mapaTitle")}</CardTitle>
-          <CardDescription>{t("flujo.efectivo.mapaHelp")}</CardDescription>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <FavoriteStarButton widgetId="chart-sankey" label={t("flujo.efectivo.mapaTitle")} />
-          {hasTraspasos ? (
-            <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={excluirTraspasos}
-                onChange={(event) => setExcluirTraspasos(event.target.checked)}
-                className="h-4 w-4 accent-[var(--cifra-brand)]"
-              />
-              {t("flujo.efectivo.excluirTraspasos")}
-            </label>
-          ) : null}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[540px] min-h-[540px] w-full">
-          <ChartErrorBoundary fallback={<FlujoEfectivoWaterfallFallback data={flujo} units={units} />}>
-            {chartLineas.ingresos.length > 0 && chartLineas.egresos.length > 0 ? (
-              <FlujoEfectivoSankey
-                ingresos={chartLineas.ingresos}
-                egresos={chartLineas.egresos}
-                units={units}
-              />
-            ) : (
-              <FlujoEfectivoWaterfallFallback data={flujo} units={units} />
-            )}
-          </ChartErrorBoundary>
-        </div>
-      </CardContent>
-    </Card>
+    <ExpandableShell className="w-full">
+      {(toggle, expanded) => (
+        <>
+          <CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
+            <div>
+              <CardTitle>{t("flujo.efectivo.mapaTitle")}</CardTitle>
+              <CardDescription>{t("flujo.efectivo.mapaHelp")}</CardDescription>
+            </div>
+            <div className="flex shrink-0 items-center gap-2">
+              <FavoriteStarButton widgetId="chart-sankey" label={t("flujo.efectivo.mapaTitle")} />
+              {hasTraspasos ? (
+                <label className="flex shrink-0 cursor-pointer items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={excluirTraspasos}
+                    onChange={(event) => setExcluirTraspasos(event.target.checked)}
+                    className="h-4 w-4 accent-[var(--cifra-brand)]"
+                  />
+                  {t("flujo.efectivo.excluirTraspasos")}
+                </label>
+              ) : null}
+              {toggle}
+            </div>
+          </CardHeader>
+          <CardContent className={cn(expanded && "flex min-h-0 flex-1 flex-col")}>
+            <div className={cn("w-full", expanded ? "min-h-0 flex-1" : "h-[540px] min-h-[540px]")}>
+              <ChartErrorBoundary fallback={<FlujoEfectivoWaterfallFallback data={flujo} units={units} />}>
+                {chartLineas.ingresos.length > 0 && chartLineas.egresos.length > 0 ? (
+                  <FlujoEfectivoSankey
+                    ingresos={chartLineas.ingresos}
+                    egresos={chartLineas.egresos}
+                    units={units}
+                  />
+                ) : (
+                  <FlujoEfectivoWaterfallFallback data={flujo} units={units} />
+                )}
+              </ChartErrorBoundary>
+            </div>
+          </CardContent>
+        </>
+      )}
+    </ExpandableShell>
   );
 }

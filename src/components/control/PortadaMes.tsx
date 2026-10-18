@@ -1,6 +1,5 @@
 "use client";
 
-import { CifraMark } from "@/components/brand/CifraMark";
 import { useLocale } from "@/context/LocaleContext";
 import { useCajaRespiro } from "@/hooks/use-caja-respiro";
 import { useCobranza } from "@/hooks/use-cobranza";
@@ -165,9 +164,11 @@ export function PortadaMes({ periodo }: { periodo: string }) {
             className="rounded-control border border-border bg-background p-4 transition-colors hover:border-clay focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <p className="text-xs font-medium text-muted-foreground">{tarjeta.label}</p>
-            <p className="cifra-num mt-2 text-2xl font-semibold tracking-tight text-foreground">{tarjeta.valor}</p>
-            <p className="mt-1 flex items-start gap-1.5 text-xs text-muted-foreground">
-              <CifraMark state={tarjeta.sello} size={14} className="mt-px shrink-0" />
+            <p className="cifra-num mt-2 text-2xl font-semibold tracking-tight text-foreground xl:text-base 2xl:text-lg">{tarjeta.valor}</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {tarjeta.sello === "estimated" ? (
+                <span className="font-medium">{t("control.portada.sello.estimada")} · </span>
+              ) : null}
               {tarjeta.detalle}
             </p>
           </Link>

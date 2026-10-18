@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { useLocale } from "@/context/LocaleContext";
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
@@ -64,7 +65,9 @@ export function SimulatorCharts({ baseline, sim, units }: SimulatorChartsProps) 
   );
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+    <ExpandableShell className="p-6">
+      {(toggle, expanded) => (
+      <>
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-sans text-xl font-medium text-foreground">
@@ -74,6 +77,7 @@ export function SimulatorCharts({ baseline, sim, units }: SimulatorChartsProps) 
             {view === "compare" ? t("simulator.chart.compareHelp") : t("simulator.chart.tornadoHelp")}
           </p>
         </div>
+        <div className="flex items-center gap-1">
         <div className="inline-flex h-9 items-center rounded-control border border-input bg-card p-0.5">
           {(["compare", "tornado"] as const).map((option) => (
             <button
@@ -92,9 +96,11 @@ export function SimulatorCharts({ baseline, sim, units }: SimulatorChartsProps) 
             </button>
           ))}
         </div>
+        {toggle}
+        </div>
       </div>
 
-      <div className="h-[320px] w-full min-w-0">
+      <div className={cn("w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[320px]")}>
         {view === "compare" ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={compareData} margin={{ top: 16, right: 12, left: 8, bottom: 0 }} barGap={6}>
@@ -153,6 +159,8 @@ export function SimulatorCharts({ baseline, sim, units }: SimulatorChartsProps) 
           </ResponsiveContainer>
         )}
       </div>
-    </section>
+      </>
+      )}
+    </ExpandableShell>
   );
 }

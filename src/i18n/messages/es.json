@@ -47,7 +47,7 @@
     "position": "Posición Financiera",
     "cashflow": "Flujo",
     "collections": "Cobranza",
-    "metrics": "Catálogo de métricas",
+    "metrics": "Métricas financieras",
     "control": "Panel de Control",
     "ingest": "Ingesta",
     "simulator": "Simulador What-If",
@@ -104,7 +104,6 @@
     "resetFailed": "No se pudo completar. Intenta de nuevo."
   },
   "settings": {
-    "intro": "Empresas y usuarios del portafolio. Cada empresa ve solo su propia información.",
     "languageTitle": "Idioma del portal",
     "languageHelp": "Selecciona el idioma utilizado en menús, métricas y mensajes del portal.",
     "languageAria": "Idioma del portal",
@@ -193,7 +192,7 @@
     "verticalAnalysis": "Análisis vertical",
     "pctOfRevenue": "% sobre ventas",
     "others": "Otros",
-    "goToCatalog": "Abrir catálogo de métricas",
+    "goToCatalog": "Abrir métricas financieras",
     "cost": "Costo",
     "expense": "Gasto",
     "ebitda": "EBITDA",
@@ -774,7 +773,6 @@
     },
     "libre": {
       "title": "De la utilidad al efectivo",
-      "subtitle": "Conciliación: ¿Por qué la utilidad no es igual al dinero en el banco? Muestra cómo los créditos a clientes y deudas a proveedores afectan tu liquidez real.",
       "estimated": "Cifra calculó este puente con la variación mensual de la balanza. No es el estado de cuenta del banco.",
       "emptyTitle": "Flujo libre aún no disponible",
       "emptyMessage": "Carga la balanza de comprobación de este mes en Ingesta para armar la conciliación.",
@@ -1045,10 +1043,9 @@
   },
   "control": {
     "title": "Panel de Control Ejecutivo",
-    "subtitle": "Métricas prioritarias y visualizaciones fijadas por la dirección financiera",
     "emptyTitle": "Tu Panel de Control está vacío",
     "emptyMessage": "Fija KPIs, gráficos y tablas con la estrella en cualquier módulo para construir tu vista ejecutiva aquí.",
-    "emptyCta": "Ir al catálogo de métricas",
+    "emptyCta": "Ir a métricas financieras",
     "emptyCtaResults": "Ir a Resultados",
     "emptyCtaFlujo": "Ir a Flujo",
     "emptyCtaCobranza": "Ir a Cobranza",
@@ -1058,7 +1055,7 @@
       "FLUJO": "Flujo y Tesorería",
       "COBRANZA": "Cobranza y Cartera",
       "POSICION": "Posición Financiera",
-      "METRICAS": "Otras Métricas del Catálogo"
+      "METRICAS": "Otras métricas financieras"
     },
     "portada": {
       "titulo": "{mes}: así cerró tu mes",
@@ -1077,6 +1074,9 @@
         "label": "Tu caja",
         "fuente": "Cajas y bancos de tu balanza al cierre del mes.",
         "sinDato": "Tu balanza no trae cuentas de caja y bancos."
+      },
+      "sello": {
+        "estimada": "Estimada"
       },
       "respiro": {
         "label": "Meses de respiro",
@@ -1108,7 +1108,6 @@
   },
   "simulator": {
     "title": "Simulador de Sensibilidad & Escenarios What-If",
-    "subtitle": "Proyecta el P&L, la caja y el capital de trabajo del periodo moviendo seis drivers; la línea base es el cierre contable real.",
     "loadError": "No se pudo cargar la línea base del simulador",
     "units": {
       "days": "días",
@@ -1117,7 +1116,6 @@
     },
     "drivers": {
       "title": "Drivers del escenario",
-      "subtitle": "Mueve los controles para simular; la línea base sigue al periodo activo.",
       "groups": {
         "commercial": "Estrategia Comercial",
         "efficiency": "Eficiencia Operativa",
@@ -1218,15 +1216,14 @@
     }
   },
   "metrics": {
-    "emptyTitle": "Catálogo aún no disponible",
+    "emptyTitle": "Métricas financieras aún no disponibles",
     "emptyMessage": "Carga una balanza para calcular las 50 métricas.",
     "loadError": "No se pudieron cargar las métricas",
     "loading": "Cargando métricas",
     "eyebrow": "Inteligencia financiera",
-    "intro": "50 indicadores para entender rentabilidad, eficiencia, liquidez y creación de valor.",
     "available": "{count} de {total} con dato este mes",
     "retry": "Reintentar",
-    "highlights": "Destacados",
+    "highlights": "Favoritos",
     "customizeHelp": "Marca con una estrella cualquier métrica o gráfico para personalizar este panel.",
     "favorites": "Métricas favoritas",
     "none": "No hay métricas para el corte seleccionado.",
@@ -1681,6 +1678,8 @@
     }
   },
   "charts": {
+    "expand": "Ampliar gráfica",
+    "collapse": "Cerrar",
     "copyInsight": "Copiar insight",
     "copied": "Insight copiado",
     "downloadChart": "Descargar gráfica",
@@ -1737,7 +1736,6 @@
     "columns": "Columnas"
   },
   "users": {
-    "intro": "Quién puede entrar a {company} y qué puede hacer.",
     "selectCompany": "Elige una empresa en el selector de arriba para ver a sus personas.",
     "viewerOnly": "Esta sección es para administradores. Pide a tu administrador cualquier cambio de acceso.",
     "loadFailed": "No pudimos cargar la lista de personas. Recarga la página para intentarlo de nuevo.",
@@ -1801,7 +1799,6 @@
     }
   },
   "loads": {
-    "intro": "Cada archivo que se subió a {company}: quién, cuándo y si de verdad quedó en tus cifras.",
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
     "viewerOnly": "Esta sección es para quien sube archivos. Pide a tu administrador cualquier duda sobre las cargas.",
     "loadFailed": "No pudimos leer el historial. Recarga la página para intentarlo de nuevo.",

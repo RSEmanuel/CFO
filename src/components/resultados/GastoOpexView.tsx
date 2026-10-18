@@ -9,11 +9,13 @@ import type { BudgetProjectionPayload } from "@/services/budgetProjectionService
 import type { MonthlyFinancials } from "@/services/financialDataTransformer";
 import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
 import { OTROS_KEY, type Top5ChartSeries, type Top5EntitySeries } from "@/services/resultadosTop5";
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { GastoControlCard } from "@/components/resultados/GastoControlCard";
 import { GastoOpexTreemap } from "@/components/resultados/GastoOpexTreemap";
 import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
+import { cn } from "@/lib/utils";
 import { Receipt } from "lucide-react";
 import { useMemo } from "react";
 import {
@@ -245,95 +247,107 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows,
         </>
       )}
 
-      <section className="flex flex-col gap-6 rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)] md:flex-row">
-        <div className="flex w-full min-w-0 flex-col md:w-[40%]">
-          <div className="mb-4 flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-              <Receipt className="h-4 w-4" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.opex.title")}</h2>
-              <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                {t("resultados.monthly")} | {units.toUpperCase()} | MXN
+      <ExpandableShell className="flex flex-col gap-6 p-6 md:flex-row">
+        {(toggle, expanded) => (
+          <>
+            <div className="flex w-full min-w-0 flex-col md:w-[40%]">
+              <div className="mb-4 flex items-center gap-2">
+                <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+                  <Receipt className="h-4 w-4" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.opex.title")}</h2>
+                  <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+                    {t("resultados.monthly")} | {units.toUpperCase()} | MXN
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.serieGasto} label={t("resultados.opex.title")} />
+                  {toggle}
+                </div>
+              </div>
+              <p className="financial-nums text-4xl font-semibold tracking-tight">
+                {formatAxisTick(data.totalOpex, units)}
               </p>
+              {Object.prototype.hasOwnProperty.call(data.totalesPorMes, comparablePeriod) ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal ?? 0, units)}
+                </p>
+              ) : null}
+
+              <h3 className="mb-3 mt-6 font-sans text-lg font-medium text-foreground">
+                {t("resultados.opex.mainItems")}
+              </h3>
+              {actors.length === 0 ? (
+                <p className="text-sm text-muted-foreground">{t("resultados.opex.empty")}</p>
+              ) : (
+                <ul className="space-y-2">
+                  {actors.map((actor, index) => (
+                    <li key={actor.key} className="flex items-center gap-2 text-sm">
+                      <span
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor: seriesColor(index, actor.key),
+                          ...(actor.key === OTROS_KEY ? { outline: `1px dashed ${TOP5_RESTO}` } : {}),
+                        }}
+                      />
+                      <span className="min-w-0 flex-1 truncate text-foreground" title={actor.label || restLabel}>
+                        {actor.label || restLabel}
+                      </span>
+                      <span className="financial-nums text-muted-foreground">{formatMxn(actor.monto)}</span>
+                      <span className="financial-nums w-14 text-right font-medium text-foreground">
+                        {pctOf(actor.monto).toFixed(1)}%
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.serieGasto} label={t("resultados.opex.title")} />
-          </div>
-          <p className="financial-nums text-4xl font-semibold tracking-tight">
-            {formatAxisTick(data.totalOpex, units)}
-          </p>
-          {Object.prototype.hasOwnProperty.call(data.totalesPorMes, comparablePeriod) ? (
-            <p className="mt-2 text-xs text-muted-foreground">
-              {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal ?? 0, units)}
-            </p>
-          ) : null}
 
-          <h3 className="mb-3 mt-6 font-sans text-lg font-medium text-foreground">
-            {t("resultados.opex.mainItems")}
-          </h3>
-          {actors.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("resultados.opex.empty")}</p>
-          ) : (
-            <ul className="space-y-2">
-              {actors.map((actor, index) => (
-                <li key={actor.key} className="flex items-center gap-2 text-sm">
-                  <span
-                    className="h-2.5 w-2.5 shrink-0 rounded-full"
-                    style={{
-                      backgroundColor: seriesColor(index, actor.key),
-                      ...(actor.key === OTROS_KEY ? { outline: `1px dashed ${TOP5_RESTO}` } : {}),
-                    }}
+            <div
+              className={cn(
+                "w-full min-w-0 md:w-[60%]",
+                expanded ? "min-h-[320px] flex-1 md:min-h-0 md:flex-initial" : "h-[320px] md:h-[360px]",
+              )}
+            >
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
+                  <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
+                  <XAxis
+                    dataKey="month"
+                    tick={<OpexXTick units={units} totalsByMonth={totalsByMonth} chartData={chartData} />}
+                    axisLine={{ stroke: CHART.mute, opacity: 0.3 }}
+                    tickLine={false}
+                    interval={0}
+                    height={72}
                   />
-                  <span className="min-w-0 flex-1 truncate text-foreground" title={actor.label || restLabel}>
-                    {actor.label || restLabel}
-                  </span>
-                  <span className="financial-nums text-muted-foreground">{formatMxn(actor.monto)}</span>
-                  <span className="financial-nums w-14 text-right font-medium text-foreground">
-                    {pctOf(actor.monto).toFixed(1)}%
-                  </span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="h-[320px] w-full min-w-0 md:h-[360px] md:w-[60%]">
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData} margin={{ top: 8, right: 12, bottom: 4, left: 4 }}>
-              <CartesianGrid stroke={CHART_AXIS.stroke} vertical={false} />
-              <XAxis
-                dataKey="month"
-                tick={<OpexXTick units={units} totalsByMonth={totalsByMonth} chartData={chartData} />}
-                axisLine={{ stroke: CHART.mute, opacity: 0.3 }}
-                tickLine={false}
-                interval={0}
-                height={72}
-              />
-              <YAxis
-                tick={{ fill: CHART.mute, fontSize: 11 }}
-                tickFormatter={(value: number) => formatAxisTick(Number(value), units)}
-                axisLine={false}
-                tickLine={false}
-                width={56}
-              />
-              <Tooltip content={<OpexTooltip totalLabel={t("resultados.opex.total")} names={names} />} />
-              {actors.map((actor, index) => (
-                <Line
-                  key={actor.key}
-                  type="monotone"
-                  dataKey={actor.key}
-                  name={actor.label || restLabel}
-                  stroke={seriesColor(index, actor.key)}
-                  strokeWidth={actor.key === OTROS_KEY ? 1.5 : 2}
-                  strokeDasharray={actor.key === OTROS_KEY ? "3 3" : undefined}
-                  dot={actor.key === OTROS_KEY ? { r: 2 } : { r: 3 }}
-                  isAnimationActive={false}
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
-        </div>
-      </section>
+                  <YAxis
+                    tick={{ fill: CHART.mute, fontSize: 11 }}
+                    tickFormatter={(value: number) => formatAxisTick(Number(value), units)}
+                    axisLine={false}
+                    tickLine={false}
+                    width={56}
+                  />
+                  <Tooltip content={<OpexTooltip totalLabel={t("resultados.opex.total")} names={names} />} />
+                  {actors.map((actor, index) => (
+                    <Line
+                      key={actor.key}
+                      type="monotone"
+                      dataKey={actor.key}
+                      name={actor.label || restLabel}
+                      stroke={seriesColor(index, actor.key)}
+                      strokeWidth={actor.key === OTROS_KEY ? 1.5 : 2}
+                      strokeDasharray={actor.key === OTROS_KEY ? "3 3" : undefined}
+                      dot={actor.key === OTROS_KEY ? { r: 2 } : { r: 3 }}
+                      isAnimationActive={false}
+                    />
+                  ))}
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </>
+        )}
+      </ExpandableShell>
 
       {only === "series" ? null : <GastoOpexTreemap periodo={data.periodo} treemap={data.treemap} />}
     </div>

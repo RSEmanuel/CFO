@@ -2,6 +2,7 @@
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
 import { ChartInsightCopy } from "@/components/charts/ChartInsightCopy";
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { HeroBarChart, TIME_COMPARE_COLORS } from "@/components/charts/HeroBarChart";
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
@@ -54,78 +55,83 @@ export function CostoMixCompareChart({
   ];
 
   return (
-    <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.costVsIncome")}</h3>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
-            {MODE_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setMode(option.value)}
-                className={cn(
-                  "h-9 min-w-9 rounded-control px-3 text-sm font-medium transition-colors",
-                  mode === option.value
-                    ? "bg-secondary text-clay shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-                aria-pressed={mode === option.value}
-              >
-                {t(option.labelKey)}
-              </button>
-            ))}
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.costVsIncome")}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
+                {MODE_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setMode(option.value)}
+                    className={cn(
+                      "h-9 min-w-9 rounded-control px-3 text-sm font-medium transition-colors",
+                      mode === option.value
+                        ? "bg-secondary text-clay shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                    aria-pressed={mode === option.value}
+                  >
+                    {t(option.labelKey)}
+                  </button>
+                ))}
+              </div>
+              <ChartDownloadButton
+                targetRef={chartRef}
+                empresa={tenantName}
+                modulo="resultados"
+                titulo={t("resultados.costVsIncome")}
+                periodo={periodo}
+              />
+              {toggle}
+            </div>
           </div>
-          <ChartDownloadButton
-            targetRef={chartRef}
-            empresa={tenantName}
-            modulo="resultados"
-            titulo={t("resultados.costVsIncome")}
-            periodo={periodo}
-          />
-        </div>
-      </div>
 
-      <div ref={chartRef} className="h-[320px] w-full min-w-0">
-        <HeroBarChart
-          chartKey={`${periodo}-${mode}`}
-          data={chartData}
-          xKey="name"
-          yTickFormatter={(value) => `${value}%`}
-          tooltipFormatter={(value, name) => {
-            const numeric = Number(value);
-            const label = name === "actual" ? model.actualLabel : (model.priorLabel ?? "—");
-            return [Number.isFinite(numeric) ? `${numeric.toFixed(1)}%` : "—", label];
-          }}
-          legendFormatter={(value) => (value === "actual" ? model.actualLabel : (model.priorLabel ?? "—"))}
-          series={series}
-          showValueLabels
-          valueLabelFormatter={(_value, dataKey, payload) => {
-            const raw = dataKey === "prior" ? payload.priorPct : payload.actualPct;
-            if (typeof raw !== "number") {
-              return "—";
-            }
-            return `${raw.toFixed(1)}%`;
-          }}
-        />
-      </div>
+          <div ref={chartRef} className={cn(expanded ? "min-h-0 flex-1" : "h-[320px]", "w-full min-w-0")}>
+            <HeroBarChart
+              chartKey={`${periodo}-${mode}`}
+              data={chartData}
+              xKey="name"
+              yTickFormatter={(value) => `${value}%`}
+              tooltipFormatter={(value, name) => {
+                const numeric = Number(value);
+                const label = name === "actual" ? model.actualLabel : (model.priorLabel ?? "—");
+                return [Number.isFinite(numeric) ? `${numeric.toFixed(1)}%` : "—", label];
+              }}
+              legendFormatter={(value) => (value === "actual" ? model.actualLabel : (model.priorLabel ?? "—"))}
+              series={series}
+              showValueLabels
+              valueLabelFormatter={(_value, dataKey, payload) => {
+                const raw = dataKey === "prior" ? payload.priorPct : payload.actualPct;
+                if (typeof raw !== "number") {
+                  return "—";
+                }
+                return `${raw.toFixed(1)}%`;
+              }}
+            />
+          </div>
 
-      {model.insight && insightText ? (
-        <div className="mt-4 flex items-center gap-2 text-[13px] text-muted-foreground">
-          <span
-            className={cn("inline-block h-2 w-2 shrink-0 rounded-full", model.insight.favorable ? "bg-favorable" : "bg-chart-ochre")}
-            style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
-            aria-hidden
-          />
-          <p className="min-w-0 flex-1">{insightText}</p>
-          <ChartInsightCopy
-            frase={insightText}
-            chartName={t("resultados.costVsIncome")}
-            empresa={tenantName}
-            periodo={periodo}
-          />
-        </div>
-      ) : null}
-    </article>
+          {model.insight && insightText ? (
+            <div className="mt-4 flex items-center gap-2 text-[13px] text-muted-foreground">
+              <span
+                className={cn("inline-block h-2 w-2 shrink-0 rounded-full", model.insight.favorable ? "bg-favorable" : "bg-chart-ochre")}
+                style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
+                aria-hidden
+              />
+              <p className="min-w-0 flex-1">{insightText}</p>
+              <ChartInsightCopy
+                frase={insightText}
+                chartName={t("resultados.costVsIncome")}
+                empresa={tenantName}
+                periodo={periodo}
+              />
+            </div>
+          ) : null}
+        </>
+      )}
+    </ExpandableShell>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
 import { CHART, CHART_AXIS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
@@ -108,111 +109,116 @@ export function FlujoWaterfallChart({
     t("resultados.companyFallback");
 
   return (
-    <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
-        <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.historyTitle")}</h3>
-        <div className="flex flex-wrap items-center gap-2">
-          <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
-            {WINDOW_OPTIONS.map((option) => (
-              <button
-                key={option.value}
-                type="button"
-                onClick={() => setWindowMode(option.value)}
-                className={cn(
-                  "h-9 min-w-9 rounded-control px-3 text-sm font-medium transition-colors",
-                  windowMode === option.value
-                    ? "bg-secondary text-clay shadow-sm"
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                )}
-                aria-pressed={windowMode === option.value}
-              >
-                {t(option.labelKey)}
-              </button>
-            ))}
-          </div>
-          <ChartDownloadButton
-            targetRef={chartRef}
-            empresa={tenantName}
-            modulo="flujo"
-            titulo={t("flujo.historyTitle")}
-            periodo={periodo}
-          />
-        </div>
-      </div>
-
-      <div ref={chartRef} className="h-[320px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart key={`${periodo}-${windowMode}-${units}`} data={data} margin={{ top: 28, right: 8, left: 8, bottom: 8 }}>
-            <XAxis
-              dataKey="label"
-              interval={0}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
-              axisLine={{ stroke: CHART_AXIS.stroke }}
-              tickLine={false}
-            />
-            <YAxis
-              width={64}
-              tick={{ fill: CHART_AXIS.tick, fontSize: 12 }}
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={(value: number) => formatAxisTick(value, units)}
-            />
-            <Tooltip
-              cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
-              contentStyle={TOOLTIP_STYLE}
-              formatter={(value, _name, item) => {
-                const payload = item?.payload as { value?: number } | undefined;
-                const raw = typeof payload?.value === "number" ? payload.value : Number(value);
-                return [
-                  <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(raw, "inherit") }}>
-                    {formatOneDecimal(raw, units)}
-                  </span>,
-                  t("pdf.amount"),
-                ];
-              }}
-            />
-            <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={64} />
-            <Bar dataKey="amount" stackId="wf" name={t("pdf.amount")} radius={[4, 4, 0, 0]} maxBarSize={64}>
-              {data.map((row) => (
-                <Cell key={row.label} fill={kindColor(row.kind, row.value)} />
-              ))}
-              <LabelList
-                position="top"
-                content={({ x, y, width, index }: FlujoLabelGeom) => {
-                  const row = index == null ? undefined : data[index];
-                  if (!row) return null;
-                  return (
-                    <text
-                      x={Number(x ?? 0) + Number(width ?? 0) / 2}
-                      y={Number(y ?? 0) - 6}
-                      textAnchor="middle"
-                      fill={waterfallFigureColor(row.value, CHART_AXIS.tick)}
-                      fontSize={11}
-                      className="financial-nums"
-                    >
-                      {formatOneDecimal(row.value, units)}
-                    </text>
-                  );
-                }}
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+        <>
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
+            <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.historyTitle")}</h3>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">
+                {WINDOW_OPTIONS.map((option) => (
+                  <button
+                    key={option.value}
+                    type="button"
+                    onClick={() => setWindowMode(option.value)}
+                    className={cn(
+                      "h-9 min-w-9 rounded-control px-3 text-sm font-medium transition-colors",
+                      windowMode === option.value
+                        ? "bg-secondary text-clay shadow-sm"
+                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    )}
+                    aria-pressed={windowMode === option.value}
+                  >
+                    {t(option.labelKey)}
+                  </button>
+                ))}
+              </div>
+              <ChartDownloadButton
+                targetRef={chartRef}
+                empresa={tenantName}
+                modulo="flujo"
+                titulo={t("flujo.historyTitle")}
+                periodo={periodo}
               />
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
+              {toggle}
+            </div>
+          </div>
 
-      {model.insight ? (
-        <p className="mt-4 flex items-center gap-2 text-[13px] text-muted-foreground">
-          <span
-            className={cn(
-              "inline-block h-2 w-2 shrink-0 rounded-full",
-              model.insight.favorable ? "" : "bg-desfavorable",
-            )}
-            style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
-            aria-hidden
-          />
-          {t(model.insight.messageKey, model.insight.values)}
-        </p>
-      ) : null}
-    </article>
+          <div ref={chartRef} className={cn(expanded ? "min-h-0 flex-1" : "h-[320px]", "w-full min-w-0")}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart key={`${periodo}-${windowMode}-${units}`} data={data} margin={{ top: 28, right: 8, left: 8, bottom: 8 }}>
+                <XAxis
+                  dataKey="label"
+                  interval={0}
+                  tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
+                  axisLine={{ stroke: CHART_AXIS.stroke }}
+                  tickLine={false}
+                />
+                <YAxis
+                  width={64}
+                  tick={{ fill: CHART_AXIS.tick, fontSize: 12 }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickFormatter={(value: number) => formatAxisTick(value, units)}
+                />
+                <Tooltip
+                  cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
+                  contentStyle={TOOLTIP_STYLE}
+                  formatter={(value, _name, item) => {
+                    const payload = item?.payload as { value?: number } | undefined;
+                    const raw = typeof payload?.value === "number" ? payload.value : Number(value);
+                    return [
+                      <span key="monto" className="financial-nums" style={{ color: waterfallFigureColor(raw, "inherit") }}>
+                        {formatOneDecimal(raw, units)}
+                      </span>,
+                      t("pdf.amount"),
+                    ];
+                  }}
+                />
+                <Bar dataKey="base" stackId="wf" fill="transparent" legendType="none" tooltipType="none" maxBarSize={64} />
+                <Bar dataKey="amount" stackId="wf" name={t("pdf.amount")} radius={[4, 4, 0, 0]} maxBarSize={64}>
+                  {data.map((row) => (
+                    <Cell key={row.label} fill={kindColor(row.kind, row.value)} />
+                  ))}
+                  <LabelList
+                    position="top"
+                    content={({ x, y, width, index }: FlujoLabelGeom) => {
+                      const row = index == null ? undefined : data[index];
+                      if (!row) return null;
+                      return (
+                        <text
+                          x={Number(x ?? 0) + Number(width ?? 0) / 2}
+                          y={Number(y ?? 0) - 6}
+                          textAnchor="middle"
+                          fill={waterfallFigureColor(row.value, CHART_AXIS.tick)}
+                          fontSize={11}
+                          className="financial-nums"
+                        >
+                          {formatOneDecimal(row.value, units)}
+                        </text>
+                      );
+                    }}
+                  />
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          {model.insight ? (
+            <p className="mt-4 flex items-center gap-2 text-[13px] text-muted-foreground">
+              <span
+                className={cn(
+                  "inline-block h-2 w-2 shrink-0 rounded-full",
+                  model.insight.favorable ? "" : "bg-desfavorable",
+                )}
+                style={model.insight.favorable ? { backgroundColor: "var(--cifra-good)" } : undefined}
+                aria-hidden
+              />
+              {t(model.insight.messageKey, model.insight.values)}
+            </p>
+          ) : null}
+        </>
+      )}
+    </ExpandableShell>
   );
 }

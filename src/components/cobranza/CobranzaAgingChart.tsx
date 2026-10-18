@@ -1,12 +1,14 @@
 "use client";
 
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { HeroBarChart } from "@/components/charts/HeroBarChart";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
 import { useCobranza } from "@/hooks/use-cobranza";
 import { CHART } from "@/lib/chart-theme";
+import { cn } from "@/lib/utils";
 import { formatAxisTick, formatMxn } from "@/services/money";
 import { useRef } from "react";
 
@@ -38,7 +40,9 @@ export function CobranzaAgingChart() {
     t("resultados.companyFallback");
 
   return (
-    <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+      <>
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.aging")}</h2>
         <div className="flex items-center gap-1">
@@ -50,9 +54,10 @@ export function CobranzaAgingChart() {
             titulo={t("cobranza.aging")}
             periodo={asOf}
           />
+          {toggle}
         </div>
       </div>
-      <div ref={agingRef} className="mt-4 h-[280px] w-full min-w-0">
+      <div ref={agingRef} className={cn("mt-4 w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[280px]")}>
         <HeroBarChart
           data={antiguedad.buckets.map((bucket) => ({
             name: t(`cobranza.agingBuckets.${bucket.key}`),
@@ -65,6 +70,8 @@ export function CobranzaAgingChart() {
           series={[{ dataKey: "saldo", name: t("cobranza.balance"), fill: CHART.clay }]}
         />
       </div>
-    </section>
+      </>
+      )}
+    </ExpandableShell>
   );
 }

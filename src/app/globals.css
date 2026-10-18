@@ -134,7 +134,7 @@
 
 @layer utilities {
   .financial-nums {
-    font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family: var(--cifra-font-mono);
     font-variant-numeric: tabular-nums lining-nums;
     font-feature-settings: "tnum" 1;
   }

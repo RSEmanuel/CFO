@@ -185,8 +185,6 @@ export default function UsuariosPage() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-muted-foreground">{t("users.intro", { company: empresa })}</p>
-
       {loadFailed ? (
         <Card>
           <CardContent className="pt-6 text-sm">{t("users.loadFailed")}</CardContent>

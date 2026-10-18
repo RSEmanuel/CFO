@@ -72,9 +72,17 @@ Los tres colores de señal juntos nunca pasan del 2% de una pantalla.
 
 ## 4. Tipografía
 
-- **Manrope** (`--cifra-font-sans`) para todo lo que se lee: UI, titulares, copy.
-  Titulares en peso 800 con `letter-spacing: -0.045em`.
-- **Azeret Mono** (`--cifra-font-mono`) para todo lo que se cuenta.
+Sistema Baselayer, tres familias (next/font/google, self-hosted):
+
+- **Cormorant Garamond** (`--cifra-font-serif`, peso 500) para titulares editoriales (hero y
+  encabezados de sección) con tracking negativo. Nunca sans ni mono para display.
+- **DM Sans** (`--cifra-font-sans`, pesos 400 y 500) para todo lo que se lee: UI, nav, cuerpo, copy.
+- **IBM Plex Mono** (`--cifra-font-mono`, pesos 400 y 500) para todo lo que se cuenta, y para
+  etiquetas (eyebrow, acciones en mono).
+
+La escala vive en `tokens/cifra.tokens.css` (`--cifra-hero-display-*`, `--cifra-section-heading-*`,
+`--cifra-panel-heading-*`, `--cifra-body-large-*`, `--cifra-body-*`, `--cifra-nav-*`,
+`--cifra-eyebrow-*`, `--cifra-mono-action-*`). Usa los tokens, no valores sueltos.
 
 **REGLA NO NEGOCIABLE:** toda cifra que aparezca en una tabla, un KPI, un eje de gráfica o una
 etiqueta de dato usa la mono con `font-variant-numeric: tabular-nums`. Si las columnas de números no

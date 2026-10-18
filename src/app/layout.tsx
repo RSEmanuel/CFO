@@ -1,20 +1,28 @@
 import type { Metadata } from "next";
 import { AppProviders } from "@/components/app-providers";
-import { Azeret_Mono, Manrope } from "next/font/google";
+import { Cormorant_Garamond, DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import type { ReactNode } from "react";
 import "./globals.css";
 
-const manrope = Manrope({
+const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
-  variable: "--font-sans",
-  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-serif",
+  weight: ["500"],
 });
 
-const azeretMono = Azeret_Mono({
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  weight: ["400", "500"],
+});
+
+const plexMono = IBM_Plex_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
-  weight: ["400", "500", "700"],
+  weight: ["400", "500"],
 });
+
+const fontVars = `${cormorant.variable} ${dmSans.variable} ${plexMono.variable}`;
 
 export const metadata: Metadata = {
   title: "Cifra · CFO virtual",
@@ -26,8 +34,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning>
-      <body className={`${manrope.variable} ${azeretMono.variable} font-sans antialiased tracking-[-0.01em]`}>
+    <html lang="es" className={fontVars} suppressHydrationWarning>
+      <body className={`${fontVars} font-sans antialiased tracking-[-0.01em]`}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

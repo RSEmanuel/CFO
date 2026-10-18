@@ -147,8 +147,7 @@ export function ControlPage() {
   return (
     <div className="mx-auto w-full max-w-[1680px] space-y-6 bg-background">
       <header className="space-y-1">
-        <p className="text-lg font-bold tracking-tight text-clay">{t("nav.control")}</p>
-        <p className="text-sm text-muted-foreground">{t("control.subtitle")}</p>
+        <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.control")}</p>
       </header>
 
       <ResultadosFilterBar

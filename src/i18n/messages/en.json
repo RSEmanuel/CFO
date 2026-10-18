@@ -47,7 +47,7 @@
     "position": "Financial Position",
     "cashflow": "Cash Flow",
     "collections": "Collections",
-    "metrics": "Metrics catalog",
+    "metrics": "Financial metrics",
     "control": "Control Panel",
     "ingest": "Ingest",
     "simulator": "What-If Simulator",
@@ -104,7 +104,6 @@
     "resetFailed": "Could not complete. Try again."
   },
   "settings": {
-    "intro": "Companies and users in the portfolio. Each company sees only its own information.",
     "languageTitle": "Portal language",
     "languageHelp": "Select the language used in portal menus, metrics, and messages.",
     "languageAria": "Portal language",
@@ -193,7 +192,7 @@
     "verticalAnalysis": "Vertical analysis",
     "pctOfRevenue": "% of revenue",
     "others": "Other",
-    "goToCatalog": "Open metrics catalog",
+    "goToCatalog": "Open financial metrics",
     "cost": "Cost",
     "expense": "Expense",
     "ebitda": "EBITDA",
@@ -774,7 +773,6 @@
     },
     "libre": {
       "title": "From profit to cash",
-      "subtitle": "Reconciliation: why profit is not the money in the bank. It shows how customer credit and supplier debt change your real cash.",
       "estimated": "Cifra built this bridge from the monthly change in the trial balance. It is not the bank statement.",
       "emptyTitle": "Free cash flow is not available yet",
       "emptyMessage": "Upload this month's trial balance in Ingestion to build the reconciliation.",
@@ -1045,10 +1043,9 @@
   },
   "control": {
     "title": "Executive Control Panel",
-    "subtitle": "Priority metrics and visualizations pinned by finance leadership",
     "emptyTitle": "Your Control Panel is empty",
     "emptyMessage": "Pin KPIs, charts and tables with the star in any module to build your executive view here.",
-    "emptyCta": "Open metrics catalog",
+    "emptyCta": "Open financial metrics",
     "emptyCtaResults": "Go to Results",
     "emptyCtaFlujo": "Go to Cash Flow",
     "emptyCtaCobranza": "Go to Receivables",
@@ -1058,7 +1055,7 @@
       "FLUJO": "Cash Flow & Treasury",
       "COBRANZA": "Receivables & Collections",
       "POSICION": "Financial Position",
-      "METRICAS": "Other Catalog Metrics"
+      "METRICAS": "Other financial metrics"
     },
     "portada": {
       "titulo": "{mes}: how your month closed",
@@ -1077,6 +1074,9 @@
         "label": "Your cash",
         "fuente": "Cash and bank accounts from your trial balance at month end.",
         "sinDato": "Your trial balance has no cash or bank accounts."
+      },
+      "sello": {
+        "estimada": "Estimated"
       },
       "respiro": {
         "label": "Months of runway",
@@ -1108,7 +1108,6 @@
   },
   "simulator": {
     "title": "Financial Sensitivity & What-If Scenario Simulator",
-    "subtitle": "Projects the period's P&L, cash and working capital by moving six drivers; the baseline is the actual accounting close.",
     "loadError": "The simulator baseline could not be loaded",
     "units": {
       "days": "days",
@@ -1117,7 +1116,6 @@
     },
     "drivers": {
       "title": "Scenario drivers",
-      "subtitle": "Move the controls to simulate; the baseline follows the active period.",
       "groups": {
         "commercial": "Commercial strategy",
         "efficiency": "Operating efficiency",
@@ -1218,15 +1216,14 @@
     }
   },
   "metrics": {
-    "emptyTitle": "Catalog not available yet",
+    "emptyTitle": "Financial metrics not available yet",
     "emptyMessage": "Upload a trial balance to calculate the 50 metrics.",
     "loadError": "Could not load metrics",
     "loading": "Loading metrics",
     "eyebrow": "Financial intelligence",
-    "intro": "50 indicators to understand profitability, efficiency, liquidity, and value creation.",
     "available": "{count} of {total} with data this month",
     "retry": "Retry",
-    "highlights": "Highlights",
+    "highlights": "Favorites",
     "customizeHelp": "Star any metric or chart to customize this panel.",
     "favorites": "Favorite metrics",
     "none": "No metrics are available for the selected cutoff.",
@@ -1681,6 +1678,8 @@
     }
   },
   "charts": {
+    "expand": "Expand chart",
+    "collapse": "Close",
     "copyInsight": "Copy insight",
     "copied": "Insight copied",
     "downloadChart": "Download chart",
@@ -1737,7 +1736,6 @@
     "columns": "Columns"
   },
   "users": {
-    "intro": "Who can sign in to {company} and what they can do.",
     "selectCompany": "Pick a company in the selector above to see its people.",
     "viewerOnly": "This section is for administrators. Ask your administrator for any access change.",
     "loadFailed": "We couldn't load the people list. Reload the page to try again.",
@@ -1801,7 +1799,6 @@
     }
   },
   "loads": {
-    "intro": "Every file uploaded to {company}: who, when and whether it actually made it into your numbers.",
     "selectCompany": "Pick a company in the selector above to see its uploads.",
     "viewerOnly": "This section is for people who upload files. Ask your administrator about any upload.",
     "loadFailed": "We couldn't read the history. Reload the page to try again.",

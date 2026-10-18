@@ -8,7 +8,7 @@
   --lp-topbar-h: 68px;
   background: var(--cifra-paper);
   color: var(--cifra-ink);
-  font-family: var(--font-sans), var(--cifra-font-sans);
+  font-family: var(--cifra-font-sans);
   min-height: 100vh;
 }
 
@@ -23,7 +23,7 @@
 }
 
 .lp-root .cifra-num {
-  font-family: var(--font-mono), var(--cifra-font-mono);
+  font-family: var(--cifra-font-mono);
 }
 
 .lp-root :focus-visible {
@@ -184,12 +184,20 @@
 }
 .lp-copy__title {
   margin: 12px 0 0;
-  font-weight: 800;
-  letter-spacing: -0.045em;
-  line-height: 1.02;
-  font-size: clamp(2.1rem, 4.6vw, 3.7rem);
+  font-family: var(--cifra-section-heading-font);
+  font-weight: var(--cifra-section-heading-weight);
+  letter-spacing: var(--cifra-section-heading-tracking);
+  line-height: var(--cifra-section-heading-lh);
+  font-size: clamp(2.1rem, 4.6vw, var(--cifra-section-heading-size));
   color: var(--cifra-ink);
   text-wrap: balance;
+}
+h1.lp-copy__title {
+  font-family: var(--cifra-hero-display-font);
+  font-weight: var(--cifra-hero-display-weight);
+  letter-spacing: var(--cifra-hero-display-tracking);
+  line-height: var(--cifra-hero-display-lh);
+  font-size: clamp(2.5rem, 5vw, var(--cifra-hero-display-size));
 }
 .lp-copy__body {
   margin: 18px 0 0;
@@ -326,7 +334,7 @@
   fill: var(--cifra-ink);
 }
 .lp-poster-label {
-  font-family: var(--font-sans), var(--cifra-font-sans);
+  font-family: var(--cifra-font-sans);
   font-size: 22px;
   font-weight: 600;
   fill: var(--cifra-ink-3);
@@ -392,9 +400,10 @@
 }
 .lp-step__title {
   margin: 10px 0 0;
+  font-family: var(--cifra-panel-heading-font);
   font-size: 1.15rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-weight: var(--cifra-panel-heading-weight);
+  letter-spacing: var(--cifra-panel-heading-tracking);
 }
 .lp-step__body {
   margin: 8px 0 0;
@@ -711,6 +720,9 @@
   }
   .lp-copy__title {
     font-size: clamp(1.9rem, 8vw, 2.7rem);
+  }
+  h1.lp-copy__title {
+    font-size: clamp(2.2rem, 9vw, 3rem);
   }
   .lp-copy__body {
     max-width: none;

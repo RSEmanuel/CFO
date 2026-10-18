@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { monthLabelKey } from "@/i18n/format";
+import { cn } from "@/lib/utils";
 import type { CatalogComparable } from "@/hooks/use-metrics-catalog";
 
 export type MetricsFilters = {
@@ -24,15 +25,16 @@ type FilterSelectProps = {
   value: string;
   onValueChange: (value: string) => void;
   options: Array<{ value: string; label: string }>;
+  disabled?: boolean;
 };
 
-function FilterSelect({ label, value, onValueChange, options }: FilterSelectProps) {
+function FilterSelect({ label, value, onValueChange, options, disabled }: FilterSelectProps) {
   return (
-    <label className="min-w-[150px] flex-1">
+    <label className={cn("min-w-[150px] flex-1", disabled && "cursor-not-allowed opacity-60")}>
       <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
         {label}
       </span>
-      <Select value={value} onValueChange={onValueChange}>
+      <Select value={value} onValueChange={onValueChange} disabled={disabled}>
         <SelectTrigger className="h-10 bg-card">
           <SelectValue />
         </SelectTrigger>
@@ -104,6 +106,7 @@ export function MetricsFilterBar({ filters, onChange }: MetricsFilterBarProps) {
       />
       <FilterSelect
         label={t("filters.units")}
+        disabled
         value={filters.units}
         onValueChange={(value) => onChange({ ...filters, units: value as MetricsFilters["units"] })}
         options={[
@@ -114,6 +117,7 @@ export function MetricsFilterBar({ filters, onChange }: MetricsFilterBarProps) {
       />
       <FilterSelect
         label={t("filters.analysis")}
+        disabled
         value={filters.analysis}
         onValueChange={(value) => onChange({ ...filters, analysis: value as MetricsFilters["analysis"] })}
         options={[

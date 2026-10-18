@@ -1,5 +1,6 @@
 "use client";
 
+import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
@@ -137,7 +138,9 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
   const { t } = useLocale();
 
   return (
-    <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+    <ExpandableShell className="p-5">
+      {(toggle, expanded) => (
+      <>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-sans text-lg font-medium text-foreground">
@@ -150,9 +153,10 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
           <p className="text-xs text-muted-foreground">
             {t("cobranza.concentracion.chartTopNote", { count: chartData.length })}
           </p>
+          {toggle}
         </div>
       </div>
-      <div className="mt-4 h-[300px] w-full min-w-0">
+      <div className={cn("mt-4 w-full min-w-0", expanded ? "min-h-0 flex-1" : "h-[300px]")}>
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
             <CartesianGrid vertical={false} stroke={CHART.beigeDeep} strokeOpacity={0.6} />
@@ -218,7 +222,9 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
           </ComposedChart>
         </ResponsiveContainer>
       </div>
-    </section>
+      </>
+      )}
+    </ExpandableShell>
   );
 }
 

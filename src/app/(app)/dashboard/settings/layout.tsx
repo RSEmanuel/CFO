@@ -23,8 +23,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-lg font-bold tracking-tight text-clay">{t("nav.settings")}</p>
-        <p className="text-sm text-muted-foreground">{t("settings.intro")}</p>
+        <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.settings")}</p>
       </div>
       {canManage ? (
         <nav
