@@ -16,9 +16,9 @@ import { useState } from "react";
 export function MobileNav() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const { user, logout } = useSession();
+  const { effectiveRole, logout } = useSession();
   const { t } = useLocale();
-  const items = [...visibleNav(PRIMARY_NAV, user?.role), ...visibleNav(ACCOUNT_NAV, user?.role)];
+  const items = [...visibleNav(PRIMARY_NAV, effectiveRole), ...visibleNav(ACCOUNT_NAV, effectiveRole)];
 
   return (
     <div className="flex items-center gap-2 border-b border-beige-deep bg-chrome px-3 py-2 lg:hidden">

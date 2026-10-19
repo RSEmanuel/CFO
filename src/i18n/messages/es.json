@@ -2023,5 +2023,12 @@
     "doneTitle": "Contraseña lista",
     "doneHelp": "Ya puedes entrar a Cifra con {email} y la contraseña que acabas de crear.",
     "goLogin": "Ir a iniciar sesión"
+  },
+  "clientPreview": {
+    "enter": "Ver como cliente",
+    "enterAria": "Ver el portal como lo ve tu cliente",
+    "exit": "Salir de vista cliente",
+    "banner": "Estás viendo Cifra como cliente ({company})",
+    "bannerHelp": "Así ve el portal quien solo consulta. Tus permisos reales no cambian."
   }
 }

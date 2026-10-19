@@ -61,7 +61,7 @@ function NavItemLink({
 }
 
 export function Sidebar() {
-  const { user, logout } = useSession();
+  const { effectiveRole, logout } = useSession();
   const { t } = useLocale();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -77,8 +77,8 @@ export function Sidebar() {
     });
   }
 
-  const primary = visibleNav(PRIMARY_NAV, user?.role);
-  const account = visibleNav(ACCOUNT_NAV, user?.role);
+  const primary = visibleNav(PRIMARY_NAV, effectiveRole);
+  const account = visibleNav(ACCOUNT_NAV, effectiveRole);
 
   return (
     <TooltipProvider delayDuration={200}>

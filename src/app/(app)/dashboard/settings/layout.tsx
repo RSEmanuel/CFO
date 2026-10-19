@@ -16,9 +16,9 @@ const TABS = [
 /** Pestañas de Configuración. Quien solo consulta no ve la de Usuarios. */
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const { user } = useSession();
+  const { effectiveRole } = useSession();
   const { t } = useLocale();
-  const canManage = Boolean(user && USER_ADMIN_ROLES.includes(user.role));
+  const canManage = Boolean(effectiveRole && USER_ADMIN_ROLES.includes(effectiveRole));
 
   // Errores del portal tiene su propia entrada en el menú y su propio encabezado.
   if (pathname.startsWith("/dashboard/settings/errores")) {

@@ -7,9 +7,9 @@ import { cn } from "@/lib/utils";
 import { Building2 } from "lucide-react";
 
 export function TenantSwitcher({ collapsed = false }: { collapsed?: boolean }) {
-  const { user, tenants, tenantId, setTenantId } = useSession();
+  const { effectiveRole, tenants, tenantId, setTenantId } = useSession();
   const { t } = useLocale();
-  const locked = user?.role === "CLIENT_VIEWER";
+  const locked = effectiveRole === "CLIENT_VIEWER";
   const activeName = tenants.find((item) => item.id === tenantId)?.name ?? t("common.company");
 
   return (

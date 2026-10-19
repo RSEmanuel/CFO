@@ -20,9 +20,9 @@ const thClass = "whitespace-nowrap pb-2 pr-4 font-medium";
 const tdClass = "py-3 pr-4 align-middle";
 
 export default function ControlCargasPage() {
-  const { user, tenants, tenantId } = useSession();
+  const { user, effectiveRole, tenants, tenantId } = useSession();
   const { locale, t } = useLocale();
-  const allowed = Boolean(user && INGEST_HISTORY_ROLES.includes(user.role));
+  const allowed = Boolean(effectiveRole && INGEST_HISTORY_ROLES.includes(effectiveRole));
   const empresa = tenants.find((item) => item.id === tenantId)?.name ?? user?.tenant.name ?? "—";
 
   const [view, setView] = useState<LoadHistoryView | null>(null);

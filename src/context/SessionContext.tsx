@@ -29,7 +29,35 @@ type SessionContextValue = {
   logout: () => void;
   refreshMe: () => Promise<void>;
   refreshPeriods: () => void;
+  /** Rol con el que se pinta la interfaz; difiere de user.role solo en vista de cliente. */
+  effectiveRole: SessionUser["role"] | undefined;
+  /** Solo puede estar activo para ADMIN o CFO_PARTNER. */
+  isClientPreviewMode: boolean;
+  canClientPreview: boolean;
+  toggleClientPreviewMode: () => void;
 };
+
+const CLIENT_PREVIEW_KEY = "cifra.clientPreviewMode";
+
+function readClientPreviewFlag(): boolean {
+  try {
+    return localStorage.getItem(CLIENT_PREVIEW_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeClientPreviewFlag(value: boolean): void {
+  try {
+    if (value) {
+      localStorage.setItem(CLIENT_PREVIEW_KEY, "true");
+    } else {
+      localStorage.removeItem(CLIENT_PREVIEW_KEY);
+    }
+  } catch {
+    // Sin almacenamiento la vista de cliente dura solo esta pestaña.
+  }
+}
 
 const SessionContext = createContext<SessionContextValue | undefined>(undefined);
 
@@ -46,6 +74,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const [periodsLoading, setPeriodsLoading] = useState(false);
   const [periodRefreshKey, setPeriodRefreshKey] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [clientPreviewFlag, setClientPreviewFlag] = useState(false);
+
+  useEffect(() => {
+    setClientPreviewFlag(readClientPreviewFlag());
+  }, []);
 
   // Los errores del navegador se atribuyen a la empresa que se está consultando.
   useEffect(() => {
@@ -165,6 +198,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     setUser(null);
     setTenants([]);
+    setClientPreviewFlag(false);
+    writeClientPreviewFlag(false);
     router.push("/login");
   }, [router]);
 
@@ -191,6 +226,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   }, []);
   const refreshPeriods = useCallback(() => setPeriodRefreshKey((value) => value + 1), []);
 
+  // La vista de cliente es solo de interfaz: la API sigue autorizando con el rol real.
+  const canClientPreview = user?.role === "ADMIN" || user?.role === "CFO_PARTNER";
+  const isClientPreviewMode = canClientPreview && clientPreviewFlag;
+  const effectiveRole: SessionUser["role"] | undefined = isClientPreviewMode ? "CLIENT_VIEWER" : user?.role;
+  const toggleClientPreviewMode = useCallback(() => {
+    setClientPreviewFlag((current) => {
+      const next = !current;
+      writeClientPreviewFlag(next);
+      return next;
+    });
+  }, []);
+
   const value = useMemo(
     () => ({
       user,
@@ -213,10 +260,15 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       logout,
       refreshMe,
       refreshPeriods,
+      effectiveRole,
+      isClientPreviewMode,
+      canClientPreview,
+      toggleClientPreviewMode,
     }),
     [
       user, tenants, tenantId, anio, periodo, periodView, availablePeriods, activePeriod,
       periodsLoading, loading, setCorte, selectPeriod, login, logout, refreshMe, refreshPeriods,
+      effectiveRole, isClientPreviewMode, canClientPreview, toggleClientPreviewMode,
     ],
   );
 

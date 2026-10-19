@@ -18,9 +18,9 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
-  const { user, tenants, tenantId, anio, periodo, periodView, refreshMe, setTenantId } = useSession();
+  const { user, effectiveRole, tenants, tenantId, anio, periodo, periodView, refreshMe, setTenantId } = useSession();
   const { locale, setLocale, t } = useLocale();
-  const canManage = Boolean(user && USER_ADMIN_ROLES.includes(user.role));
+  const canManage = Boolean(effectiveRole && USER_ADMIN_ROLES.includes(effectiveRole));
   const empresa = tenants.find((item) => item.id === tenantId)?.name ?? user?.tenant.name ?? "—";
   const corte =
     periodView === "ytd"
@@ -140,7 +140,7 @@ export default function SettingsPage() {
           </p>
           <p>
             <span className="text-muted-foreground">{t("settings.role")}: </span>
-            {user?.role ? t(`common.roles.${user.role}`) : "—"}
+            {effectiveRole ? t(`common.roles.${effectiveRole}`) : "—"}
           </p>
           <p>
             <span className="text-muted-foreground">{t("settings.company")}: </span>

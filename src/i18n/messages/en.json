@@ -2023,5 +2023,12 @@
     "doneTitle": "Password ready",
     "doneHelp": "You can now sign in to Cifra with {email} and the password you just created.",
     "goLogin": "Go to sign in"
+  },
+  "clientPreview": {
+    "enter": "View as client",
+    "enterAria": "See the portal the way your client sees it",
+    "exit": "Exit client view",
+    "banner": "You're viewing Cifra as a client ({company})",
+    "bannerHelp": "This is what a view-only user sees. Your real permissions don't change."
   }
 }
