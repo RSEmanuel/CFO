@@ -56,7 +56,8 @@
     "simulator": "What-If Simulator",
     "settings": "Settings",
     "loadControl": "Load history",
-    "errorLog": "Portal errors"
+    "errorLog": "Portal errors",
+    "clients": "Clients"
   },
   "auth": {
     "title": "Sign in",
@@ -2042,5 +2043,24 @@
     "iframeTitle": "Welcome email preview",
     "exportHint": "The code and link are samples. To change the email that goes out, export the template and upload it to the AWS console.",
     "adminOnly": "This section is only for the Cifra team."
+  },
+  "clients": {
+    "help": "Every company you serve, who has access, and whether its trial balance is loaded.",
+    "listTitle": "Your clients",
+    "colClient": "Client",
+    "colRfc": "RFC",
+    "colPeople": "People with access",
+    "colBalanza": "Trial balance",
+    "balanzaYes": "Loaded",
+    "balanzaNo": "Not loaded",
+    "open": "Open",
+    "openAria": "Open {name}",
+    "openNumbers": "See their numbers",
+    "newTitle": "Add a client",
+    "create": "Add client",
+    "empty": "You don't have clients yet. Add the first one below.",
+    "loadFailed": "We couldn't load your clients. Reload the page to try again.",
+    "notFound": "We couldn't find this client. Go back to the list and pick another.",
+    "teamOnly": "This section is only for the Cifra team."
   }
 }

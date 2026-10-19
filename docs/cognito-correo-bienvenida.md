@@ -1,6 +1,6 @@
 # Correo de bienvenida (alta de usuarios)
 
-Al dar de alta a alguien en **Configuración → Usuarios**, Cifra ya no muestra una contraseña temporal.
+Al dar de alta a alguien en **Clientes → (cliente) → Personas con acceso**, Cifra ya no muestra una contraseña temporal.
 Cognito le manda a la persona un correo con un código de 6 dígitos y un enlace a
 `https://app.cfocifra.com/set-password`. Ahí escribe su correo, el código y su contraseña dos veces,
 y después entra por `/login`.
@@ -26,7 +26,7 @@ El correo de bienvenida y el de "olvidé mi contraseña" usan la **misma plantil
 
 - **Fuente única:** `src/services/email/welcomeEmailTemplate.ts` (asunto, HTML con `{{CODE}}` y
   `{{APP_URL}}`, y `renderWelcomeEmail`). Para cambiar el diseño o el texto, edita ese archivo.
-- **Vista previa:** en el portal, **Configuración → Correo de bienvenida** (solo ADMIN y CFO_PARTNER),
+- **Vista previa:** en el portal, **Clientes → Correo de bienvenida** (`/dashboard/clientes/correo-bienvenida`, solo ADMIN y CFO_PARTNER),
   con el código ficticio `123456`.
 - **HTML de referencia para AWS:** `docs/templates/welcome-email.html`, generado con
 

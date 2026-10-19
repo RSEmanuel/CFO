@@ -1,6 +1,6 @@
 import type { SessionUser } from "@/lib/session-types";
-import { ERROR_VIEW_ROLES } from "@/auth/rbac";
-import { Bug, BarChart3, ClipboardCheck, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Upload, Wallet } from "lucide-react";
+import { ERROR_VIEW_ROLES, USER_ADMIN_ROLES } from "@/auth/rbac";
+import { Briefcase, Bug, BarChart3, ClipboardCheck, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Upload, Wallet } from "lucide-react";
 
 export type AppNavItem = {
   href: string;
@@ -25,6 +25,8 @@ export const PRIMARY_NAV: AppNavItem[] = [
 ];
 
 export const ACCOUNT_NAV: AppNavItem[] = [
+  // Escritorio de clientes del equipo: lista de empresas, sus personas y altas.
+  { href: "/dashboard/clientes", labelKey: "nav.clients", icon: Briefcase, roles: USER_ADMIN_ROLES },
   { href: "/dashboard/settings", labelKey: "nav.settings", icon: Settings },
 ];
 

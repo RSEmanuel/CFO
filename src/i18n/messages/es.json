@@ -56,7 +56,8 @@
     "simulator": "Simulador What-If",
     "settings": "Configuración",
     "loadControl": "Control de cargas",
-    "errorLog": "Errores del portal"
+    "errorLog": "Errores del portal",
+    "clients": "Clientes"
   },
   "auth": {
     "title": "Iniciar sesión",
@@ -2042,5 +2043,24 @@
     "iframeTitle": "Vista previa del correo de bienvenida",
     "exportHint": "El código y el enlace son de ejemplo. Para cambiar el correo que se envía hay que exportar la plantilla y subirla a la consola de AWS.",
     "adminOnly": "Esta sección es solo para el equipo de Cifra."
+  },
+  "clients": {
+    "help": "Cada empresa que atiendes, quién tiene acceso y si ya tiene su balanza cargada.",
+    "listTitle": "Tus clientes",
+    "colClient": "Cliente",
+    "colRfc": "RFC",
+    "colPeople": "Personas con acceso",
+    "colBalanza": "Balanza",
+    "balanzaYes": "Cargada",
+    "balanzaNo": "Sin cargar",
+    "open": "Abrir",
+    "openAria": "Abrir {name}",
+    "openNumbers": "Ver sus cifras",
+    "newTitle": "Dar de alta un cliente",
+    "create": "Dar de alta",
+    "empty": "Todavía no tienes clientes. Da de alta el primero abajo.",
+    "loadFailed": "No pudimos cargar tus clientes. Recarga la página para intentarlo de nuevo.",
+    "notFound": "No encontramos este cliente. Vuelve a la lista y elige otro.",
+    "teamOnly": "Esta sección es solo para el equipo de Cifra."
   }
 }
