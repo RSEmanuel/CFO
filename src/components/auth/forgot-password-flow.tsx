@@ -17,6 +17,7 @@ const REASON_MESSAGE_KEY: Record<string, string> = {
 const LABEL_CLASS = "text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground";
 const PRIMARY_BUTTON_CLASS =
   "flex h-12 items-center justify-center rounded-full bg-clay text-[15px] font-medium text-white transition-colors hover:bg-clay-hover disabled:pointer-events-none disabled:opacity-50";
+const LOCKED_INPUT_CLASS = "cursor-not-allowed bg-muted text-muted-foreground";
 const LINK_BUTTON_CLASS = "text-center text-[13.5px] text-muted-foreground hover:text-clay";
 
 function errorMessageKey(error: unknown): string {
@@ -30,6 +31,8 @@ function errorMessageKey(error: unknown): string {
  *
  * variant="welcome" (pantalla /set-password del correo de bienvenida): empieza directo en el
  * paso del código, pide también el correo y usa los textos de "Establece tu contraseña".
+ * Si el enlace trae correo o código, esos campos van de solo lectura; sin correo, el correo se
+ * puede escribir. Al reenviar el código se desbloquea el campo, porque el anterior ya no sirve.
  */
 export function ForgotPasswordFlow({
   initialEmail,
@@ -49,6 +52,9 @@ export function ForgotPasswordFlow({
   const [step, setStep] = useState<"request" | "reset">(welcome ? "reset" : "request");
   const [email, setEmail] = useState(initialEmail);
   const [code, setCode] = useState(initialCode);
+  const [codeUnlocked, setCodeUnlocked] = useState(false);
+  const emailLocked = welcome && initialEmail.trim() !== "";
+  const codeLocked = welcome && initialCode !== "" && !codeUnlocked;
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -87,6 +93,8 @@ export function ForgotPasswordFlow({
     }
     if (await requestCode()) {
       setNotice(t("auth.resetResent"));
+      setCode("");
+      setCodeUnlocked(true);
     }
   }
 
@@ -181,7 +189,7 @@ export function ForgotPasswordFlow({
           {welcome ? t("setPassword.title") : t("auth.resetTitle")}
         </h2>
         <p className="break-words text-sm leading-[1.5] text-muted-foreground">
-          {welcome ? t("setPassword.help") : t("auth.resetHelp", { email })}
+          {welcome ? t(emailLocked ? "setPassword.helpPrefilled" : "setPassword.help") : t("auth.resetHelp", { email })}
         </p>
       </div>
       <form className="flex flex-col gap-6" onSubmit={onReset}>
@@ -196,7 +204,9 @@ export function ForgotPasswordFlow({
                 required
                 value={email}
                 onChange={(event) => setEmail(event.target.value)}
-                className="h-[46px] bg-background"
+                readOnly={emailLocked}
+                aria-readonly={emailLocked}
+                className={`h-[46px] ${emailLocked ? LOCKED_INPUT_CLASS : "bg-background"}`}
               />
             </label>
           ) : null}
@@ -210,7 +220,9 @@ export function ForgotPasswordFlow({
               required
               value={code}
               onChange={(event) => setCode(event.target.value)}
-              className="cifra-num h-[46px] bg-background tracking-[0.3em]"
+              readOnly={codeLocked}
+              aria-readonly={codeLocked}
+              className={`cifra-num h-[46px] tracking-[0.3em] ${codeLocked ? LOCKED_INPUT_CLASS : "bg-background"}`}
             />
           </label>
           <label className="flex flex-col gap-[7px]" htmlFor="reset-new-password">
