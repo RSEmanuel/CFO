@@ -157,6 +157,8 @@ export const ExpandableShell = forwardRef<
         role={expanded ? "dialog" : undefined}
         aria-modal={expanded ? true : undefined}
         className={cn(
+          // relative ancla la estrella de favoritos a la esquina; ampliada, fixed ya posiciona la tarjeta.
+          !expanded && "relative",
           className,
           expanded &&
             "fixed inset-3 z-50 !m-0 flex h-auto w-auto max-w-none flex-col overflow-auto shadow-[var(--shadow-md)] sm:inset-6 lg:inset-x-20 lg:inset-y-12",
@@ -192,7 +194,7 @@ export const ExpandableChartCard = forwardRef<HTMLDivElement, ExpandableChartCar
     <ExpandableShell ref={ref} className={className}>
       {(toggle, expanded) => (
         <>
-          <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
+          <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0 pr-10">
             <div className="min-w-0">
               <CardTitle>{title}</CardTitle>
               <InsightText text={insightText} />

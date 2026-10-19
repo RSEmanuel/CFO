@@ -54,7 +54,7 @@ function splitSegments(split: GastoOpexControl["split"]) {
 
 function TitleRow({ title, widgetId, extra }: { title: string; widgetId: string; extra?: ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-2">
+    <div className="flex items-start justify-between gap-2 pr-10">
       <div className="flex min-w-0 items-center gap-1.5">
         <p className="font-sans text-base font-bold text-foreground">{title}</p>
         {extra}
@@ -70,7 +70,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
   if (kind === "absorcion") {
     const title = t("resultados.opex.absorptionTitle");
     return (
-      <article className="rounded-card border border-category-marginsFg/20 bg-category-margins px-4 py-3 shadow-[var(--shadow-card)]">
+      <article className="relative rounded-card border border-category-marginsFg/20 bg-category-margins px-4 py-3 shadow-[var(--shadow-card)]">
         <TitleRow title={title} widgetId={GASTO_CONTROL_FAVORITE_ID.absorcion} />
         <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
           {control.absorcionPct == null ? t("resultados.opex.na") : `${control.absorcionPct.toFixed(1)}%`}
@@ -91,7 +91,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
     return (
       <article
         className={cn(
-          "rounded-card border px-4 py-3 shadow-[var(--shadow-card)]",
+          "relative rounded-card border px-4 py-3 shadow-[var(--shadow-card)]",
           control.jaws == null
             ? "border-border bg-card"
             : jawsPositive
@@ -160,7 +160,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
       .map((cuenta) => `${cuenta.idCuenta} ${cuenta.nombreCuenta}`)
       .join(" · ");
     return (
-      <article className="rounded-card border border-category-efficiencyFg/20 bg-category-efficiency px-4 py-3 shadow-[var(--shadow-card)]">
+      <article className="relative rounded-card border border-category-efficiencyFg/20 bg-category-efficiency px-4 py-3 shadow-[var(--shadow-card)]">
         <TitleRow title={title} widgetId={GASTO_CONTROL_FAVORITE_ID.laboral} />
         <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight" title={laborHintAccounts || undefined}>
           {KPI_FORMATTER.format(control.laboral.monto)}
@@ -179,7 +179,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
   const splitLabel = (key: "venta" | "admin" | "otros") =>
     t(key === "venta" ? "resultados.opex.splitVenta" : key === "admin" ? "resultados.opex.splitAdmin" : "resultados.opex.splitOtros");
   return (
-    <article className="rounded-card border border-border bg-card px-4 py-3 shadow-[var(--shadow-card)]">
+    <article className="relative rounded-card border border-border bg-card px-4 py-3 shadow-[var(--shadow-card)]">
       <TitleRow title={title} widgetId={GASTO_CONTROL_FAVORITE_ID.split} />
       <p className="mt-2 text-sm font-medium text-foreground">
         {splitRows

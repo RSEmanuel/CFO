@@ -151,7 +151,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
     <ExpandableShell className="p-6">
       {(toggle, expanded) => (
         <>
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3 pr-10">
             <div className="flex items-start gap-2">
               <div>
                 <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.cogs.analisisTitle")}</h3>

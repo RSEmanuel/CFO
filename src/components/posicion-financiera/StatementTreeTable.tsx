@@ -205,8 +205,8 @@ export function StatementTreeTable({
 
   return (
     <TooltipProvider>
-      <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+        <div className="flex flex-col gap-4 pr-10 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
               <h2 className="font-sans text-xl font-medium text-foreground">{title}</h2>

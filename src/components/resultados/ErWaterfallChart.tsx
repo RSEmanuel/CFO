@@ -139,7 +139,7 @@ export function ErWaterfallChart({ nodes, yearKey, loading, empty }: ErWaterfall
     <ExpandableShell className="p-6">
       {(toggle, expanded) => (
         <>
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3 pr-10">
             <div>
               <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-clay">
                 {t("posicionFinanciera.waterfall.eyebrow")}

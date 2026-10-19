@@ -72,7 +72,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
     <ExpandableShell className="p-6">
       {(toggle) => (
         <>
-          <div className="mb-1 flex flex-wrap items-start justify-between gap-3">
+          <div className="mb-1 flex flex-wrap items-start justify-between gap-3 pr-10">
             <div>
               <h3 className="font-sans text-lg font-medium text-foreground">{t("resultados.cogs.title")}</h3>
               <p className="mt-1 text-sm text-muted-foreground">{t("resultados.cogs.help")}</p>

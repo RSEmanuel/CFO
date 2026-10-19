@@ -136,7 +136,7 @@ export function CategorySeriesCard({
       {(toggle, expanded) => (
         <>
           <div className="flex w-full flex-col lg:w-[30%]">
-            <div className="mb-4 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2 pr-10 lg:pr-0">
               <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
                 <LineChartIcon className="h-4 w-4" />
               </span>
@@ -161,7 +161,7 @@ export function CategorySeriesCard({
           </div>
 
           <div className={cn("flex w-full min-w-0 flex-col lg:w-[70%]", expanded && "min-h-0 flex-1")}>
-            <div className="flex items-center justify-end gap-1">
+            <div className="flex items-center justify-end gap-1 lg:pr-10">
               {canToggleYear ? (
                 <div
                   role="group"
@@ -252,7 +252,7 @@ export function IncomeBreakdownCard({
     <ExpandableShell className="p-6">
       {(toggle) => (
         <>
-          <div className="mb-4 flex items-center gap-2">
+          <div className="mb-4 flex items-center gap-2 pr-10">
             <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
               <BarChartHorizontal className="h-4 w-4" />
             </span>

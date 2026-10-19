@@ -50,8 +50,8 @@ export function DestacadosRubroCard({
   const favorable = isFavorable(rubro);
   const title = t(rubroTitleKey(rubro.key));
   return (
-    <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-3">
+    <article className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+      <div className="flex items-start justify-between gap-3 pr-10">
         <p className="font-sans text-lg font-bold text-foreground">{title}</p>
         <div className="flex items-center gap-1">
           <FavoriteStarButton widgetId={`destacados:${rubro.key}`} label={title} />

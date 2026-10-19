@@ -266,7 +266,7 @@ function Top5Card({
     <ExpandableShell className="w-full overflow-x-hidden p-6">
       {(toggle, expanded) => (
         <>
-          <div className="mb-1 flex items-start justify-between gap-3">
+          <div className="mb-1 flex items-start justify-between gap-3 pr-10">
             <div className="min-w-0">
               <h3 className="font-sans text-lg font-medium text-foreground">{title}</h3>
               <InsightText text={insightText} />

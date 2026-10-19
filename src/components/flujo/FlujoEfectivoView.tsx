@@ -150,7 +150,7 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
     <ExpandableShell className="w-full">
       {(toggle, expanded) => (
         <>
-          <CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 sm:flex-row">
+          <CardHeader className="flex flex-col items-start justify-between gap-4 space-y-0 pr-10 sm:flex-row">
             <div>
               <CardTitle>{t("flujo.efectivo.mapaTitle")}</CardTitle>
               <CardDescription>{t("flujo.efectivo.mapaHelp")}</CardDescription>

@@ -57,8 +57,8 @@ function KpiCard({
   favoriteId?: string;
 }) {
   return (
-    <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-2">
+    <article className="relative rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+      <div className={cn("flex items-start justify-between gap-2", favoriteId && "pr-10")}>
         <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{label}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={label} /> : null}
       </div>
@@ -187,7 +187,7 @@ export function FlujoOperativoTablero({
     <ExpandableShell className="p-5">
       {(toggle, expanded) => (
         <>
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3 pr-10">
             <div className="min-w-0">
               <h3 className="font-sans text-lg font-medium text-foreground">
                 {t("flujo.operativo.saldoDiario.title")} · {formatPeriodoMesAnio(data.periodo, locale)}

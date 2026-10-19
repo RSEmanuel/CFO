@@ -251,7 +251,7 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows,
         {(toggle, expanded) => (
           <>
             <div className="flex w-full min-w-0 flex-col md:w-[40%]">
-              <div className="mb-4 flex items-center gap-2">
+              <div className="mb-4 flex items-center gap-2 pr-10 md:pr-0">
                 <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
                   <Receipt className="h-4 w-4" />
                 </span>
@@ -306,7 +306,7 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows,
 
             <div
               className={cn(
-                "w-full min-w-0 md:w-[60%]",
+                "w-full min-w-0 md:w-[60%] md:pt-5",
                 expanded ? "min-h-[320px] flex-1 md:min-h-0 md:flex-initial" : "h-[320px] md:h-[360px]",
               )}
             >

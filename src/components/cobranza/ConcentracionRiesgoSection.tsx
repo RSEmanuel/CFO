@@ -141,7 +141,7 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
     <ExpandableShell className="p-5">
       {(toggle, expanded) => (
       <>
-      <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-3 pr-10">
         <div>
           <h2 className="font-sans text-lg font-medium text-foreground">
             {t("cobranza.concentracion.chartTitle")}

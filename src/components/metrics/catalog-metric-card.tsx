@@ -26,11 +26,11 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
   return (
     <article
       className={cn(
-        "group flex min-h-[238px] flex-col rounded-card border p-5 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5",
+        "group relative flex min-h-[238px] flex-col rounded-card border p-5 shadow-[var(--shadow-card)] transition duration-200 hover:-translate-y-0.5",
         category.cardClass,
       )}
     >
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex items-center justify-end gap-3 pr-10">
         <div className="flex items-center gap-1">
           <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", category.badgeClass)}>
             {t(`metrics.categories.${metric.category}`)}

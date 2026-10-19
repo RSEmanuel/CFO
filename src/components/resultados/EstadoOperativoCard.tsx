@@ -128,8 +128,8 @@ export function EstadoOperativoCard({ periodo }: EstadoOperativoCardProps) {
     <div className="space-y-6">
       <EbitdaEbitTtmChart ttm={data.ttm} />
 
-      <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+      <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+        <div className="mb-4 flex flex-wrap items-start justify-between gap-3 pr-10">
           <div className="flex items-start gap-2">
             <div>
               <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.title")}</h3>

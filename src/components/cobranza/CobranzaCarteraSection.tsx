@@ -63,13 +63,13 @@ function KpiCard({
   return (
     <article
       className={cn(
-        "rounded-card border p-6 shadow-[var(--shadow-card)]",
+        "relative rounded-card border p-6 shadow-[var(--shadow-card)]",
         tone === "margins"
           ? "border-category-marginsFg/20 bg-category-margins"
           : "border-category-solvencyFg/20 bg-category-solvency",
       )}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 pr-10">
         <p className="font-sans text-lg font-bold text-foreground">{label}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={label} /> : null}
       </div>
@@ -96,13 +96,13 @@ function PlazoKpiCard({
   return (
     <article
       className={cn(
-        "rounded-card border p-6 shadow-[var(--shadow-card)]",
+        "relative rounded-card border p-6 shadow-[var(--shadow-card)]",
         tone === "margins" && "border-category-marginsFg/20 bg-category-margins",
         tone === "solvency" && "border-category-solvencyFg/20 bg-category-solvency",
         tone === "efficiency" && "border-category-efficiencyFg/20 bg-category-efficiency",
       )}
     >
-      <div className="flex items-start justify-between gap-2">
+      <div className="flex items-start justify-between gap-2 pr-10">
         <p className="font-sans text-lg font-bold text-foreground">{title}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
       </div>
@@ -146,6 +146,7 @@ function PlazosComercialesRow({ plazos }: { plazos: PlazosComerciales }) {
           subtitle={t("cobranza.cartera.brechaSubtitle")}
           value={formatPlazoDias(plazos.brecha, na)}
           tone={brechaTone}
+          favoriteId="kpi-cobranza-brecha"
         />
       </div>
       {kind === "deficit" ? (
@@ -565,7 +566,7 @@ export function CobranzaCarteraSection() {
   );
 }
 
-export type CobranzaCarteraKpiKey = "total-cartera" | "cobrado" | "facturacion" | "dso" | "dpo";
+export type CobranzaCarteraKpiKey = "total-cartera" | "cobrado" | "facturacion" | "dso" | "dpo" | "brecha";
 
 /**
  * KPI individual de cartera para el Panel de Control. Auto-fetch en MXN
@@ -583,6 +584,17 @@ export function CobranzaCarteraKpiCard({ kpi }: { kpi: CobranzaCarteraKpiKey }) 
   }
 
   const na = t("common.na");
+  if (kpi === "brecha") {
+    return (
+      <PlazoKpiCard
+        title={t("cobranza.cartera.brechaTitle")}
+        subtitle={t("cobranza.cartera.brechaSubtitle")}
+        value={formatPlazoDias(data.plazos.brecha, na)}
+        tone={brechaKind(data.plazos.brecha) === "superavit" ? "margins" : "efficiency"}
+        favoriteId="kpi-cobranza-brecha"
+      />
+    );
+  }
   if (kpi === "dso" || kpi === "dpo") {
     const isDso = kpi === "dso";
     return (

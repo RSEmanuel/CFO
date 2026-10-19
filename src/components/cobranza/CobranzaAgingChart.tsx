@@ -43,7 +43,7 @@ export function CobranzaAgingChart() {
     <ExpandableShell className="p-5">
       {(toggle, expanded) => (
       <>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 pr-10">
         <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.aging")}</h2>
         <div className="flex items-center gap-1">
           <FavoriteStarButton widgetId="chart-cobranza-aging" label={t("cobranza.aging")} />

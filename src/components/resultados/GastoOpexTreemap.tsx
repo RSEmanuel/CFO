@@ -266,8 +266,8 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
   }
 
   return (
-    <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <div className="mb-4">
+    <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+      <div className="mb-4 pr-10">
         <div className="flex items-center gap-1.5">
           <h2 className="font-sans text-xl font-bold text-foreground">{t("resultados.opex.treemap.title")}</h2>
           <FavoriteStarButton widgetId="chart-gasto-treemap" label={t("resultados.opex.treemap.title")} />
