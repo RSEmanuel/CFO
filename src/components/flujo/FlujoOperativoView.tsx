@@ -4,6 +4,7 @@ import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
+import { formatPeriodoMesAnio } from "@/lib/formatPeriodo";
 import { cn } from "@/lib/utils";
 import { useFlujoOperativo } from "@/hooks/use-flujo-operativo";
 import { CHART, CHART_AXIS, CHART_VARS } from "@/lib/chart-theme";
@@ -165,7 +166,7 @@ export function FlujoOperativoTablero({
   data: FlujoOperativoPayload;
   units: DisplayUnits;
 }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const chartData: OperativoRow[] = data.puntos.map((punto) => ({
     dia: punto.label.slice(8),
     saldoAcumulado: punto.saldoAcumulado,
@@ -189,7 +190,7 @@ export function FlujoOperativoTablero({
           <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
             <div className="min-w-0">
               <h3 className="font-sans text-lg font-medium text-foreground">
-                {t("flujo.operativo.saldoDiario.title")} · {data.periodo}
+                {t("flujo.operativo.saldoDiario.title")} · {formatPeriodoMesAnio(data.periodo, locale)}
               </h3>
               <p className="text-sm text-muted-foreground">{t("flujo.operativo.saldoDiario.help")}</p>
             </div>
