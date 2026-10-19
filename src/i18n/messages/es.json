@@ -808,7 +808,8 @@
       "entradasOperativas": "Entradas operativas",
       "salidasOperativas": "Salidas operativas",
       "emptyTitle": "Flujo de efectivo aún no disponible",
-      "emptyMessage": "Carga el reporte de flujo de efectivo (o la plantilla máster) para ver el detalle por categoría."
+      "emptyMessage": "Carga el reporte de flujo de efectivo (o la plantilla máster) para ver el detalle por categoría.",
+      "totalIngresos": "Total de ingresos"
     },
     "libre": {
       "title": "De la utilidad al efectivo",

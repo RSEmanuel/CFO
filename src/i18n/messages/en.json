@@ -808,7 +808,8 @@
       "entradasOperativas": "Operating inflows",
       "salidasOperativas": "Operating outflows",
       "emptyTitle": "Cash flow not available yet",
-      "emptyMessage": "Upload the cash flow report (or the master template) to see category detail."
+      "emptyMessage": "Upload the cash flow report (or the master template) to see category detail.",
+      "totalIngresos": "Total income"
     },
     "libre": {
       "title": "From profit to cash",
