@@ -2030,5 +2030,15 @@
     "exit": "Salir de vista cliente",
     "banner": "Estás viendo Cifra como cliente ({company})",
     "bannerHelp": "Así ve el portal quien solo consulta. Tus permisos reales no cambian."
+  },
+  "welcomeEmail": {
+    "tab": "Correo de bienvenida",
+    "title": "Correo de bienvenida",
+    "help": "Así llega el correo a cada persona que das de alta. También es el que reciben quienes olvidan su contraseña.",
+    "subject": "Asunto",
+    "sampleCode": "Código de ejemplo",
+    "iframeTitle": "Vista previa del correo de bienvenida",
+    "exportHint": "El código y el enlace son de ejemplo. Para cambiar el correo que se envía hay que exportar la plantilla y subirla a la consola de AWS.",
+    "adminOnly": "Esta sección es solo para el equipo de Cifra."
   }
 }

@@ -2030,5 +2030,15 @@
     "exit": "Exit client view",
     "banner": "You're viewing Cifra as a client ({company})",
     "bannerHelp": "This is what a view-only user sees. Your real permissions don't change."
+  },
+  "welcomeEmail": {
+    "tab": "Welcome email",
+    "title": "Welcome email",
+    "help": "This is how the email reaches each person you add. People who forget their password get it too.",
+    "subject": "Subject",
+    "sampleCode": "Sample code",
+    "iframeTitle": "Welcome email preview",
+    "exportHint": "The code and link are samples. To change the email that goes out, export the template and upload it to the AWS console.",
+    "adminOnly": "This section is only for the Cifra team."
   }
 }

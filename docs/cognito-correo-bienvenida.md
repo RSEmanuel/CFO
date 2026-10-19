@@ -19,47 +19,42 @@ y después entra por `/login`.
 4. Si el correo no salió, la pantalla de Usuarios lo dice y ofrece **Reenviar correo**
    (`POST /api/admin/users/welcome`).
 
-## Plantilla en la consola de AWS (no vive en el repo)
+## Plantilla del correo
 
 El correo de bienvenida y el de "olvidé mi contraseña" usan la **misma plantilla** de Cognito
-(mensaje de verificación). Por eso el texto de abajo sirve para los dos casos.
+(mensaje de verificación), así que el texto sirve para los dos casos.
 
-Ruta: **Amazon Cognito → User pools → (pool de Cifra) → Messaging → Message templates →
-Verification message → Edit**.
+- **Fuente única:** `src/services/email/welcomeEmailTemplate.ts` (asunto, HTML con `{{CODE}}` y
+  `{{APP_URL}}`, y `renderWelcomeEmail`). Para cambiar el diseño o el texto, edita ese archivo.
+- **Vista previa:** en el portal, **Configuración → Correo de bienvenida** (solo ADMIN y CFO_PARTNER),
+  con el código ficticio `123456`.
+- **HTML de referencia para AWS:** `docs/templates/welcome-email.html`, generado con
 
-- **Verification type:** Code
-- **Email subject:**
-
+```bash
+npm run email:export
 ```
-Cifra: establece tu contraseña
-```
 
-- **Email message** (HTML; debe incluir `{####}`, que Cognito sustituye por el código):
+  El script sustituye `{{CODE}}` por `{####}` y `{{APP_URL}}` por `https://app.cfocifra.com`, y falla
+  si falta `{####}` o si el HTML pasa de 20,000 caracteres (límite de Cognito). No edites ese archivo a
+  mano: regenéralo.
 
-```html
-<div style="font-family:Arial,Helvetica,sans-serif;color:#101425;max-width:520px;margin:0 auto;padding:24px;">
-  <p style="font-size:18px;font-weight:bold;margin:0 0 16px;">Bienvenido a Cifra</p>
-  <p style="font-size:15px;line-height:1.5;margin:0 0 16px;">
-    Para entrar a Cifra, establece tu contraseña con este código. Vence en una hora.
-  </p>
-  <p style="font-size:28px;font-weight:bold;letter-spacing:6px;font-family:'Courier New',monospace;margin:0 0 20px;">{####}</p>
-  <p style="margin:0 0 20px;">
-    <a href="https://app.cfocifra.com/set-password?code={####}"
-       style="display:inline-block;background:#1550E0;color:#ffffff;text-decoration:none;font-size:15px;font-weight:bold;padding:12px 22px;border-radius:999px;">
-      Establecer contraseña
-    </a>
-  </p>
-  <p style="font-size:13px;line-height:1.5;color:#646B85;margin:0;">
-    Si no pediste este correo, ignóralo: tu cuenta sigue igual.<br />
-    Cifra · CFO virtual. Un producto de Data Frontier.
-  </p>
-</div>
-```
+### Subirla a Cognito
+
+1. Corre `npm run email:export` y abre `docs/templates/welcome-email.html`; copia todo su contenido.
+2. En AWS: **Amazon Cognito → User pools → (pool de Cifra) → Messaging → Message templates →
+   Verification message → Edit**.
+3. **Verification type:** Code.
+4. **Email subject:** el que imprime el script (hoy `Cifra: crea tu contraseña para entrar`).
+5. **Email message:** pega el HTML completo y guarda (**Save changes**).
+6. Prueba: da de alta un usuario de prueba con `DEV_AUTH_BYPASS=false` o usa "Olvidé mi contraseña"
+   con una cuenta tuya, y revisa el correo en Gmail y Outlook.
 
 Notas:
 
 - Los colores van en hexadecimal porque los clientes de correo no leen las variables CSS del portal;
-  son los mismos valores de `tokens/cifra.tokens.css` (`--cifra-ink`, `--cifra-brand`, `--cifra-ink-3`).
+  son los mismos valores de `tokens/cifra.tokens.css`, mapeados en el objeto `COLOR` de la plantilla.
+- Sin SVG (Gmail no los muestra): el encabezado es la palabra "Cifra" en serif. Las fuentes de marca
+  se piden por nombre y caen a Georgia, Arial y Courier New donde no están instaladas.
 - El código vence en 1 hora (valor fijo de Cognito para ForgotPassword).
 - Con el remitente por defecto de Cognito (`COGNITO_DEFAULT`) el límite es de 50 correos al día por
   cuenta; para producción conviene configurar SES en **Messaging → Email**.

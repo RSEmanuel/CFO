@@ -11,9 +11,10 @@ import type { ReactNode } from "react";
 const TABS = [
   { href: "/dashboard/settings", labelKey: "settings.tabGeneral" },
   { href: "/dashboard/settings/usuarios", labelKey: "settings.tabUsers" },
+  { href: "/dashboard/settings/correo", labelKey: "welcomeEmail.tab" },
 ] as const;
 
-/** Pestañas de Configuración. Quien solo consulta no ve la de Usuarios. */
+/** Pestañas de Configuración. Quien solo consulta no ve Usuarios ni Correo de bienvenida. */
 export default function SettingsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { effectiveRole } = useSession();
