@@ -63,6 +63,12 @@ type HeroBarChartProps = {
   valueLabelFormatter?: (value: number, dataKey: string, payload: HeroBarDatum) => string;
 };
 
+function segmentValue(payload: HeroBarDatum, dataKey: string): number {
+  const raw = payload[dataKey];
+  const numeric = typeof raw === "number" ? raw : Number(raw ?? 0);
+  return Number.isFinite(numeric) ? numeric : 0;
+}
+
 export function HeroBarChart({
   data,
   xKey,
@@ -121,7 +127,7 @@ export function HeroBarChart({
               radius={roundTop ? [4, 4, 0, 0] : [0, 0, 0, 0]}
               maxBarSize={80}
             >
-              {showValueLabels ? (
+              {showValueLabels && !isStacked ? (
                 <LabelList
                   position="top"
                   fill={CHART_AXIS.tick}
@@ -134,6 +140,26 @@ export function HeroBarChart({
                       return valueLabelFormatter(Number.isFinite(numeric) ? numeric : 0, item.dataKey, payload);
                     }
                     return Number.isFinite(numeric) ? String(numeric) : "";
+                  }}
+                />
+              ) : null}
+              {showValueLabels && isStacked ? (
+                <LabelList
+                  position="top"
+                  fill={CHART_AXIS.tick}
+                  fontSize={12}
+                  className="financial-nums"
+                  style={{ fontWeight: 700, fontFamily: "var(--cifra-font-mono)", fontVariantNumeric: "tabular-nums" }}
+                  valueAccessor={(entry) => {
+                    const payload = (entry.payload ?? {}) as HeroBarDatum;
+                    // Una sola cifra por pila: la lleva la serie más alta con valor en esa barra.
+                    // Si siempre fuera la última serie, una barra con ese segmento vacío quedaría sin total.
+                    const stack = series.filter((other) => other.stackId === item.stackId);
+                    const topKey = [...stack].reverse().find((other) => segmentValue(payload, other.dataKey) !== 0)?.dataKey;
+                    if (topKey !== item.dataKey) return "";
+                    const total = stack.reduce((sum, other) => sum + segmentValue(payload, other.dataKey), 0);
+                    if (total === 0) return "";
+                    return valueLabelFormatter ? valueLabelFormatter(total, item.dataKey, payload) : String(total);
                   }}
                 />
               ) : null}

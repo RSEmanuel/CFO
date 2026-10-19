@@ -12,6 +12,7 @@ import { IngresoMonitor } from "@/components/resultados/IngresoMonitor";
 import { ResultadosTop5Charts } from "@/components/resultados/ResultadosTop5Charts";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
+import { monthLabelKey } from "@/i18n/format";
 import { formatAxisTick, formatMxn } from "@/services/money";
 import { buildIncomeBreakdown, buildStackedSeries } from "@/services/financialDataTransformer";
 import type { MonthlyFinancials, ResultadosCategoryName } from "@/services/financialDataTransformer";
@@ -50,6 +51,8 @@ function StackedCategoryChart({
         fill: HERO_CHART_COLORS[index % HERO_CHART_COLORS.length],
         stackId: "category",
       }))}
+      showValueLabels
+      valueLabelFormatter={(value) => formatAxisTick(value, units)}
     />
   );
 }
@@ -333,18 +336,25 @@ export function ResultadosCategoryView({
       { temporalidad: "year", periodo, comparable, currency: "mxn", units, analysis: "amount" },
       "Ingreso",
     );
+    // Cada año suma de enero al mes de corte; un año con menos meses en ese tramo se ve más bajo.
+    const cutoffMonth = Number(periodo.slice(5, 7)) || 12;
     const monthsByYear = new Map<string, number>();
     for (const row of rows) {
+      if (Number(row.periodo.slice(5, 7)) > cutoffMonth) continue;
       const year = row.periodo.slice(0, 4);
       monthsByYear.set(year, (monthsByYear.get(year) ?? 0) + 1);
     }
-    const partial = [...monthsByYear.entries()].filter(([, count]) => count < 12).map(([year]) => year);
+    const partial = [...monthsByYear.entries()].filter(([, count]) => count < cutoffMonth).map(([year]) => year);
     const years =
       partial.length > 1 ? `${partial.slice(0, -1).join(", ")} ${t("common.and")} ${partial.at(-1)}` : partial[0];
+    const notes = [
+      cutoffMonth < 12 ? t("resultados.yearCutoffNote", { month: t(monthLabelKey(cutoffMonth - 1)) }) : null,
+      years ? t("resultados.partialYearsNote", { years }) : null,
+    ].filter(Boolean);
     return {
       chartData: series.chartData,
       selectedLabel: series.headlineLabel,
-      partialYearsNote: years ? t("resultados.partialYearsNote", { years }) : null,
+      partialYearsNote: notes.length ? notes.join(" ") : null,
     };
   }, [rows, category, temporalidad, periodo, comparable, units, t]);
   if (category === "Gasto") {

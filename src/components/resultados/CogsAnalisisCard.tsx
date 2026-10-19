@@ -6,6 +6,7 @@ import { useLocale } from "@/context/LocaleContext";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useCogsDesglose } from "@/hooks/use-cogs-desglose";
 import { CHART, COGS_STACK } from "@/lib/chart-theme";
+import { formatAccountName } from "@/lib/formatAccountName";
 import { cn } from "@/lib/utils";
 import type { CogsAnalysisRow, CogsColumnCell, CogsLineRef, CogsStackedMix } from "@/services/cogsDesglose";
 import { formatMxn } from "@/services/money";
@@ -38,7 +39,7 @@ function lineLabel(line: CogsLineRef, t: (key: string) => string): string {
   if (line.kind === "rubro" && line.rubroKey) {
     return t(`resultados.cogs.rubros.${line.rubroKey}`);
   }
-  return line.nombre;
+  return formatAccountName(line.nombre);
 }
 
 function formatPct(value: number | null): string {

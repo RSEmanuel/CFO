@@ -246,15 +246,47 @@ describe("serie de ingreso total", () => {
     assert.equal(ytd.value, fromChart);
   });
 
-  it("Año dibuja un punto por año con el mismo total", () => {
+  it("Año dibuja un punto por año y solo suma de enero al mes de corte", () => {
     const year = buildStackedSeries(rows, { ...baseFilters, temporalidad: "year" }, "Ingreso");
+    // Corte febrero: 2025 solo tiene diciembre, fuera del tramo ene-feb: sin datos, no 0.
     assert.deepEqual(
       year.chartData.map((point) => [point.month, point.total]),
       [
-        ["2025", 150],
+        ["2025", null],
         ["2026", 600],
       ],
     );
+  });
+
+  it("Año compara los mismos meses entre años y con corte en diciembre suma el año completo", () => {
+    const month = (periodo: string, total: number): MonthlyFinancials => ({
+      periodo,
+      ingreso_total: total,
+      desglose_ingreso: { "Cuenta A": total },
+      micro_categorias: {},
+      costo_total: 0,
+      desglose_costo: {},
+      gasto_total: 0,
+      desglose_gasto: {},
+      ebitda: total,
+    });
+    const data = [
+      ...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((m) => month(`2025-${String(m).padStart(2, "0")}`, 10)),
+      ...[1, 2, 3, 4, 5].map((m) => month(`2026-${String(m).padStart(2, "0")}`, 20)),
+    ];
+    const may = buildStackedSeries(data, { ...baseFilters, periodo: "2026-05", temporalidad: "year" }, "Ingreso");
+    assert.deepEqual(
+      may.chartData.map((point) => [point.month, point.total]),
+      [
+        ["2025", 50],
+        ["2026", 100],
+      ],
+    );
+    assert.equal(may.headlineTotal, 100);
+    assert.equal(may.comparableTotal, 50);
+
+    const december = buildStackedSeries(data, { ...baseFilters, periodo: "2025-12", temporalidad: "year" }, "Ingreso");
+    assert.equal(december.chartData.find((point) => point.month === "2025")?.total, 120);
   });
 
   it("conserva seriesKeys apilables para Costo y Gasto", () => {

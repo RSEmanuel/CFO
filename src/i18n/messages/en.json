@@ -549,7 +549,8 @@
     "chartByMonth": "By month",
     "chartByYear": "By year",
     "chartViewLabel": "View revenue by month or by year",
-    "partialYearsNote": "Years without all 12 months: {years}. They look lower; to compare years, use the Year to date card."
+    "yearCutoffNote": "Every year adds up January to {month}: the same months in all of them.",
+    "partialYearsNote": "Years missing some of those months: {years}. They look lower."
   },
   "widgets": {
     "customize": "Customize view",

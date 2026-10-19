@@ -100,6 +100,14 @@ function parsePeriodo(periodo: string): { year: number; month: number } {
   return { year: year || 2025, month: month || 12 };
 }
 
+/** Meses de `itemYear` hasta el mes de corte: así todos los años suman el mismo tramo (enero a corte). */
+function rowsOfYearToCutoff(rows: MonthlyFinancials[], itemYear: number, cutoffMonth: number): MonthlyFinancials[] {
+  return rows.filter((row) => {
+    const p = parsePeriodo(row.periodo);
+    return p.year === itemYear && p.month <= cutoffMonth;
+  });
+}
+
 function sumBreakdown(rows: MonthlyFinancials[], category: ResultadosCategoryName): Record<string, number> {
   const keys = seriesKeysFor(category, rows);
   const acc: Record<string, number> = Object.fromEntries(keys.map((key) => [key, 0]));
@@ -183,11 +191,10 @@ export function buildStackedSeries(
   if (temporalidad === "year") {
     const years = Array.from(new Set(rows.map((row) => Number(row.periodo.slice(0, 4))))).sort();
     const chartData = years.map((itemYear) => {
-      const ofYear = rows.filter((row) => row.periodo.startsWith(`${itemYear}-`));
-      return chartPoint(String(itemYear), ofYear, category);
+      return chartPoint(String(itemYear), rowsOfYearToCutoff(rows, itemYear, month), category);
     });
-    const ofSelected = rows.filter((row) => row.periodo.startsWith(`${year}-`));
-    const priorYear = rows.filter((row) => row.periodo.startsWith(`${year - 1}-`));
+    const ofSelected = rowsOfYearToCutoff(rows, year, month);
+    const priorYear = rowsOfYearToCutoff(rows, year - 1, month);
     const selectedBreakdown = sumBreakdown(ofSelected, category);
     const headlineTotal = ofSelected.length > 0 ? breakdownTotal(selectedBreakdown) : null;
 
@@ -399,7 +406,7 @@ export function selectedPeriodRows(rows: MonthlyFinancials[], filters: Resultado
   const { year, month } = parsePeriodo(periodo);
 
   if (temporalidad === "year") {
-    return rows.filter((row) => row.periodo.startsWith(`${year}-`));
+    return rowsOfYearToCutoff(rows, year, month);
   }
   if (temporalidad === "quarter") {
     return rowsInQuarter(rows, year, Math.ceil(month / 3));
@@ -480,13 +487,13 @@ export function getDestacadosKpis(rows: MonthlyFinancials[], filters: Resultados
   const { year, month } = parsePeriodo(periodo);
 
   if (temporalidad === "year") {
-    const ofSelected = rows.filter((row) => row.periodo.startsWith(`${year}-`));
-    const priorYear = comparable === "yoy" ? rows.filter((row) => row.periodo.startsWith(`${year - 1}-`)) : [];
+    const ofSelected = rowsOfYearToCutoff(rows, year, month);
+    const priorYear = comparable === "yoy" ? rowsOfYearToCutoff(rows, year - 1, month) : [];
     const current = sumRubros(ofSelected);
     const prior = comparable === "yoy" && priorYear.length ? sumRubros(priorYear) : null;
     return {
       rubros: toRubros(current, prior),
-      contextLabel: prior ? "vs año anterior" : null,
+      contextLabel: prior ? (month < 12 ? "vs mismo periodo del año anterior" : "vs año anterior") : null,
     };
   }
 
