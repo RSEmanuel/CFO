@@ -1,4 +1,5 @@
 import type { FavoritesState } from "@/lib/favorites-storage";
+import type { RatioGaugeId } from "@/lib/posicion-financiera/ratioGaugeZones";
 import type { ResultadosCategoryName } from "@/services/financialDataTransformer";
 import type { CategoryTemporalKey } from "@/services/resultadosKpis";
 
@@ -118,6 +119,26 @@ const GASTO_CONTROL_TITLE: Record<GastoControlKind, string> = {
   split: "resultados.opex.splitTitle",
 };
 
+/** Tarjetas de Razones en Posición Financiera (ROE solo vive en la tabla). */
+export type PosicionGaugeKind = Exclude<RatioGaugeId, "roe">;
+
+export const POSICION_GAUGE_KIND: readonly PosicionGaugeKind[] = ["currentRatio", "operatingMargin", "dso"];
+
+export const POSICION_GAUGE_FAVORITE_ID: Record<PosicionGaugeKind, string> = {
+  currentRatio: "kpi-posicion-razon-circulante",
+  operatingMargin: "kpi-posicion-margen-operativo",
+  dso: "kpi-posicion-dias-cobranza",
+};
+
+const POSICION_GAUGE_WIDGETS: FavoritableWidget[] = POSICION_GAUGE_KIND.map((kind) => ({
+  id: POSICION_GAUGE_FAVORITE_ID[kind],
+  titleKey: `posicionFinanciera.gauges.metrics.${kind}`,
+  category: "POSICION" as const,
+  type: "KPI" as const,
+  componentKey: "posicionGaugeKpi",
+  storage: "widget" as const,
+}));
+
 export const RESULTADOS_FAVORITE = {
   utilidad: "destacados:utilidad",
   ingresoAcumulado: "kpi-ingreso-acumulado",
@@ -202,6 +223,7 @@ export const FAVORITABLE_WIDGETS: FavoritableWidget[] = [
   { id: "chart-cobranza-pareto", titleKey: "cobranza.concentracion.chartTitle", category: "COBRANZA", type: "CHART", componentKey: "cobranzaPareto", storage: "widget" },
 
   // ── Posición Financiera (/dashboard/posicion-financiera) ─────────────────
+  ...POSICION_GAUGE_WIDGETS,
   { id: "table-posicion-balance", titleKey: "posicionFinanciera.titlePosition", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },
   { id: "table-posicion-resultados", titleKey: "posicionFinanciera.titleResults", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },
   { id: "table-posicion-razones", titleKey: "posicionFinanciera.titleRatios", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },

@@ -10,6 +10,7 @@ import {
   FlujoOperativoTableroCard,
   type FlujoOperativoKpiKey,
 } from "@/components/flujo/FlujoOperativoView";
+import { RatioGaugeFavorite } from "@/components/posicion-financiera/RatioGaugeGrid";
 import { StatementTreeTable } from "@/components/posicion-financiera/StatementTreeTable";
 import { CategoryTemporalKpiCard, YearToDateKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
 import { CategorySeriesCard, IncomeBreakdownCard } from "@/components/resultados/ResultadosCategoryView";
@@ -33,9 +34,11 @@ import { usePosicionFinanciera } from "@/hooks/use-posicion-financiera";
 import {
   GASTO_CONTROL_FAVORITE_ID,
   parseCategoryTemporalFavoriteId,
+  POSICION_GAUGE_FAVORITE_ID,
   RESULTADOS_FAVORITE,
   type FavoritableWidget,
   type GastoControlKind,
+  type PosicionGaugeKind,
 } from "@/services/favoritesRegistry";
 import { buildStackedSeries, type DestacadosKpis, type DestacadosRubro, type MonthlyFinancials } from "@/services/financialDataTransformer";
 import {
@@ -244,6 +247,12 @@ export function FavoriteWidgetRenderer({
       return <CobranzaAgingChart />;
     case "cobranzaPareto":
       return <ConcentracionParetoCard />;
+    case "posicionGaugeKpi": {
+      const kind = (Object.entries(POSICION_GAUGE_FAVORITE_ID) as Array<[PosicionGaugeKind, string]>).find(
+        ([, id]) => id === widget.id,
+      )?.[0];
+      return kind ? <RatioGaugeFavorite id={kind} /> : null;
+    }
     case "posicionStatement": {
       const statement: PosicionStatementKey =
         widget.id === "table-posicion-balance"
