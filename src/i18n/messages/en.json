@@ -1874,7 +1874,8 @@
       "USER_CREATED": "{actor} added {target} as {role}.",
       "USER_DEACTIVATED": "{actor} turned off access for {target}.",
       "USER_REACTIVATED": "{actor} restored access for {target}.",
-      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}."
+      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}.",
+      "USER_DELETED": "{actor} deleted {target}."
     },
     "welcomeSent": "Welcome email sent to {email}.",
     "welcomeFailed": "{email} was added, but the welcome email did not go out. Resend it.",
@@ -1884,7 +1885,13 @@
     "resend": "Resend email",
     "resending": "Resending…",
     "resent": "We resent the welcome email to {email}.",
-    "resendFailed": "The email could not be resent. Try again in a few minutes."
+    "resendFailed": "The email could not be resent. Try again in a few minutes.",
+    "delete": "Delete",
+    "deleteAria": "Delete {email}",
+    "confirmDelete": "Delete {email}? They lose access and their account is removed; their file uploads move to your name. To let them back in, add them again.",
+    "deleted": "{email} was deleted.",
+    "deletedWithUploads": "{email} was deleted. Their {count} file uploads are now under your name.",
+    "deleteFailed": "We couldn't delete this person. Try again."
   },
   "loads": {
     "selectCompany": "Pick a company in the selector above to see its uploads.",

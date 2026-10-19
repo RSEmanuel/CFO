@@ -128,6 +128,32 @@ export function TenantUsersPanel({ tenantId, companyName }: { tenantId: string; 
     void patchUser(target, { role: nextRole });
   }
 
+  async function onDelete(target: TenantUserRow) {
+    if (!window.confirm(t("users.confirmDelete", { email: target.email }))) {
+      return;
+    }
+    setBusyUserId(target.id);
+    try {
+      const result = await apiRequest<{ email: string; reassignedUploads: number }>("/api/admin/users", {
+        method: "DELETE",
+        body: JSON.stringify({ tenantId, userId: target.id }),
+      });
+      toast.success(
+        result.reassignedUploads > 0
+          ? t("users.deletedWithUploads", { email: result.email, count: result.reassignedUploads })
+          : t("users.deleted", { email: result.email }),
+      );
+      if (welcome?.userId === target.id) {
+        setWelcome(null);
+      }
+      await load();
+    } catch (error) {
+      toast.error(errorMessage(error, "users.deleteFailed"));
+    } finally {
+      setBusyUserId(null);
+    }
+  }
+
   async function onCreate(event: FormEvent) {
     event.preventDefault();
     setCreating(true);
@@ -244,15 +270,28 @@ export function TenantUsersPanel({ tenantId, companyName }: { tenantId: string; 
                         </td>
                         <td className={`${tdClass} pr-0 text-right`}>
                           {editable ? (
-                            <Button
-                              type="button"
-                              size="sm"
-                              variant={member.isActive ? "secondary" : "outline"}
-                              disabled={busy}
-                              onClick={() => onToggleAccess(member)}
-                            >
-                              {t(member.isActive ? "users.turnOff" : "users.turnOn")}
-                            </Button>
+                            <div className="inline-flex flex-wrap justify-end gap-2">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant={member.isActive ? "secondary" : "outline"}
+                                disabled={busy}
+                                onClick={() => onToggleAccess(member)}
+                              >
+                                {t(member.isActive ? "users.turnOff" : "users.turnOn")}
+                              </Button>
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                className="text-muted-foreground hover:text-foreground"
+                                disabled={busy}
+                                aria-label={t("users.deleteAria", { email: member.email })}
+                                onClick={() => void onDelete(member)}
+                              >
+                                {t("users.delete")}
+                              </Button>
+                            </div>
                           ) : null}
                         </td>
                       </tr>

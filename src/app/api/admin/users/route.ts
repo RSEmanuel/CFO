@@ -1,8 +1,8 @@
 import { jsonSuccess } from "@/auth/http";
 import { assertCanManageUsers, resolveScopedTenantId, USER_ADMIN_ROLES } from "@/auth/rbac";
-import { changeUserSchema, tenantQuerySchema } from "@/auth/schemas";
+import { changeUserSchema, deleteUserSchema, tenantQuerySchema } from "@/auth/schemas";
 import { withAuth } from "@/middleware/auth";
-import { changeTenantUser, getTenantAccess } from "@/services/admin/userAdmin";
+import { changeTenantUser, deleteTenantUser, getTenantAccess } from "@/services/admin/userAdmin";
 
 // Las altas siguen entrando por POST /api/auth/register-user (Cognito + bitácora).
 
@@ -31,6 +31,22 @@ export const PATCH = withAuth(
       change: { isActive: payload.isActive, role: payload.role },
     });
     return jsonSuccess(user);
+  },
+  { roles: USER_ADMIN_ROLES },
+);
+
+export const DELETE = withAuth(
+  async (request, auth) => {
+    assertCanManageUsers(auth.role);
+    const payload = deleteUserSchema.parse(await request.json());
+    const scopedTenantId = resolveScopedTenantId(auth, payload.tenantId);
+    return jsonSuccess(
+      await deleteTenantUser({
+        actor: { userId: auth.userId, email: auth.email, role: auth.role },
+        tenantId: scopedTenantId,
+        userId: payload.userId,
+      }),
+    );
   },
   { roles: USER_ADMIN_ROLES },
 );

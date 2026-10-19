@@ -4,6 +4,7 @@ import { UserRole } from "@/generated/prisma/enums";
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
+  AdminDeleteUserCommand,
   AdminDisableUserCommand,
   AdminEnableUserCommand,
   AdminGetUserCommand,
@@ -455,6 +456,21 @@ export async function setCognitoUserEnabled(username: string, enabled: boolean):
         : new AdminDisableUserCommand({ UserPoolId: userPoolId, Username: username }),
     );
   } catch (error) {
+    mapCognitoError(error);
+  }
+}
+
+/** Borra al usuario de Cognito para que el correo quede libre. Si ya no existe, no es error. */
+export async function deleteCognitoUser(username: string): Promise<void> {
+  const { userPoolId } = getConfig();
+  const client = getClient();
+
+  try {
+    await client.send(new AdminDeleteUserCommand({ UserPoolId: userPoolId, Username: username }));
+  } catch (error) {
+    if (error instanceof UserNotFoundException) {
+      return;
+    }
     mapCognitoError(error);
   }
 }

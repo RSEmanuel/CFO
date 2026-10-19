@@ -72,6 +72,11 @@ export const onboardTenantSchema = createTenantSchema.extend({
     .transform((value) => value || undefined),
 });
 
+export const deleteUserSchema = z.object({
+  tenantId: z.string().min(1, "El tenantId es obligatorio."),
+  userId: z.string().min(1, "El userId es obligatorio."),
+});
+
 export const resendWelcomeSchema = z.object({
   tenantId: z.string().min(1, "El tenantId es obligatorio."),
   userId: z.string().min(1, "El userId es obligatorio."),

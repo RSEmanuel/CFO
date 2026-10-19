@@ -1874,7 +1874,8 @@
       "USER_CREATED": "{actor} agregó a {target} como {role}.",
       "USER_DEACTIVATED": "{actor} le quitó el acceso a {target}.",
       "USER_REACTIVATED": "{actor} le devolvió el acceso a {target}.",
-      "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to}."
+      "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to}.",
+      "USER_DELETED": "{actor} borró a {target}."
     },
     "welcomeSent": "Correo de bienvenida enviado a {email}.",
     "welcomeFailed": "Dimos de alta a {email}, pero el correo de bienvenida no salió. Reenvíalo.",
@@ -1884,7 +1885,13 @@
     "resend": "Reenviar correo",
     "resending": "Reenviando…",
     "resent": "Reenviamos el correo de bienvenida a {email}.",
-    "resendFailed": "No se pudo reenviar el correo. Intenta de nuevo en unos minutos."
+    "resendFailed": "No se pudo reenviar el correo. Intenta de nuevo en unos minutos.",
+    "delete": "Borrar",
+    "deleteAria": "Borrar a {email}",
+    "confirmDelete": "¿Borrar a {email}? Pierde el acceso y su cuenta se elimina; sus cargas de archivos quedan a tu nombre. Para que vuelva a entrar hay que darlo de alta otra vez.",
+    "deleted": "{email} quedó borrado.",
+    "deletedWithUploads": "{email} quedó borrado. Sus {count} cargas de archivos quedaron a tu nombre.",
+    "deleteFailed": "No pudimos borrar a esta persona. Intenta de nuevo."
   },
   "loads": {
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
