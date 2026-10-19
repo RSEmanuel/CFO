@@ -4,6 +4,7 @@ import { BudgetForecastChart } from "@/components/charts/BudgetForecastChart";
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
+import { BudgetAssumptionsSummary } from "@/components/resultados/BudgetAssumptionsSummary";
 import { BudgetDriversForm } from "@/components/resultados/BudgetDriversForm";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import {
@@ -24,6 +25,7 @@ import {
   type PresupuestoGrouping,
   type PresupuestoRubroKey,
 } from "@/services/resultadosPresupuesto";
+import { ChevronDown } from "lucide-react";
 import { useMemo, useState } from "react";
 import { TableScroll } from "@/components/ui/table-scroll";
 
@@ -91,6 +93,7 @@ export function ResultadosPresupuestoView({
   const [scenario, setScenario] = useState<EscenarioPresupuesto>("base");
   const [incomeAdjustmentPct, setIncomeAdjustmentPct] = useState(0);
   const [grouping, setGrouping] = useState<PresupuestoGrouping>("quarter");
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const model = useMemo(
     () =>
       data
@@ -144,6 +147,19 @@ export function ResultadosPresupuestoView({
               </div>
               {toggle}
             </div>
+
+            {data ? (
+              <div className="mt-4">
+                <BudgetAssumptionsSummary
+                  anio={anchorYear}
+                  drivers={data.drivers}
+                  source={data.assumptionsSource}
+                  driversApplied={data.driversApplied}
+                  updatedAt={data.assumptionsUpdatedAt}
+                  onReset={() => onDriversSaved?.()}
+                />
+              </div>
+            ) : null}
 
             <div className="mt-5 flex flex-wrap items-end gap-5 border-y border-beige-deep py-4">
               <div>
@@ -216,8 +232,27 @@ export function ResultadosPresupuestoView({
               </label>
             </div>
 
-            <div className="mt-5">
-              <BudgetDriversForm anio={anchorYear} onSaved={() => onDriversSaved?.()} />
+            {/* Supuestos a mano: solo para quien quiere ir más allá de los tres escenarios. */}
+            <div className="mt-4">
+              <button
+                type="button"
+                onClick={() => setAdvancedOpen((open) => !open)}
+                aria-expanded={advancedOpen}
+                aria-controls="budget-advanced-assumptions"
+                className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-clay"
+              >
+                <ChevronDown className={cn("h-3.5 w-3.5 transition-transform", advancedOpen && "rotate-180")} aria-hidden />
+                {t("resultados.budgetAssumptions.advancedToggle")}
+              </button>
+              {advancedOpen && data ? (
+                <div id="budget-advanced-assumptions" className="mt-3">
+                  <BudgetDriversForm
+                    anio={anchorYear}
+                    initialDrivers={data.drivers}
+                    onSaved={() => onDriversSaved?.()}
+                  />
+                </div>
+              ) : null}
             </div>
 
             {model.unavailable ? (

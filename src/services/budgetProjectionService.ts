@@ -1,6 +1,11 @@
 import { prisma, requireBudgetAssumptionDelegate } from "@/lib/prisma";
 import { projectFromPoints } from "@/services/forecast/budgetProjection";
-import { applyBudgetDrivers, type BudgetDrivers } from "@/services/forecast/drivers";
+import { rowToBudgetDrivers } from "@/services/budgetAssumptionService";
+import {
+  resolveProjectionDrivers,
+  type BudgetAssumptionsSource,
+  type BudgetDrivers,
+} from "@/services/forecast/drivers";
 import { fromBalanzaPnl } from "@/services/forecast/series";
 import type {
   BudgetProjectionResult,
@@ -26,7 +31,13 @@ export type BudgetProjectionPayload = {
   sourceMonths: number;
   hasOfficialBudget: boolean;
   status: "available" | "insufficient_history";
-  drivers: BudgetDrivers | null;
+  /** Supuestos efectivos aplicados a la proyección (ceros si la base ya trae la tendencia). */
+  drivers: BudgetDrivers;
+  assumptionsSource: BudgetAssumptionsSource;
+  /** false: modo automático con Holt-Winters; la proyección es solo la tendencia, sin ajustes encima. */
+  driversApplied: boolean;
+  /** Fecha del último guardado cuando assumptionsSource es "manual". */
+  assumptionsUpdatedAt: string | null;
 };
 
 function periodKey(anio: number, periodo: number): string {
@@ -103,17 +114,12 @@ export async function getBudgetProjection(
     anchorPeriodo,
   );
 
-  const drivers: BudgetDrivers | null = assumptionRow
-    ? {
-        salesGrowthPct: toNumber(assumptionRow.salesGrowthPct),
-        inflationPct: toNumber(assumptionRow.inflationPct),
-        headcount: assumptionRow.headcount,
-        headcountCostMonthly: toNumber(assumptionRow.headcountCostMonthly),
-        debtInterestMonthly: toNumber(assumptionRow.debtInterestMonthly),
-        depreciationMonthly: toNumber(assumptionRow.depreciationMonthly),
-      }
-    : null;
-  const projection = drivers ? applyBudgetDrivers(baseProjection, drivers) : baseProjection;
+  // Sin supuestos guardados, Cifra decide si aplica supuestos automáticos según si la base ya trae tendencia.
+  const { projection, drivers, source, driversApplied } = resolveProjectionDrivers(
+    baseProjection,
+    assumptionRow ? rowToBudgetDrivers(assumptionRow) : null,
+    history,
+  );
 
   return {
     tenantId,
@@ -126,5 +132,8 @@ export async function getBudgetProjection(
     hasOfficialBudget,
     status: history.length >= 8 ? "available" : "insufficient_history",
     drivers,
+    assumptionsSource: source,
+    driversApplied,
+    assumptionsUpdatedAt: assumptionRow ? assumptionRow.updatedAt.toISOString() : null,
   };
 }
