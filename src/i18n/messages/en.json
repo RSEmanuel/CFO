@@ -982,8 +982,8 @@
     "concentracion": {
       "toggleClientes": "Customers (Sales & Collection)",
       "toggleProveedores": "Suppliers (Purchases & Payment)",
-      "kpiHhi": "HHI Index",
-      "kpiHhiHelp": "Sum of squared shares (0–10,000)",
+      "kpiHhi": "Portfolio Concentration",
+      "kpiHhiHelp": "How spread out your business is: lower score means lower risk",
       "kpiPareto": "Pareto 80/20",
       "kpiParetoHelp": "Accounts making up 80% of the amount",
       "kpiParetoValue": "{count} accounts",

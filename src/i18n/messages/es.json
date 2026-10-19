@@ -982,8 +982,8 @@
     "concentracion": {
       "toggleClientes": "Clientes (Ventas y Cobro)",
       "toggleProveedores": "Proveedores (Compras y Pago)",
-      "kpiHhi": "Índice HHI",
-      "kpiHhiHelp": "Suma de participaciones al cuadrado (0–10,000)",
+      "kpiHhi": "Concentración de cartera",
+      "kpiHhiHelp": "Qué tan repartido está tu negocio: menor puntaje es menor riesgo",
       "kpiPareto": "Pareto 80/20",
       "kpiParetoHelp": "Cuentas que acumulan el 80% del monto",
       "kpiParetoValue": "{count} cuentas",
