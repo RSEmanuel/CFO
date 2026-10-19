@@ -54,9 +54,9 @@ function FilterField({ label, children }: { label: string; children: React.React
 }
 
 export default function ErroresPage() {
-  const { user, tenants } = useSession();
+  const { effectiveRole, tenants } = useSession();
   const { locale, t } = useLocale();
-  const allowed = Boolean(user && ERROR_VIEW_ROLES.includes(user.role));
+  const allowed = Boolean(effectiveRole && ERROR_VIEW_ROLES.includes(effectiveRole));
 
   const [filters, setFilters] = useState<Filters>(INITIAL_FILTERS);
   // La búsqueda por texto se aplica al dejar de escribir, no en cada tecla.

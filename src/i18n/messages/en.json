@@ -41,7 +41,9 @@
       "CLIENT_VIEWER": "View only"
     },
     "and": "and",
-    "retry": "Retry"
+    "retry": "Retry",
+    "clientLabel": "Client",
+    "yourCompanyIs": "Your company: {name}"
   },
   "nav": {
     "results": "Results",
@@ -54,7 +56,8 @@
     "simulator": "What-If Simulator",
     "settings": "Settings",
     "loadControl": "Load history",
-    "errorLog": "Portal errors"
+    "errorLog": "Portal errors",
+    "clients": "Clients"
   },
   "auth": {
     "title": "Sign in",
@@ -1871,7 +1874,8 @@
       "USER_CREATED": "{actor} added {target} as {role}.",
       "USER_DEACTIVATED": "{actor} turned off access for {target}.",
       "USER_REACTIVATED": "{actor} restored access for {target}.",
-      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}."
+      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}.",
+      "USER_DELETED": "{actor} deleted {target}."
     },
     "welcomeSent": "Welcome email sent to {email}.",
     "welcomeFailed": "{email} was added, but the welcome email did not go out. Resend it.",
@@ -1881,7 +1885,13 @@
     "resend": "Resend email",
     "resending": "Resending…",
     "resent": "We resent the welcome email to {email}.",
-    "resendFailed": "The email could not be resent. Try again in a few minutes."
+    "resendFailed": "The email could not be resent. Try again in a few minutes.",
+    "delete": "Delete",
+    "deleteAria": "Delete {email}",
+    "confirmDelete": "Delete {email}? They lose access and their account is removed; their file uploads move to your name. To let them back in, add them again.",
+    "deleted": "{email} was deleted.",
+    "deletedWithUploads": "{email} was deleted. Their {count} file uploads are now under your name.",
+    "deleteFailed": "We couldn't delete this person. Try again."
   },
   "loads": {
     "selectCompany": "Pick a company in the selector above to see its uploads.",
@@ -2023,5 +2033,41 @@
     "doneTitle": "Password ready",
     "doneHelp": "You can now sign in to Cifra with {email} and the password you just created.",
     "goLogin": "Go to sign in"
+  },
+  "clientPreview": {
+    "enter": "View as client",
+    "enterAria": "See the portal the way your client sees it",
+    "exit": "Exit client view",
+    "banner": "You're viewing Cifra as a client ({company})",
+    "bannerHelp": "This is what a view-only user sees. Your real permissions don't change."
+  },
+  "welcomeEmail": {
+    "tab": "Welcome email",
+    "title": "Welcome email",
+    "help": "This is how the email reaches each person you add. People who forget their password get it too.",
+    "subject": "Subject",
+    "sampleCode": "Sample code",
+    "iframeTitle": "Welcome email preview",
+    "exportHint": "The code and link are samples. To change the email that goes out, export the template and upload it to the AWS console.",
+    "adminOnly": "This section is only for the Cifra team."
+  },
+  "clients": {
+    "help": "Every company you serve, who has access, and whether its trial balance is loaded.",
+    "listTitle": "Your clients",
+    "colClient": "Client",
+    "colRfc": "RFC",
+    "colPeople": "People with access",
+    "colBalanza": "Trial balance",
+    "balanzaYes": "Loaded",
+    "balanzaNo": "Not loaded",
+    "open": "Open",
+    "openAria": "Open {name}",
+    "openNumbers": "See their numbers",
+    "newTitle": "Add a client",
+    "create": "Add client",
+    "empty": "You don't have clients yet. Add the first one below.",
+    "loadFailed": "We couldn't load your clients. Reload the page to try again.",
+    "notFound": "We couldn't find this client. Go back to the list and pick another.",
+    "teamOnly": "This section is only for the Cifra team."
   }
 }

@@ -64,7 +64,7 @@ export default function IngestaPage() {
     const format = translateOr(`ingesta.docTypes.${(kind ?? "").replace(/-/g, "_")}`, profileKey);
     return source in SOURCE_KEYS ? `${format} (${t(SOURCE_KEYS[source])})` : format;
   };
-  const { user, tenantId, periodo, anio, selectPeriod, refreshPeriods } = useSession();
+  const { effectiveRole, tenantId, periodo, anio, selectPeriod, refreshPeriods } = useSession();
   const [files, setFiles] = useState<File[]>([]);
   const [progress, setProgress] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -83,7 +83,7 @@ export default function IngestaPage() {
     missingInputs: MissingInput[];
   } | null>(null);
 
-  if (user?.role === "CLIENT_VIEWER") {
+  if (effectiveRole === "CLIENT_VIEWER") {
     return (
       <Card>
         <CardHeader>

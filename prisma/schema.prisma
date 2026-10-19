@@ -55,6 +55,7 @@ enum AdminAuditAction {
   USER_DEACTIVATED
   USER_REACTIVATED
   ROLE_CHANGED
+  USER_DELETED
 }
 
 enum FlujoDireccion {

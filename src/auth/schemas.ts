@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { UserRole } from "@/generated/prisma/enums";
 
+export const refreshSchema = z.object({
+  refreshToken: z.string().min(1, "Falta el refresh token."),
+});
+
 export const loginSchema = z.object({
   email: z.string().email("El correo no es válido."),
   password: z.string().min(1, "La contraseña es obligatoria."),
@@ -66,6 +70,11 @@ export const onboardTenantSchema = createTenantSchema.extend({
     .max(120, "El nombre del dueño es demasiado largo.")
     .optional()
     .transform((value) => value || undefined),
+});
+
+export const deleteUserSchema = z.object({
+  tenantId: z.string().min(1, "El tenantId es obligatorio."),
+  userId: z.string().min(1, "El userId es obligatorio."),
 });
 
 export const resendWelcomeSchema = z.object({

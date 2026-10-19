@@ -4,6 +4,7 @@ import { UserRole } from "@/generated/prisma/enums";
 import {
   AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
+  AdminDeleteUserCommand,
   AdminDisableUserCommand,
   AdminEnableUserCommand,
   AdminGetUserCommand,
@@ -156,6 +157,46 @@ export async function initiatePasswordLogin(
       expiresIn: result.ExpiresIn ?? 3600,
     };
   } catch (error) {
+    mapCognitoError(error);
+  }
+}
+
+/**
+ * Renueva el access token con el refresh token del login. Con app client con secreto, Cognito exige
+ * SECRET_HASH calculado con el username interno del usuario (el claim `username` del access token
+ * vencido), no con el correo.
+ */
+export async function refreshCognitoTokens(
+  refreshToken: string,
+  username: string | undefined,
+): Promise<{ accessToken: string; idToken?: string; expiresIn: number }> {
+  const { clientId, clientSecret } = getConfig();
+  const client = getClient();
+  if (clientSecret && !username) {
+    throw new AppError("UNAUTHORIZED", "No se pudo renovar la sesión. Inicia sesión de nuevo.", 401);
+  }
+  const secretHash = username ? computeSecretHash(username) : undefined;
+
+  try {
+    const response = await client.send(
+      new InitiateAuthCommand({
+        ClientId: clientId,
+        AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
+        AuthParameters: {
+          REFRESH_TOKEN: refreshToken,
+          ...(secretHash ? { SECRET_HASH: secretHash } : {}),
+        },
+      }),
+    );
+    const result = response.AuthenticationResult;
+    if (!result?.AccessToken) {
+      throw new AppError("UNAUTHORIZED", "No se pudo renovar la sesión. Inicia sesión de nuevo.", 401);
+    }
+    return { accessToken: result.AccessToken, idToken: result.IdToken, expiresIn: result.ExpiresIn ?? 3600 };
+  } catch (error) {
+    if (error instanceof NotAuthorizedException || error instanceof UserNotFoundException) {
+      throw new AppError("UNAUTHORIZED", "La sesión venció. Inicia sesión de nuevo.", 401);
+    }
     mapCognitoError(error);
   }
 }
@@ -415,6 +456,21 @@ export async function setCognitoUserEnabled(username: string, enabled: boolean):
         : new AdminDisableUserCommand({ UserPoolId: userPoolId, Username: username }),
     );
   } catch (error) {
+    mapCognitoError(error);
+  }
+}
+
+/** Borra al usuario de Cognito para que el correo quede libre. Si ya no existe, no es error. */
+export async function deleteCognitoUser(username: string): Promise<void> {
+  const { userPoolId } = getConfig();
+  const client = getClient();
+
+  try {
+    await client.send(new AdminDeleteUserCommand({ UserPoolId: userPoolId, Username: username }));
+  } catch (error) {
+    if (error instanceof UserNotFoundException) {
+      return;
+    }
     mapCognitoError(error);
   }
 }

@@ -1,5 +1,5 @@
 import { AppError } from "@/auth/errors";
-import { changeCognitoUserRole, sendWelcomeCode, setCognitoUserEnabled } from "@/auth/cognito";
+import { changeCognitoUserRole, deleteCognitoUser, sendWelcomeCode, setCognitoUserEnabled } from "@/auth/cognito";
 import { isDevAuthBypassEnabled } from "@/auth/devAuth";
 import { assertCanChangeUser, canRegisterRole, type UserChange } from "@/auth/rbac";
 import type { AdminAuditAction, UserRole } from "@/generated/prisma/enums";
@@ -178,4 +178,49 @@ export async function changeTenantUser(input: {
   });
 
   return toRow(updated);
+}
+
+/**
+ * Borra a una persona de la empresa: su usuario en Cognito y su fila en users. Sus cargas de archivos
+ * pasan a quien borra (la base no deja borrar a alguien con cargas) y su rastro en errores se desvincula.
+ * Mismas reglas que cambiar acceso: nadie se borra a sí mismo ni a alguien por encima de su rol.
+ */
+export async function deleteTenantUser(input: {
+  actor: { userId: string; email: string; role: UserRole };
+  tenantId: string;
+  userId: string;
+}): Promise<{ email: string; reassignedUploads: number }> {
+  const target = await prisma.user.findFirst({
+    where: { id: input.userId, tenantId: input.tenantId },
+    select: USER_SELECT,
+  });
+  if (!target) {
+    throw new AppError("NOT_FOUND", "Esa persona no pertenece a esta empresa.", 404);
+  }
+
+  assertCanChangeUser(input.actor, target, {});
+
+  // Primero Cognito: si después falla la base, reintentar el borrado sigue funcionando (Cognito
+  // ignora al usuario que ya no existe). Al revés quedaría un usuario en Cognito que bloquea el correo.
+  if (!isDevAuthBypassEnabled()) {
+    await deleteCognitoUser(target.email);
+  }
+
+  return prisma.$transaction(async (tx) => {
+    const batches = await tx.ingestBatch.updateMany({ where: { userId: target.id }, data: { userId: input.actor.userId } });
+    await tx.ingestFileAudit.updateMany({ where: { userId: target.id }, data: { userId: input.actor.userId } });
+    await tx.user.delete({ where: { id: target.id } });
+    await tx.adminAuditLog.create({
+      data: {
+        tenantId: input.tenantId,
+        action: "USER_DELETED",
+        actorUserId: input.actor.userId,
+        actorEmail: input.actor.email,
+        targetUserId: target.id,
+        targetEmail: target.email,
+        fromRole: target.role,
+      },
+    });
+    return { email: target.email, reassignedUploads: batches.count };
+  });
 }

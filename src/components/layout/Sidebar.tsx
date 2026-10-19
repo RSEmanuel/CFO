@@ -12,6 +12,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CifraMark } from "@/components/brand/CifraMark";
+import { TenantSwitcher } from "@/components/tenant-switcher";
 
 const STORAGE_KEY = "cfo.sidebarCollapsed";
 
@@ -61,7 +62,7 @@ function NavItemLink({
 }
 
 export function Sidebar() {
-  const { user, logout } = useSession();
+  const { effectiveRole, logout } = useSession();
   const { t } = useLocale();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -77,8 +78,8 @@ export function Sidebar() {
     });
   }
 
-  const primary = visibleNav(PRIMARY_NAV, user?.role);
-  const account = visibleNav(ACCOUNT_NAV, user?.role);
+  const primary = visibleNav(PRIMARY_NAV, effectiveRole);
+  const account = visibleNav(ACCOUNT_NAV, effectiveRole);
 
   return (
     <TooltipProvider delayDuration={200}>
@@ -117,6 +118,10 @@ export function Sidebar() {
           >
             {collapsed ? <ChevronsRight className="h-4 w-4" /> : <ChevronsLeft className="h-4 w-4" />}
           </Button>
+        </div>
+
+        <div className={cn("mb-4", collapsed && "flex justify-center")}>
+          <TenantSwitcher collapsed={collapsed} />
         </div>
 
         <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
