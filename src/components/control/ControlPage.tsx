@@ -5,7 +5,7 @@ import {
   type ControlWidgetContext,
 } from "@/components/control/favorite-widget-renderer";
 import { PortadaMes } from "@/components/control/PortadaMes";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { CatalogFavoritesSection } from "@/components/metrics/favorite-metrics-grid";
 import {
   INITIAL_RESULTADOS_FILTERS,
@@ -137,7 +137,7 @@ export function ControlPage() {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   }
   if (error) {
-    return <DataEmptyState title={t("resultados.loadError")} message={error} />;
+    return <DataErrorState title={t("resultados.loadError")} error={error} />;
   }
 
   const rows = data?.series ?? [];

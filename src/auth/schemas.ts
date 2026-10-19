@@ -35,12 +35,6 @@ export const resetPasswordSchema = z.object({
 
 export const registerUserSchema = z.object({
   email: z.string().trim().email("El correo no es válido."),
-  // Opcional: si no llega, el servidor genera una temporal y la devuelve una sola vez.
-  password: z
-    .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres.")
-    .max(256, "La contraseña es demasiado larga.")
-    .optional(),
   role: z.enum(UserRole),
   tenantId: z.string().min(1, "El tenantId es obligatorio."),
 });
@@ -61,6 +55,22 @@ export const createTenantSchema = z.object({
 
 export const tenantQuerySchema = z.object({
   tenantId: z.string().min(1, "El tenantId es obligatorio."),
+});
+
+/** Alta de empresa con su dueño: el correo del dueño recibe la bienvenida para crear su contraseña. */
+export const onboardTenantSchema = createTenantSchema.extend({
+  ownerEmail: z.string().trim().email("El correo del dueño no es válido."),
+  ownerName: z
+    .string()
+    .trim()
+    .max(120, "El nombre del dueño es demasiado largo.")
+    .optional()
+    .transform((value) => value || undefined),
+});
+
+export const resendWelcomeSchema = z.object({
+  tenantId: z.string().min(1, "El tenantId es obligatorio."),
+  userId: z.string().min(1, "El userId es obligatorio."),
 });
 
 export const changeUserSchema = z

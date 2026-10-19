@@ -1,7 +1,7 @@
 import { UserRole } from "@/generated/prisma/enums";
 import { forbidden, unauthorized } from "@/auth/errors";
-import { toErrorResponse } from "@/auth/http";
 import { extractBearerToken, verifyAccessToken } from "@/auth/jwt";
+import { handleApiError } from "@/lib/api-error-handler";
 import { prisma } from "@/lib/prisma";
 import type { AuthContext } from "@/auth/rbac";
 import { NextRequest } from "next/server";
@@ -22,6 +22,7 @@ type WithAuthOptions = {
 
 export function withAuth(handler: AuthenticatedHandler, options: WithAuthOptions = {}) {
   return async (request: NextRequest, routeContext?: RouteContext): Promise<Response> => {
+    let auth: AuthContext | null = null;
     try {
       const token = extractBearerToken(request.headers.get("authorization"));
       const payload = await verifyAccessToken(token);
@@ -38,7 +39,7 @@ export function withAuth(handler: AuthenticatedHandler, options: WithAuthOptions
         throw forbidden("Tu rol no tiene permiso para esta operación.");
       }
 
-      const auth: AuthContext = {
+      auth = {
         userId: user.id,
         email: user.email,
         role: user.role,
@@ -49,7 +50,12 @@ export function withAuth(handler: AuthenticatedHandler, options: WithAuthOptions
 
       return await handler(request, auth, routeContext);
     } catch (error) {
-      return toErrorResponse(error);
+      // Las fallas del servidor quedan en el panel de errores con la empresa y el usuario de la sesión.
+      // Se atribuye a la empresa consultada (?tenantId=) y, si no viene, a la de la sesión.
+      return handleApiError(error, request, {
+        tenantId: auth ? (request.nextUrl.searchParams.get("tenantId") ?? auth.tenantId) : null,
+        userId: auth?.userId,
+      });
     }
   };
 }

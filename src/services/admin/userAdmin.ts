@@ -1,7 +1,7 @@
 import { AppError } from "@/auth/errors";
-import { changeCognitoUserRole, setCognitoUserEnabled } from "@/auth/cognito";
+import { changeCognitoUserRole, sendWelcomeCode, setCognitoUserEnabled } from "@/auth/cognito";
 import { isDevAuthBypassEnabled } from "@/auth/devAuth";
-import { assertCanChangeUser, type UserChange } from "@/auth/rbac";
+import { assertCanChangeUser, canRegisterRole, type UserChange } from "@/auth/rbac";
 import type { AdminAuditAction, UserRole } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
@@ -80,6 +80,35 @@ export async function getTenantAccess(tenantId: string): Promise<TenantAccessVie
       createdAt: entry.createdAt.toISOString(),
     })),
   };
+}
+
+/**
+ * Reenvía el correo de bienvenida (código para crear contraseña). Solo a alguien de la empresa
+ * abierta, activo y que el actor podría haber dado de alta.
+ */
+export async function resendWelcomeEmail(input: {
+  actor: { userId: string; role: UserRole };
+  tenantId: string;
+  userId: string;
+}): Promise<{ welcomeEmail: "sent" | "skipped" }> {
+  const target = await prisma.user.findFirst({
+    where: { id: input.userId, tenantId: input.tenantId },
+    select: USER_SELECT,
+  });
+  if (!target) {
+    throw new AppError("NOT_FOUND", "Esa persona no pertenece a esta empresa.", 404);
+  }
+  if (target.id === input.actor.userId || !canRegisterRole(input.actor.role, target.role)) {
+    throw new AppError("FORBIDDEN", "Tu rol no puede administrar a esta persona.", 403, { reason: "TARGET_ABOVE" });
+  }
+  if (!target.isActive) {
+    throw new AppError("VALIDATION_ERROR", "Esa persona no tiene acceso activo.", 400, { reason: "inactiveUser" });
+  }
+  if (isDevAuthBypassEnabled()) {
+    return { welcomeEmail: "skipped" };
+  }
+  await sendWelcomeCode(target.email);
+  return { welcomeEmail: "sent" };
 }
 
 export async function changeTenantUser(input: {

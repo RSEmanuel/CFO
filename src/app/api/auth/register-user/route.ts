@@ -10,7 +10,6 @@ export const POST = withAuth(
     const user = await registerUser({
       actor: { userId: auth.userId, email: auth.email, role: auth.role },
       email: payload.email,
-      password: payload.password,
       role: payload.role,
       tenantId: payload.tenantId,
     });

@@ -96,15 +96,6 @@ export function MetricsFilterBar({ filters, onChange }: MetricsFilterBarProps) {
         ]}
       />
       <FilterSelect
-        label={t("filters.currency")}
-        value={filters.currency}
-        onValueChange={(value) => onChange({ ...filters, currency: value as MetricsFilters["currency"] })}
-        options={[
-          { value: "mxn", label: t("metrics.currencyMxn") },
-          { value: "usd", label: t("metrics.currencyUsd") },
-        ]}
-      />
-      <FilterSelect
         label={t("filters.units")}
         disabled
         value={filters.units}
@@ -113,16 +104,6 @@ export function MetricsFilterBar({ filters, onChange }: MetricsFilterBarProps) {
           { value: "exact", label: t("metrics.exact") },
           { value: "k", label: t("metrics.thousands") },
           { value: "m", label: t("metrics.millions") },
-        ]}
-      />
-      <FilterSelect
-        label={t("filters.analysis")}
-        disabled
-        value={filters.analysis}
-        onValueChange={(value) => onChange({ ...filters, analysis: value as MetricsFilters["analysis"] })}
-        options={[
-          { value: "amount", label: t("metrics.amount") },
-          { value: "pct", label: t("metrics.percentage") },
         ]}
       />
     </section>

@@ -132,15 +132,6 @@ export function ResultadosFilterBar({
           { value: "mom", label: t("filters.momFull") },
         ]}
       />
-      <FilterSelect
-        label={t("filters.currency")}
-        value={filters.currency}
-        onValueChange={(value) => onChange({ ...filters, currency: value })}
-        options={[
-          { value: "mxn", label: "MXN" },
-          { value: "usd", label: "USD" },
-        ]}
-      />
       <ToggleGroup
         label={t("filters.units")}
         value={filters.units}
@@ -149,15 +140,6 @@ export function ResultadosFilterBar({
           { value: "k", label: "K" },
           { value: "m", label: "M" },
           { value: "b", label: "B" },
-        ]}
-      />
-      <ToggleGroup
-        label={t("filters.analysis")}
-        value={filters.analysis}
-        onChange={(analysis) => onChange({ ...filters, analysis })}
-        options={[
-          { value: "amount", label: "$" },
-          { value: "pct", label: "%" },
         ]}
       />
       {trailing ? <div className="ml-auto pb-1">{trailing}</div> : null}

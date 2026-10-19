@@ -40,7 +40,8 @@
       "CFO_PARTNER": "Operating partner",
       "CLIENT_VIEWER": "View only"
     },
-    "and": "and"
+    "and": "and",
+    "retry": "Retry"
   },
   "nav": {
     "results": "Results",
@@ -52,7 +53,8 @@
     "ingest": "Ingest",
     "simulator": "What-If Simulator",
     "settings": "Settings",
-    "loadControl": "Load history"
+    "loadControl": "Load history",
+    "errorLog": "Portal errors"
   },
   "auth": {
     "title": "Sign in",
@@ -120,7 +122,12 @@
     "newCompanyHelp": "Create a new company with no information yet. It will appear in the company selector.",
     "name": "Name",
     "rfc": "Tax ID",
+    "ownerEmail": "Owner email",
+    "ownerName": "Owner name (optional)",
     "createEmptyCompany": "Create company",
+    "ownerWelcomeSent": "Company created. A welcome email was sent to {email}.",
+    "ownerWelcomeFailed": "Company created, but the welcome email to {email} did not go out. Resend it.",
+    "resendWelcome": "Resend welcome email",
     "companyCreated": "Company created: {name}. Pick it in the company selector and upload its trial balance in Ingest.",
     "companyCreateFailed": "Could not create the company.",
     "selectCompanyFirst": "Pick a company in the company selector.",
@@ -543,7 +550,8 @@
     "chartByMonth": "By month",
     "chartByYear": "By year",
     "chartViewLabel": "View revenue by month or by year",
-    "partialYearsNote": "Years without all 12 months: {years}. They look lower; to compare years, use the Year to date card."
+    "yearCutoffNote": "Every year adds up January to {month}: the same months in all of them.",
+    "partialYearsNote": "Years missing some of those months: {years}. They look lower."
   },
   "widgets": {
     "customize": "Customize view",
@@ -687,11 +695,6 @@
     "activities": "Activities",
     "alerts": "Alerts",
     "summary": "Summary",
-    "tabs": {
-      "vision": "Overview",
-      "libre": "Free Cash Flow",
-      "diaria": "Daily Cash"
-    },
     "activityFamilies": "Operations / Investing / Financing",
     "explanation": "Explanation",
     "currentPeriod": "Current period ({period})",
@@ -729,6 +732,16 @@
       "help": "Real daily cash and bank movements: collections, payroll, vendors, rent, taxes and debt.",
       "accountsCovered": "{count} cash accounts · {moneda}",
       "traspasosNote": "Transfers between own accounts: {amount}. Excluded from operating inflows and outflows.",
+      "saldoDiario": {
+        "title": "Your cash day by day",
+        "help": "Cash and bank balance at the end of each day, per your bank ledger.",
+        "opening": "Balance at start of month",
+        "closing": "Balance at end of month",
+        "lowest": "Lowest balance of the month",
+        "lowestDay": "Day {dia}",
+        "insightLowest": "Your cash hit its lowest point on day {dia}, at {monto}. Schedule large payments after your collection days.",
+        "insightNegative": "Your cash went negative on day {dia} by {monto}. Speed up collections or move that payment."
+      },
       "daily": "Day",
       "weekly": "Week",
       "inflows": "Inflows",
@@ -1565,7 +1578,8 @@
       "noBalanceData": "No data: this month's trial balance lacks those balances",
       "unknown": "No data this month",
       "noCash": "No data: your trial balance has no cash or bank accounts"
-    }
+    },
+    "vsPreviousMonth": "vs previous month"
   },
   "ingesta": {
     "title": "Ingest",
@@ -1703,7 +1717,72 @@
     "COGNITO_CHALLENGE": "An additional authentication step is required.",
     "INTERNAL_ERROR": "An internal error occurred.",
     "prismaClientStale": "Cifra couldn't read the information right now. Try again in a few minutes.",
-    "generic": "Something went wrong."
+    "generic": "Something went wrong.",
+    "viewerOnly": "Only the Cifra team (admins and partners) can see portal errors.",
+    "tableTitle": "Logged errors",
+    "tableHelp": "Newest first. Open a row to see where it happened and its technical detail.",
+    "empty": "No errors match these filters.",
+    "loadFailed": "Errors could not be loaded. Reload the page.",
+    "updateFailed": "The error could not be updated. Try again.",
+    "markedResolved": "Error marked as resolved.",
+    "markedPending": "Error marked as pending.",
+    "markResolved": "Mark resolved",
+    "markPending": "Mark pending",
+    "pageOf": "Page {page} of {pages}",
+    "prev": "Previous",
+    "next": "Next",
+    "kpis": {
+      "last24h": "Last 24 hours",
+      "unresolved": "Unresolved",
+      "total": "Total in period"
+    },
+    "filters": {
+      "status": "Status",
+      "source": "Source",
+      "severity": "Severity",
+      "company": "Company",
+      "from": "From",
+      "to": "To",
+      "search": "Search",
+      "searchPlaceholder": "Message text",
+      "all": "All",
+      "allCompanies": "All companies"
+    },
+    "status": {
+      "all": "All",
+      "unresolved": "Unresolved",
+      "resolved": "Resolved"
+    },
+    "source": {
+      "client": "Browser",
+      "server": "Server"
+    },
+    "severity": {
+      "error": "Error",
+      "warn": "Warning"
+    },
+    "columns": {
+      "date": "Date and time",
+      "source": "Source",
+      "severity": "Severity",
+      "message": "Message",
+      "company": "Company",
+      "user": "User",
+      "status": "Status"
+    },
+    "detail": {
+      "url": "Where",
+      "digest": "Digest",
+      "userAgent": "Browser",
+      "resolvedBy": "Resolved by",
+      "noStack": "No technical detail."
+    },
+    "boundary": {
+      "title": "Something failed on this screen",
+      "message": "Cifra logged the error for review. Reload the page to keep working.",
+      "reload": "Reload page"
+    },
+    "loadRetry": "We couldn't load your numbers. Retry."
   },
   "emptyStates": {
     "noSource": "The selected company does not have this data source."
@@ -1770,13 +1849,7 @@
     },
     "add": "Add person",
     "adding": "Adding…",
-    "added": "Done: {email} can now sign in to {company}.",
-    "tempTitle": "Temporary password for {email}",
-    "tempHelp": "Copy it now and share it privately. It won't be shown again.",
-    "tempCopy": "Copy",
-    "tempCopied": "Copied",
-    "tempDone": "I've shared it",
-    "devNoPassword": "In this test environment people sign in with their email only. No password needed.",
+    "added": "Done: {email} was added to {company}.",
     "roleChanged": "{email} is now: {role}.",
     "accessOff": "{email} can no longer sign in.",
     "accessOn": "{email} can sign in again.",
@@ -1786,7 +1859,10 @@
       "TARGET_ABOVE": "Only an administrator can change another administrator. Ask one.",
       "ROLE_NOT_ALLOWED": "Your role can't grant that permission. Ask an administrator to do it.",
       "CONFLICT": "That email already has access to Cifra. Find it in the list or use another email.",
-      "VALIDATION_ERROR": "Check the email: it doesn't look valid."
+      "VALIDATION_ERROR": "Check the email: it doesn't look valid.",
+      "welcomeFailed": "The welcome email could not be sent. Try again in a few minutes.",
+      "inactiveUser": "This person has no active access. Turn access on before resending the email.",
+      "tooManyAttempts": "Too many attempts. Wait a few minutes and try again."
     },
     "auditTitle": "Recent changes",
     "auditHelp": "Who added people, turned access off or changed roles. Passwords are never stored.",
@@ -1796,7 +1872,16 @@
       "USER_DEACTIVATED": "{actor} turned off access for {target}.",
       "USER_REACTIVATED": "{actor} restored access for {target}.",
       "ROLE_CHANGED": "{actor} changed {target} from {from} to {to}."
-    }
+    },
+    "welcomeSent": "Welcome email sent to {email}.",
+    "welcomeFailed": "{email} was added, but the welcome email did not go out. Resend it.",
+    "welcomeHelp": "They get a code to create their Cifra password. The code expires in one hour; if they miss it, resend the email.",
+    "welcomeSkipped": "No emails are sent in this test environment: sign-in uses only the email, no password.",
+    "welcomeDone": "Got it",
+    "resend": "Resend email",
+    "resending": "Resending…",
+    "resent": "We resent the welcome email to {email}.",
+    "resendFailed": "The email could not be resent. Try again in a few minutes."
   },
   "loads": {
     "selectCompany": "Pick a company in the selector above to see its uploads.",
@@ -1929,5 +2014,14 @@
       "tagline": "Your numbers, made clear.",
       "endorsement": "A Data Frontier product"
     }
+  },
+  "setPassword": {
+    "title": "Set your password",
+    "help": "Enter your email, the 6-digit code from your welcome email and your new password.",
+    "submit": "Save password",
+    "emailFirst": "Enter your email first.",
+    "doneTitle": "Password ready",
+    "doneHelp": "You can now sign in to Cifra with {email} and the password you just created.",
+    "goLogin": "Go to sign in"
   }
 }

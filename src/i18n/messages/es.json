@@ -40,7 +40,8 @@
       "CFO_PARTNER": "Socio que opera la empresa",
       "CLIENT_VIEWER": "Quien solo consulta"
     },
-    "and": "y"
+    "and": "y",
+    "retry": "Reintentar"
   },
   "nav": {
     "results": "Resultados",
@@ -52,7 +53,8 @@
     "ingest": "Ingesta",
     "simulator": "Simulador What-If",
     "settings": "Configuración",
-    "loadControl": "Control de cargas"
+    "loadControl": "Control de cargas",
+    "errorLog": "Errores del portal"
   },
   "auth": {
     "title": "Iniciar sesión",
@@ -120,7 +122,12 @@
     "newCompanyHelp": "Crea una empresa nueva, todavía sin información. Aparecerá en el selector de empresa.",
     "name": "Nombre",
     "rfc": "RFC",
+    "ownerEmail": "Correo del dueño",
+    "ownerName": "Nombre del dueño (opcional)",
     "createEmptyCompany": "Crear empresa",
+    "ownerWelcomeSent": "Empresa creada. Se envió un correo de bienvenida a {email}.",
+    "ownerWelcomeFailed": "Empresa creada, pero el correo de bienvenida a {email} no salió. Reenvíalo.",
+    "resendWelcome": "Reenviar correo de bienvenida",
     "companyCreated": "Empresa creada: {name}. Elígela en el selector de empresa y sube su balanza en Ingesta.",
     "companyCreateFailed": "No se pudo crear la empresa.",
     "selectCompanyFirst": "Elige una empresa en el selector de empresa.",
@@ -543,7 +550,8 @@
     "chartByMonth": "Por mes",
     "chartByYear": "Por año",
     "chartViewLabel": "Ver el ingreso por mes o por año",
-    "partialYearsNote": "Años sin los 12 meses: {years}. Se ven más bajos; para comparar años, usa la tarjeta Acumulado del año."
+    "yearCutoffNote": "Cada año suma de enero a {month}: son los mismos meses en todos.",
+    "partialYearsNote": "Años sin todos esos meses: {years}. Se ven más bajos."
   },
   "widgets": {
     "customize": "Personalizar vista",
@@ -687,11 +695,6 @@
     "activities": "Actividades",
     "alerts": "Alertas",
     "summary": "Resumen",
-    "tabs": {
-      "vision": "Visión General",
-      "libre": "Flujo Libre",
-      "diaria": "Dinámica Diaria"
-    },
     "activityFamilies": "Operación / Inversión / Financiamiento",
     "explanation": "Explicación",
     "currentPeriod": "Periodo actual ({period})",
@@ -729,6 +732,16 @@
       "help": "Movimientos diarios reales de caja y bancos: cobranza, nómina, proveedores, renta, impuestos y deuda.",
       "accountsCovered": "{count} cuentas de efectivo · {moneda}",
       "traspasosNote": "Traspasos entre cuentas propias: {amount}. Se excluyen de entradas y salidas operativas.",
+      "saldoDiario": {
+        "title": "Tu caja día a día",
+        "help": "Saldo de caja y bancos al cierre de cada día, según tu auxiliar de bancos.",
+        "opening": "Saldo al inicio del mes",
+        "closing": "Saldo al cierre del mes",
+        "lowest": "Saldo más bajo del mes",
+        "lowestDay": "Día {dia}",
+        "insightLowest": "Tu caja tocó su punto más bajo el día {dia}, con {monto}. Programa tus pagos grandes después de tus días de cobro.",
+        "insightNegative": "Tu caja quedó en negativo el día {dia} por {monto}. Adelanta tu cobranza o mueve ese pago."
+      },
       "daily": "Día",
       "weekly": "Semana",
       "inflows": "Entradas",
@@ -1565,7 +1578,8 @@
       "noBalanceData": "Sin dato: la balanza del mes no trae esos saldos",
       "unknown": "Sin dato este mes",
       "noCash": "Sin dato: tu balanza no trae cuentas de caja y bancos"
-    }
+    },
+    "vsPreviousMonth": "vs mes anterior"
   },
   "ingesta": {
     "title": "Ingesta",
@@ -1703,7 +1717,72 @@
     "COGNITO_CHALLENGE": "Se requiere un paso adicional de autenticación.",
     "INTERNAL_ERROR": "Ocurrió un error interno.",
     "prismaClientStale": "Cifra no pudo leer la información en este momento. Intenta de nuevo en unos minutos.",
-    "generic": "Ocurrió un error."
+    "generic": "Ocurrió un error.",
+    "viewerOnly": "Solo el equipo de Cifra (administración y socios) puede ver los errores del portal.",
+    "tableTitle": "Errores registrados",
+    "tableHelp": "Del más reciente al más antiguo. Abre un renglón para ver dónde ocurrió y su detalle técnico.",
+    "empty": "No hay errores con estos filtros.",
+    "loadFailed": "No se pudieron cargar los errores. Recarga la página.",
+    "updateFailed": "No se pudo actualizar el error. Intenta de nuevo.",
+    "markedResolved": "Error marcado como resuelto.",
+    "markedPending": "Error marcado como pendiente.",
+    "markResolved": "Marcar resuelto",
+    "markPending": "Marcar pendiente",
+    "pageOf": "Página {page} de {pages}",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "kpis": {
+      "last24h": "Últimas 24 horas",
+      "unresolved": "Sin resolver",
+      "total": "Total del periodo"
+    },
+    "filters": {
+      "status": "Estado",
+      "source": "Origen",
+      "severity": "Severidad",
+      "company": "Empresa",
+      "from": "Desde",
+      "to": "Hasta",
+      "search": "Buscar",
+      "searchPlaceholder": "Texto del mensaje",
+      "all": "Todos",
+      "allCompanies": "Todas las empresas"
+    },
+    "status": {
+      "all": "Todos",
+      "unresolved": "Sin resolver",
+      "resolved": "Resuelto"
+    },
+    "source": {
+      "client": "Navegador",
+      "server": "Servidor"
+    },
+    "severity": {
+      "error": "Error",
+      "warn": "Aviso"
+    },
+    "columns": {
+      "date": "Fecha y hora",
+      "source": "Origen",
+      "severity": "Severidad",
+      "message": "Mensaje",
+      "company": "Empresa",
+      "user": "Usuario",
+      "status": "Estado"
+    },
+    "detail": {
+      "url": "Dónde",
+      "digest": "Digest",
+      "userAgent": "Navegador",
+      "resolvedBy": "Resuelto por",
+      "noStack": "Sin detalle técnico."
+    },
+    "boundary": {
+      "title": "Algo falló en esta pantalla",
+      "message": "Cifra registró el error para revisarlo. Recarga la página para seguir trabajando.",
+      "reload": "Recargar página"
+    },
+    "loadRetry": "No pudimos traer tus cifras. Reintenta."
   },
   "emptyStates": {
     "noSource": "La empresa seleccionada no tiene esta fuente de datos."
@@ -1770,13 +1849,7 @@
     },
     "add": "Agregar persona",
     "adding": "Agregando…",
-    "added": "Listo: {email} ya puede entrar a {company}.",
-    "tempTitle": "Contraseña temporal de {email}",
-    "tempHelp": "Cópiala ahora y compártela por un canal privado. No se vuelve a mostrar.",
-    "tempCopy": "Copiar",
-    "tempCopied": "Copiada",
-    "tempDone": "Ya la compartí",
-    "devNoPassword": "En este entorno de pruebas se entra solo con el correo. No hace falta contraseña.",
+    "added": "Listo: dimos de alta a {email} en {company}.",
     "roleChanged": "{email} ahora es: {role}.",
     "accessOff": "{email} ya no puede entrar.",
     "accessOn": "{email} puede volver a entrar.",
@@ -1786,7 +1859,10 @@
       "TARGET_ABOVE": "Solo un administrador puede cambiar a otro administrador. Pídeselo a uno.",
       "ROLE_NOT_ALLOWED": "Tu rol no puede dar ese permiso. Pide a un administrador que lo haga.",
       "CONFLICT": "Ese correo ya tiene acceso a Cifra. Búscalo en la lista o usa otro correo.",
-      "VALIDATION_ERROR": "Revisa el correo: no parece válido."
+      "VALIDATION_ERROR": "Revisa el correo: no parece válido.",
+      "welcomeFailed": "No se pudo enviar el correo de bienvenida. Intenta de nuevo en unos minutos.",
+      "inactiveUser": "Esa persona no tiene acceso activo. Dale acceso antes de reenviar el correo.",
+      "tooManyAttempts": "Demasiados intentos. Espera unos minutos y vuelve a intentar."
     },
     "auditTitle": "Cambios recientes",
     "auditHelp": "Quién agregó personas, quitó accesos o cambió roles. Nunca se guardan contraseñas.",
@@ -1796,7 +1872,16 @@
       "USER_DEACTIVATED": "{actor} le quitó el acceso a {target}.",
       "USER_REACTIVATED": "{actor} le devolvió el acceso a {target}.",
       "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to}."
-    }
+    },
+    "welcomeSent": "Correo de bienvenida enviado a {email}.",
+    "welcomeFailed": "Dimos de alta a {email}, pero el correo de bienvenida no salió. Reenvíalo.",
+    "welcomeHelp": "Le llega un código para crear su contraseña en Cifra. El código vence en una hora; si no lo usa a tiempo, reenvía el correo.",
+    "welcomeSkipped": "En este entorno de pruebas no se envían correos: se entra solo con el correo, sin contraseña.",
+    "welcomeDone": "Entendido",
+    "resend": "Reenviar correo",
+    "resending": "Reenviando…",
+    "resent": "Reenviamos el correo de bienvenida a {email}.",
+    "resendFailed": "No se pudo reenviar el correo. Intenta de nuevo en unos minutos."
   },
   "loads": {
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
@@ -1929,5 +2014,14 @@
       "tagline": "Tus cifras, en claro.",
       "endorsement": "Un producto de Data Frontier"
     }
+  },
+  "setPassword": {
+    "title": "Establece tu contraseña",
+    "help": "Escribe tu correo, el código de 6 dígitos que te llegó en el correo de bienvenida y tu nueva contraseña.",
+    "submit": "Guardar contraseña",
+    "emailFirst": "Escribe primero tu correo.",
+    "doneTitle": "Contraseña lista",
+    "doneHelp": "Ya puedes entrar a Cifra con {email} y la contraseña que acabas de crear.",
+    "goLogin": "Ir a iniciar sesión"
   }
 }

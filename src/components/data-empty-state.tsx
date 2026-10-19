@@ -1,6 +1,9 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocale } from "@/context/LocaleContext";
-import type { ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 export function DataEmptyState({
   title,
@@ -26,5 +29,38 @@ export function DataEmptyState({
         {action}
       </CardContent>
     </Card>
+  );
+}
+
+/**
+ * Falla de carga: mensaje fijo en llano que termina en verbo y botón Reintentar.
+ * El detalle del error solo va a la consola (el API ya lo registra en el servidor).
+ */
+export function DataErrorState({
+  title,
+  error,
+  onRetry,
+}: {
+  title: string;
+  error?: string | null;
+  onRetry?: () => void;
+}) {
+  const { t } = useLocale();
+  useEffect(() => {
+    if (error) {
+      console.error("DataErrorState", error);
+    }
+  }, [error]);
+  return (
+    <DataEmptyState
+      title={title}
+      message={t("errors.loadRetry")}
+      description={null}
+      action={
+        <Button type="button" variant="outline" onClick={onRetry ?? (() => window.location.reload())}>
+          {t("common.retry")}
+        </Button>
+      }
+    />
   );
 }

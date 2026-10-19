@@ -1,7 +1,7 @@
 "use client";
 
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
@@ -245,7 +245,7 @@ export function ConcentracionRiesgoSection() {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   }
   if (error) {
-    return <DataEmptyState title={t("cobranza.loadError")} message={error} />;
+    return <DataErrorState title={t("cobranza.loadError")} error={error} />;
   }
   if (!data?.hasData) {
     return (

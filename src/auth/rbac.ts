@@ -69,6 +69,9 @@ export const USER_ADMIN_ROLES: readonly UserRole[] = ["ADMIN", "CFO_PARTNER"];
 /** Mismos roles que Ingesta: quien sube archivos puede revisar el historial de cargas. */
 export const INGEST_HISTORY_ROLES: readonly UserRole[] = ["ADMIN", "CFO_PARTNER"];
 
+/** Quién ve el panel de errores del portal: el equipo, no los clientes. */
+export const ERROR_VIEW_ROLES: readonly UserRole[] = ["ADMIN", "CFO_PARTNER"];
+
 export function assertCanManageUsers(actorRole: UserRole): void {
   if (!USER_ADMIN_ROLES.includes(actorRole)) {
     throw new AppError("FORBIDDEN", "Tu rol no puede administrar usuarios.", 403);

@@ -1,4 +1,5 @@
 import { AppError } from "@/auth/errors";
+import { generateTemporaryPassword } from "@/auth/temporaryPassword";
 import { UserRole } from "@/generated/prisma/enums";
 import {
   AdminAddUserToGroupCommand,
@@ -236,6 +237,39 @@ export async function sendPasswordResetCode(email: string): Promise<void> {
   }
 }
 
+/**
+ * Correo de bienvenida: el mismo código de ForgotPassword, que el usuario usa en /set-password para
+ * crear su contraseña. A diferencia de sendPasswordResetCode, aquí sí se reporta la falla, porque
+ * quien da de alta necesita saber si el correo salió para poder reenviarlo.
+ * ClientMetadata.flow = "welcome" permite a un trigger Custom Message distinguirlo de un "olvidé mi contraseña".
+ */
+export async function sendWelcomeCode(email: string): Promise<void> {
+  const { clientId } = getConfig();
+  const client = getClient();
+  const secretHash = computeSecretHash(email);
+
+  try {
+    await client.send(
+      new ForgotPasswordCommand({
+        ClientId: clientId,
+        Username: email,
+        ClientMetadata: { flow: "welcome" },
+        ...(secretHash ? { SecretHash: secretHash } : {}),
+      }),
+    );
+  } catch (error) {
+    if (error instanceof LimitExceededException || error instanceof TooManyRequestsException) {
+      throw new AppError("VALIDATION_ERROR", "Demasiados intentos. Espera unos minutos.", 429, {
+        reason: "tooManyAttempts",
+      });
+    }
+    console.error("No se envió el correo de bienvenida", (error as Error).name);
+    throw new AppError("INTERNAL_ERROR", "No se pudo enviar el correo de bienvenida.", 502, {
+      reason: "welcomeFailed",
+    });
+  }
+}
+
 export async function confirmPasswordReset(
   email: string,
   code: string,
@@ -287,9 +321,14 @@ export async function confirmPasswordReset(
   }
 }
 
+/**
+ * Crea al usuario sin correo de Cognito (SUPPRESS) y con una contraseña interna aleatoria que nadie
+ * conoce: así queda CONFIRMED, el único estado en que ForgotPassword manda el código de bienvenida
+ * (un usuario en FORCE_CHANGE_PASSWORD no puede restablecer). La contraseña real la crea la persona.
+ */
 export async function adminCreateCognitoUser(input: {
   email: string;
-  password: string;
+  name?: string;
   role: UserRole;
   tenantId: string;
 }): Promise<{ cognitoSub: string; username: string }> {
@@ -308,6 +347,7 @@ export async function adminCreateCognitoUser(input: {
           { Name: "email_verified", Value: "true" },
           { Name: "custom:tenantId", Value: input.tenantId },
           { Name: "custom:role", Value: input.role },
+          ...(input.name ? [{ Name: "name", Value: input.name }] : []),
         ],
       }),
     );
@@ -316,7 +356,7 @@ export async function adminCreateCognitoUser(input: {
       new AdminSetUserPasswordCommand({
         UserPoolId: userPoolId,
         Username: username,
-        Password: input.password,
+        Password: generateTemporaryPassword(24),
         Permanent: true,
       }),
     );

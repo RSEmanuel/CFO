@@ -85,6 +85,7 @@ model Tenant {
   ingestFileAudits      IngestFileAudit[]
   budgetAssumptions     BudgetAssumption[]
   adminAuditLogs        AdminAuditLog[]
+  appErrorLogs          AppErrorLog[]
 
   @@index([rfc])
   @@map("tenants")
@@ -103,6 +104,7 @@ model User {
   tenant           Tenant            @relation(fields: [tenantId], references: [id], onDelete: Cascade)
   ingestBatches    IngestBatch[]
   ingestFileAudits IngestFileAudit[]
+  appErrorLogs     AppErrorLog[]
 
   @@index([tenantId])
   @@index([email])
@@ -478,4 +480,41 @@ model AdminAuditLog {
 
   @@index([tenantId, createdAt])
   @@map("admin_audit_logs")
+}
+
+enum AppErrorSource {
+  client
+  server
+}
+
+enum AppErrorSeverity {
+  error
+  warn
+}
+
+/// Errores del portal (cliente y servidor) para diagnosticar sin revisar logs. tenantId/userId se
+/// llenan desde la sesión; quedan nulos si el error ocurre fuera de una sesión. resolvedBy guarda el
+/// correo de quien lo marcó resuelto.
+model AppErrorLog {
+  id         String           @id @default(cuid())
+  createdAt  DateTime         @default(now())
+  tenantId   String?
+  userId     String?
+  source     AppErrorSource
+  message    String
+  stack      String?
+  digest     String?
+  url        String?
+  userAgent  String?
+  severity   AppErrorSeverity @default(error)
+  resolved   Boolean          @default(false)
+  resolvedBy String?
+  resolvedAt DateTime?
+
+  tenant Tenant? @relation(fields: [tenantId], references: [id], onDelete: SetNull)
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([createdAt])
+  @@index([tenantId, createdAt])
+  @@map("app_error_logs")
 }

@@ -20,6 +20,11 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   const { t } = useLocale();
   const canManage = Boolean(user && USER_ADMIN_ROLES.includes(user.role));
 
+  // Errores del portal tiene su propia entrada en el menú y su propio encabezado.
+  if (pathname.startsWith("/dashboard/settings/errores")) {
+    return <>{children}</>;
+  }
+
   return (
     <div className="space-y-6">
       <div>

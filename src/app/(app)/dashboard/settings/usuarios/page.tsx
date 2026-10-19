@@ -21,9 +21,12 @@ type Role = SessionUser["role"];
 
 const ALL_ROLES: readonly Role[] = ["ADMIN", "CFO_PARTNER", "CLIENT_VIEWER"];
 
-type IssuedPassword = { email: string; password: string };
+type WelcomeEmailStatus = "sent" | "failed" | "skipped";
 
-type CreatedUser = TenantUserRow & { temporaryPassword: string | null };
+type CreatedUser = TenantUserRow & { welcomeEmail: WelcomeEmailStatus };
+
+/** Aviso tras el alta: a quién se le mandó (o no) el correo de bienvenida. */
+type WelcomeNotice = { userId: string; email: string; status: WelcomeEmailStatus; resent: boolean };
 
 const thClass = "pb-2 pr-4 font-medium";
 const tdClass = "py-3 pr-4 align-middle";
@@ -40,10 +43,8 @@ export default function UsuariosPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<Role>("CLIENT_VIEWER");
   const [creating, setCreating] = useState(false);
-  const [devNoPassword, setDevNoPassword] = useState(false);
-  // La contraseña temporal vive solo en memoria hasta que se cierra el aviso.
-  const [issued, setIssued] = useState<IssuedPassword | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [welcome, setWelcome] = useState<WelcomeNotice | null>(null);
+  const [resending, setResending] = useState(false);
 
   const grantableRoles = user ? ALL_ROLES.filter((option) => canRegisterRole(user.role, option)) : [];
 
@@ -82,8 +83,7 @@ export default function UsuariosPage() {
       return;
     }
     setView(null);
-    setIssued(null);
-    setDevNoPassword(false);
+    setWelcome(null);
     void load();
   }, [canManage, load]);
 
@@ -146,20 +146,14 @@ export default function UsuariosPage() {
   async function onCreate(event: FormEvent) {
     event.preventDefault();
     setCreating(true);
-    setIssued(null);
-    setCopied(false);
+    setWelcome(null);
     try {
       const created = await apiRequest<CreatedUser>("/api/auth/register-user", {
         method: "POST",
         body: JSON.stringify({ email: email.trim(), role, tenantId }),
       });
       toast.success(t("users.added", { email: created.email, company: empresa }));
-      if (created.temporaryPassword) {
-        setIssued({ email: created.email, password: created.temporaryPassword });
-        setDevNoPassword(false);
-      } else {
-        setDevNoPassword(true);
-      }
+      setWelcome({ userId: created.id, email: created.email, status: created.welcomeEmail, resent: false });
       setEmail("");
       await load();
     } catch (error) {
@@ -169,15 +163,25 @@ export default function UsuariosPage() {
     }
   }
 
-  async function onCopy() {
-    if (!issued) {
+  async function onResendWelcome() {
+    if (!welcome) {
       return;
     }
+    setResending(true);
     try {
-      await navigator.clipboard.writeText(issued.password);
-      setCopied(true);
-    } catch {
-      setCopied(false);
+      const result = await apiRequest<{ welcomeEmail: WelcomeEmailStatus }>("/api/admin/users/welcome", {
+        method: "POST",
+        body: JSON.stringify({ tenantId, userId: welcome.userId }),
+      });
+      setWelcome({ ...welcome, status: result.welcomeEmail, resent: true });
+      if (result.welcomeEmail === "sent") {
+        toast.success(t("users.resent", { email: welcome.email }));
+      }
+    } catch (error) {
+      setWelcome({ ...welcome, status: "failed" });
+      toast.error(errorMessage(error, "users.resendFailed"));
+    } finally {
+      setResending(false);
     }
   }
 
@@ -316,31 +320,30 @@ export default function UsuariosPage() {
           </form>
           <p className="text-sm text-muted-foreground">{t(`users.roleHelp.${role}`)}</p>
 
-          {issued ? (
-            <div className="space-y-3 rounded-control border border-clay/40 bg-secondary p-4" role="status">
-              <p className="text-sm font-semibold text-foreground">{t("users.tempTitle", { email: issued.email })}</p>
-              <p className="text-sm text-muted-foreground">{t("users.tempHelp")}</p>
-              <div className="flex flex-wrap items-center gap-2">
-                <code className="cifra-num select-all rounded-control border border-border bg-card px-3 py-2 text-sm text-foreground">
-                  {issued.password}
-                </code>
-                <Button type="button" size="sm" variant="outline" onClick={onCopy}>
-                  {copied ? t("users.tempCopied") : t("users.tempCopy")}
-                </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={() => {
-                    setIssued(null);
-                    setCopied(false);
-                  }}
-                >
-                  {t("users.tempDone")}
-                </Button>
-              </div>
+          {welcome ? (
+            <div className="space-y-3 rounded-control border border-border bg-secondary p-4" role="status">
+              {welcome.status === "skipped" ? (
+                <p className="text-sm text-muted-foreground">{t("users.welcomeSkipped")}</p>
+              ) : (
+                <>
+                  <p className="text-sm font-semibold text-foreground">
+                    {welcome.status === "sent"
+                      ? t(welcome.resent ? "users.resent" : "users.welcomeSent", { email: welcome.email })
+                      : t("users.welcomeFailed", { email: welcome.email })}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{t("users.welcomeHelp")}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button type="button" size="sm" variant="outline" disabled={resending} onClick={() => void onResendWelcome()}>
+                      {resending ? t("users.resending") : t("users.resend")}
+                    </Button>
+                    <Button type="button" size="sm" onClick={() => setWelcome(null)}>
+                      {t("users.welcomeDone")}
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           ) : null}
-          {devNoPassword ? <p className="text-sm text-muted-foreground">{t("users.devNoPassword")}</p> : null}
         </CardContent>
       </Card>
 

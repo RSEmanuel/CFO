@@ -1,5 +1,6 @@
 "use client";
 
+import { reportClientError } from "@/lib/report-client-error";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
 type Props = {
@@ -20,6 +21,7 @@ export class ChartErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error("ChartErrorBoundary", error, info.componentStack);
+    reportClientError(error, { componentStack: info.componentStack });
   }
 
   render() {

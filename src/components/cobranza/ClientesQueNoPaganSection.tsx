@@ -1,6 +1,5 @@
 "use client";
 
-import { CifraMark } from "@/components/brand/CifraMark";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { TableScroll } from "@/components/ui/table-scroll";
 import { useLocale } from "@/context/LocaleContext";
@@ -95,8 +94,7 @@ export function ClientesQueNoPaganSection({ variant, total, rows, topCount, topP
         </TableScroll>
       )}
 
-      <p className="mt-3 flex items-start gap-1.5 text-xs text-muted-foreground">
-        <CifraMark state={variant === "vencido" ? "confirmed" : "estimated"} size={14} className="mt-px shrink-0" />
+      <p className="mt-3 text-xs text-muted-foreground">
         {t(`${prefix}.fuente`)}
       </p>
     </section>
