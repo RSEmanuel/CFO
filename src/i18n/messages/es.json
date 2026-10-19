@@ -41,7 +41,9 @@
       "CLIENT_VIEWER": "Quien solo consulta"
     },
     "and": "y",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "clientLabel": "Cliente",
+    "yourCompanyIs": "Tu empresa: {name}"
   },
   "nav": {
     "results": "Resultados",

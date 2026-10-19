@@ -41,7 +41,9 @@
       "CLIENT_VIEWER": "View only"
     },
     "and": "and",
-    "retry": "Retry"
+    "retry": "Retry",
+    "clientLabel": "Client",
+    "yourCompanyIs": "Your company: {name}"
   },
   "nav": {
     "results": "Results",
