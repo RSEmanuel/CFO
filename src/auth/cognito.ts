@@ -328,6 +328,7 @@ export async function confirmPasswordReset(
  */
 export async function adminCreateCognitoUser(input: {
   email: string;
+  name?: string;
   role: UserRole;
   tenantId: string;
 }): Promise<{ cognitoSub: string; username: string }> {
@@ -346,6 +347,7 @@ export async function adminCreateCognitoUser(input: {
           { Name: "email_verified", Value: "true" },
           { Name: "custom:tenantId", Value: input.tenantId },
           { Name: "custom:role", Value: input.role },
+          ...(input.name ? [{ Name: "name", Value: input.name }] : []),
         ],
       }),
     );

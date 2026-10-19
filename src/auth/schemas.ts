@@ -57,6 +57,17 @@ export const tenantQuerySchema = z.object({
   tenantId: z.string().min(1, "El tenantId es obligatorio."),
 });
 
+/** Alta de empresa con su dueño: el correo del dueño recibe la bienvenida para crear su contraseña. */
+export const onboardTenantSchema = createTenantSchema.extend({
+  ownerEmail: z.string().trim().email("El correo del dueño no es válido."),
+  ownerName: z
+    .string()
+    .trim()
+    .max(120, "El nombre del dueño es demasiado largo.")
+    .optional()
+    .transform((value) => value || undefined),
+});
+
 export const resendWelcomeSchema = z.object({
   tenantId: z.string().min(1, "El tenantId es obligatorio."),
   userId: z.string().min(1, "El userId es obligatorio."),

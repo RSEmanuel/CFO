@@ -142,6 +142,7 @@ export type RegisterUserResult = PublicUser & {
 export async function registerUser(input: {
   actor: { userId: string; email: string; role: UserRole };
   email: string;
+  name?: string;
   role: UserRole;
   tenantId: string;
 }): Promise<RegisterUserResult> {
@@ -192,6 +193,7 @@ export async function registerUser(input: {
 
   const cognitoUser = await adminCreateCognitoUser({
     email: input.email,
+    name: input.name,
     role: input.role,
     tenantId: input.tenantId,
   });

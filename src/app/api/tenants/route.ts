@@ -1,8 +1,8 @@
 import { jsonSuccess } from "@/auth/http";
-import { createTenantSchema } from "@/auth/schemas";
+import { onboardTenantSchema } from "@/auth/schemas";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/middleware/auth";
-import { createEmptyTenant } from "@/services/tenants/tenantService";
+import { onboardTenant } from "@/services/tenants/onboarding";
 
 export const GET = withAuth(async (_request, auth) => {
   if (auth.role === "CLIENT_VIEWER") {
@@ -21,11 +21,14 @@ export const GET = withAuth(async (_request, auth) => {
 });
 
 export const POST = withAuth(
-  async (request) => {
+  async (request, auth) => {
     const body: unknown = await request.json();
-    const payload = createTenantSchema.parse(body);
-    const tenant = await createEmptyTenant(payload);
-    return jsonSuccess(tenant, 201);
+    const payload = onboardTenantSchema.parse(body);
+    const result = await onboardTenant({
+      actor: { userId: auth.userId, email: auth.email, role: auth.role },
+      ...payload,
+    });
+    return jsonSuccess(result, 201);
   },
   { roles: ["ADMIN", "CFO_PARTNER"] },
 );
