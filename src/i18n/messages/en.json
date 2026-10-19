@@ -694,11 +694,6 @@
     "activities": "Activities",
     "alerts": "Alerts",
     "summary": "Summary",
-    "tabs": {
-      "vision": "Overview",
-      "libre": "Free Cash Flow",
-      "diaria": "Daily Cash"
-    },
     "activityFamilies": "Operations / Investing / Financing",
     "explanation": "Explanation",
     "currentPeriod": "Current period ({period})",

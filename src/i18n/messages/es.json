@@ -694,11 +694,6 @@
     "activities": "Actividades",
     "alerts": "Alertas",
     "summary": "Resumen",
-    "tabs": {
-      "vision": "Visión General",
-      "libre": "Flujo Libre",
-      "diaria": "Dinámica Diaria"
-    },
     "activityFamilies": "Operación / Inversión / Financiamiento",
     "explanation": "Explicación",
     "currentPeriod": "Periodo actual ({period})",
