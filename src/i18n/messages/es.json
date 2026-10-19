@@ -1578,7 +1578,8 @@
       "noBalanceData": "Sin dato: la balanza del mes no trae esos saldos",
       "unknown": "Sin dato este mes",
       "noCash": "Sin dato: tu balanza no trae cuentas de caja y bancos"
-    }
+    },
+    "vsPreviousMonth": "vs mes anterior"
   },
   "ingesta": {
     "title": "Ingesta",

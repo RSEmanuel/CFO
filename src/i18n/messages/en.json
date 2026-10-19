@@ -1578,7 +1578,8 @@
       "noBalanceData": "No data: this month's trial balance lacks those balances",
       "unknown": "No data this month",
       "noCash": "No data: your trial balance has no cash or bank accounts"
-    }
+    },
+    "vsPreviousMonth": "vs previous month"
   },
   "ingesta": {
     "title": "Ingest",

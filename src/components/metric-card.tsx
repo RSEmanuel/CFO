@@ -2,6 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InsightText } from "@/components/insight-text";
+import { useLocale } from "@/context/LocaleContext";
 import { cn } from "@/lib/utils";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 import { FavoriteStar } from "@/components/favorites/favorite-star";
@@ -17,6 +18,8 @@ type MetricCardProps = {
   currentNumeric?: number | null;
   invertTrend?: boolean;
   favoriteId?: string;
+  /** Con qué se compara el delta (p. ej. "vs mismo mes del año pasado"). Por defecto, el mes anterior. */
+  comparableLabel?: string;
 };
 
 export function MetricCard({
@@ -29,7 +32,9 @@ export function MetricCard({
   currentNumeric,
   invertTrend = false,
   favoriteId,
+  comparableLabel,
 }: MetricCardProps) {
+  const { t } = useLocale();
   const canCompare =
     typeof currentNumeric === "number" && typeof previousValue === "number" && Math.abs(previousValue) > 0.0001;
   const deltaPct = canCompare ? ((currentNumeric - previousValue) / Math.abs(previousValue)) * 100 : null;
@@ -53,7 +58,7 @@ export function MetricCard({
           {deltaPct == null || loading ? (
             <span className="flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-muted-foreground">
               <Minus className="h-3 w-3" />
-              Sin comparativo
+              {t("metrics.noComparable")}
             </span>
           ) : (
             <span
@@ -66,7 +71,7 @@ export function MetricCard({
             >
               {deltaPct > 0 ? <ArrowUpRight className="h-4 w-4" /> : <ArrowDownRight className="h-4 w-4" />}
               {deltaPct > 0 ? "+" : ""}
-              {deltaPct.toFixed(1)}% vs mes anterior
+              {deltaPct.toFixed(1)}% {comparableLabel ?? t("metrics.vsPreviousMonth")}
             </span>
           )}
         </div>
