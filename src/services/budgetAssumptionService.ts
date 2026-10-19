@@ -10,6 +10,26 @@ export type BudgetAssumptionPayload = {
   updatedAt: string | null;
 };
 
+type BudgetAssumptionRow = {
+  salesGrowthPct: unknown;
+  inflationPct: unknown;
+  headcount: number;
+  headcountCostMonthly: unknown;
+  debtInterestMonthly: unknown;
+  depreciationMonthly: unknown;
+};
+
+export function rowToBudgetDrivers(row: BudgetAssumptionRow): BudgetDrivers {
+  return {
+    salesGrowthPct: toNumber(row.salesGrowthPct as number),
+    inflationPct: toNumber(row.inflationPct as number),
+    headcount: row.headcount,
+    headcountCostMonthly: toNumber(row.headcountCostMonthly as number),
+    debtInterestMonthly: toNumber(row.debtInterestMonthly as number),
+    depreciationMonthly: toNumber(row.depreciationMonthly as number),
+  };
+}
+
 export async function getBudgetAssumptions(
   tenantId: string,
   anio: number,
@@ -30,14 +50,7 @@ export async function getBudgetAssumptions(
   return {
     tenantId,
     anio,
-    drivers: {
-      salesGrowthPct: toNumber(row.salesGrowthPct),
-      inflationPct: toNumber(row.inflationPct),
-      headcount: row.headcount,
-      headcountCostMonthly: toNumber(row.headcountCostMonthly),
-      debtInterestMonthly: toNumber(row.debtInterestMonthly),
-      depreciationMonthly: toNumber(row.depreciationMonthly),
-    },
+    drivers: rowToBudgetDrivers(row),
     persisted: true,
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -61,4 +74,11 @@ export async function upsertBudgetAssumptions(
     persisted: true,
     updatedAt: row.updatedAt.toISOString(),
   };
+}
+
+/** "Volver a la proyección automática": borra los supuestos guardados de ese año. */
+export async function deleteBudgetAssumptions(tenantId: string, anio: number): Promise<{ deleted: boolean }> {
+  requireBudgetAssumptionDelegate();
+  const result = await prisma.budgetAssumption.deleteMany({ where: { tenantId, anio } });
+  return { deleted: result.count > 0 };
 }

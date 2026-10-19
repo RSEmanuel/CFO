@@ -1,6 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { nowcastRubro, projectFromPoints } from "./budgetProjection";
+import {
+  AUTO_INFLATION_PCT,
+  AUTO_SALES_GROWTH_MAX_PCT,
+  applyBudgetDrivers,
+  deriveAutoBudgetDrivers,
+  deriveSalesGrowthPct,
+  resolveBudgetDrivers,
+  type BudgetDrivers,
+} from "./drivers";
 import { fromBalanzaPnl, hasOfficialBudget } from "./series";
 import type { MonthlyPnlPoint } from "./types";
 
@@ -145,5 +154,67 @@ describe("budgetProjection", () => {
         );
       }
     }
+  });
+});
+
+function growingSeries(months: number, monthlyRate: number, start = 1000): MonthlyPnlPoint[] {
+  return Array.from({ length: months }, (_, index) => {
+    const date = new Date(2025, index, 1);
+    const periodo = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+    return point(periodo, start * (1 + monthlyRate) ** index);
+  });
+}
+
+describe("supuestos de la proyección", () => {
+  it("sin assumptions guardadas → drivers auto derivados del historial", () => {
+    const history = growingSeries(12, 0.01);
+    const { drivers, source } = resolveBudgetDrivers(null, history);
+    assert.equal(source, "auto");
+    // 1% mensual sostenido ≈ 12.7% al año.
+    assert.equal(drivers.salesGrowthPct, 12.7);
+    assert.equal(drivers.inflationPct, AUTO_INFLATION_PCT);
+    assert.equal(drivers.headcount, 0);
+    assert.equal(drivers.headcountCostMonthly, 0);
+    assert.equal(drivers.debtInterestMonthly, 0);
+    assert.equal(drivers.depreciationMonthly, 0);
+  });
+
+  it("con assumptions guardadas → se respetan tal cual", () => {
+    const saved: BudgetDrivers = {
+      salesGrowthPct: 5,
+      inflationPct: 3,
+      headcount: 2,
+      headcountCostMonthly: 15000,
+      debtInterestMonthly: 800,
+      depreciationMonthly: 400,
+    };
+    const { drivers, source } = resolveBudgetDrivers(saved, growingSeries(12, 0.05));
+    assert.equal(source, "manual");
+    assert.deepEqual(drivers, saved);
+  });
+
+  it("el crecimiento automático usa solo los últimos 12 meses y se acota", () => {
+    const flatThenSteep = [...growingSeries(12, 0), ...growingSeries(12, 0.08, 1000)].map((row, index) => ({
+      ...row,
+      periodo: `${2024 + Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`,
+    }));
+    assert.equal(deriveSalesGrowthPct(flatThenSteep), AUTO_SALES_GROWTH_MAX_PCT);
+    assert.equal(deriveSalesGrowthPct(growingSeries(12, -0.05)), -10);
+  });
+
+  it("con menos de 6 meses con ventas no hay tendencia: crecimiento 0", () => {
+    assert.equal(deriveSalesGrowthPct(growingSeries(5, 0.1)), 0);
+    assert.equal(deriveAutoBudgetDrivers([]).salesGrowthPct, 0);
+  });
+
+  it("los drivers auto mueven ingreso por crecimiento y costo por inflación", () => {
+    const history = growingSeries(16, 0.01);
+    const base = projectFromPoints(history);
+    const drivers = deriveAutoBudgetDrivers(history);
+    const adjusted = applyBudgetDrivers(base, drivers);
+    const baseIngreso = base.rubros.ingreso.months[0].p50;
+    const baseCosto = base.rubros.costo.months[0].p50;
+    assert.ok(Math.abs(adjusted.rubros.ingreso.months[0].p50 - baseIngreso * (1 + drivers.salesGrowthPct / 100)) < 0.02);
+    assert.ok(Math.abs(adjusted.rubros.costo.months[0].p50 - baseCosto * (1 + AUTO_INFLATION_PCT / 100)) < 0.02);
   });
 });

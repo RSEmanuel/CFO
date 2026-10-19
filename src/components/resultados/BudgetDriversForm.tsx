@@ -6,7 +6,7 @@ import { useLocale } from "@/context/LocaleContext";
 import { ApiError, apiRequest } from "@/lib/api";
 import { invalidateApiCache } from "@/lib/api-cache";
 import type { BudgetAssumptionPayload } from "@/services/budgetAssumptionService";
-import { DEFAULT_BUDGET_DRIVERS, type BudgetDrivers } from "@/services/forecast/drivers";
+import type { BudgetDrivers } from "@/services/forecast/drivers";
 import { Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -24,39 +24,27 @@ const DRIVER_FIELDS: Array<{
   { key: "depreciationMonthly", labelKey: "resultados.drivers.depreciation", step: "100" },
 ];
 
+/**
+ * Supuestos avanzados de la proyección. Arranca con los supuestos efectivos (los automáticos de Cifra o
+ * los que el usuario guardó); al guardar, pasan a ser supuestos propios del tenant para ese año.
+ */
 export function BudgetDriversForm({
   anio,
+  initialDrivers,
   onSaved,
 }: {
   anio: number;
+  initialDrivers: BudgetDrivers;
   onSaved: () => void;
 }) {
   const { t } = useLocale();
   const { tenantId } = useSession();
-  const [drivers, setDrivers] = useState<BudgetDrivers>(DEFAULT_BUDGET_DRIVERS);
+  const [drivers, setDrivers] = useState<BudgetDrivers>(initialDrivers);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!tenantId || !anio) {
-      return;
-    }
-    const controller = new AbortController();
-    const params = new URLSearchParams({ tenantId, anio: String(anio) });
-    apiRequest<BudgetAssumptionPayload>(`/api/metrics/budget-assumptions?${params.toString()}`, {
-      signal: controller.signal,
-    })
-      .then((payload) => {
-        if (!controller.signal.aborted) {
-          setDrivers(payload.drivers);
-        }
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setDrivers(DEFAULT_BUDGET_DRIVERS);
-        }
-      });
-    return () => controller.abort();
-  }, [tenantId, anio]);
+    setDrivers(initialDrivers);
+  }, [initialDrivers]);
 
   const save = async () => {
     if (!tenantId || saving) {

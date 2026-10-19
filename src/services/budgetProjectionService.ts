@@ -1,6 +1,12 @@
 import { prisma, requireBudgetAssumptionDelegate } from "@/lib/prisma";
 import { projectFromPoints } from "@/services/forecast/budgetProjection";
-import { applyBudgetDrivers, type BudgetDrivers } from "@/services/forecast/drivers";
+import { rowToBudgetDrivers } from "@/services/budgetAssumptionService";
+import {
+  applyBudgetDrivers,
+  resolveBudgetDrivers,
+  type BudgetAssumptionsSource,
+  type BudgetDrivers,
+} from "@/services/forecast/drivers";
 import { fromBalanzaPnl } from "@/services/forecast/series";
 import type {
   BudgetProjectionResult,
@@ -26,7 +32,11 @@ export type BudgetProjectionPayload = {
   sourceMonths: number;
   hasOfficialBudget: boolean;
   status: "available" | "insufficient_history";
-  drivers: BudgetDrivers | null;
+  /** Supuestos efectivos aplicados a la proyección (automáticos o guardados). */
+  drivers: BudgetDrivers;
+  assumptionsSource: BudgetAssumptionsSource;
+  /** Fecha del último guardado cuando assumptionsSource es "manual". */
+  assumptionsUpdatedAt: string | null;
 };
 
 function periodKey(anio: number, periodo: number): string {
@@ -103,17 +113,9 @@ export async function getBudgetProjection(
     anchorPeriodo,
   );
 
-  const drivers: BudgetDrivers | null = assumptionRow
-    ? {
-        salesGrowthPct: toNumber(assumptionRow.salesGrowthPct),
-        inflationPct: toNumber(assumptionRow.inflationPct),
-        headcount: assumptionRow.headcount,
-        headcountCostMonthly: toNumber(assumptionRow.headcountCostMonthly),
-        debtInterestMonthly: toNumber(assumptionRow.debtInterestMonthly),
-        depreciationMonthly: toNumber(assumptionRow.depreciationMonthly),
-      }
-    : null;
-  const projection = drivers ? applyBudgetDrivers(baseProjection, drivers) : baseProjection;
+  // Sin supuestos guardados, Cifra los deriva del historial del tenant (tendencia de ventas e inflación).
+  const { drivers, source } = resolveBudgetDrivers(assumptionRow ? rowToBudgetDrivers(assumptionRow) : null, history);
+  const projection = applyBudgetDrivers(baseProjection, drivers);
 
   return {
     tenantId,
@@ -126,5 +128,7 @@ export async function getBudgetProjection(
     hasOfficialBudget,
     status: history.length >= 8 ? "available" : "insufficient_history",
     drivers,
+    assumptionsSource: source,
+    assumptionsUpdatedAt: assumptionRow ? assumptionRow.updatedAt.toISOString() : null,
   };
 }

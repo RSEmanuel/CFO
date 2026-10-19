@@ -3,6 +3,7 @@ import { jsonSuccess } from "@/auth/http";
 import { assertTenantAccess } from "@/auth/rbac";
 import { withAuth } from "@/middleware/auth";
 import {
+  deleteBudgetAssumptions,
   getBudgetAssumptions,
   upsertBudgetAssumptions,
 } from "@/services/budgetAssumptionService";
@@ -63,4 +64,15 @@ export const PUT = withAuth(async (request, auth) => {
   const anio = parseAnio(searchParams.get("anio"));
   const drivers = parseDrivers(await request.json());
   return jsonSuccess(await upsertBudgetAssumptions(tenantId, anio, drivers));
+});
+
+export const DELETE = withAuth(async (request, auth) => {
+  const { searchParams } = new URL(request.url);
+  const tenantId = searchParams.get("tenantId") ?? auth.tenantId;
+  if (!tenantId) {
+    throw new AppError("VALIDATION_ERROR", "El parámetro tenantId es obligatorio.", 400);
+  }
+  assertTenantAccess(auth, tenantId);
+  const anio = parseAnio(searchParams.get("anio"));
+  return jsonSuccess(await deleteBudgetAssumptions(tenantId, anio));
 });

@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 import type { ResultadosFilters } from "../components/resultados/resultados-filter-bar";
 import type { BudgetProjectionPayload } from "./budgetProjectionService";
 import { projectFromPoints } from "./forecast/budgetProjection";
+import { deriveAutoBudgetDrivers } from "./forecast/drivers";
 import type { MonthlyPnlPoint } from "./forecast/types";
 import {
   buildGroupedProjection,
@@ -61,7 +62,9 @@ function payload(withOfficial: boolean): BudgetProjectionPayload {
     sourceMonths: points.length,
     hasOfficialBudget: withOfficial,
     status: "available",
-    drivers: null,
+    drivers: deriveAutoBudgetDrivers(points),
+    assumptionsSource: "auto",
+    assumptionsUpdatedAt: null,
   };
 }
 

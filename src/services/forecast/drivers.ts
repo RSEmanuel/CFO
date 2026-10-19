@@ -2,6 +2,7 @@ import { round2 } from "@/services/money";
 import type {
   BudgetProjectionResult,
   HorizonMonth,
+  MonthlyPnlPoint,
   RubroForecast,
   ScenarioMonth,
 } from "@/services/forecast/types";
@@ -23,6 +24,70 @@ export const DEFAULT_BUDGET_DRIVERS: BudgetDrivers = {
   debtInterestMonthly: 0,
   depreciationMonthly: 0,
 };
+
+/** De dónde salen los supuestos de la proyección: calculados por Cifra o guardados por el usuario. */
+export type BudgetAssumptionsSource = "auto" | "manual";
+
+/**
+ * Inflación anual que la proyección automática aplica a costos y gastos: referencia fija cercana a la
+ * inflación general reciente en México (meta de Banxico 3% ± 1 pt). Es un supuesto declarado, no un dato
+ * del tenant; quien quiera otro valor lo ajusta en "Ajustar supuestos (avanzado)".
+ */
+export const AUTO_INFLATION_PCT = 4.5;
+
+/** Límites del crecimiento anual automático, para que un par de meses atípicos no disparen la proyección. */
+export const AUTO_SALES_GROWTH_MIN_PCT = -10;
+export const AUTO_SALES_GROWTH_MAX_PCT = 30;
+
+const AUTO_GROWTH_MIN_MONTHS = 6;
+const AUTO_GROWTH_MAX_MONTHS = 12;
+
+/**
+ * Crecimiento anual de ventas según la tendencia reciente: ajuste log-lineal sobre los últimos 6-12 meses
+ * con ingreso positivo (la pendiente es el crecimiento promedio mensual), anualizado y acotado.
+ * Con menos de 6 meses no hay tendencia confiable y regresa 0.
+ */
+export function deriveSalesGrowthPct(history: MonthlyPnlPoint[]): number {
+  const recent = history.filter((point) => point.ingreso > 0).slice(-AUTO_GROWTH_MAX_MONTHS);
+  if (recent.length < AUTO_GROWTH_MIN_MONTHS) {
+    return 0;
+  }
+  const n = recent.length;
+  const xs = recent.map((_, index) => index);
+  const ys = recent.map((point) => Math.log(point.ingreso));
+  const meanX = xs.reduce((sum, x) => sum + x, 0) / n;
+  const meanY = ys.reduce((sum, y) => sum + y, 0) / n;
+  let num = 0;
+  let den = 0;
+  for (let index = 0; index < n; index += 1) {
+    num += (xs[index] - meanX) * (ys[index] - meanY);
+    den += (xs[index] - meanX) ** 2;
+  }
+  const monthlyRate = Math.exp(den === 0 ? 0 : num / den) - 1;
+  const annualPct = ((1 + monthlyRate) ** 12 - 1) * 100;
+  const bounded = Math.min(AUTO_SALES_GROWTH_MAX_PCT, Math.max(AUTO_SALES_GROWTH_MIN_PCT, annualPct));
+  return Math.round(bounded * 10) / 10;
+}
+
+/** Supuestos que Cifra usa cuando el tenant no ha guardado los suyos. */
+export function deriveAutoBudgetDrivers(history: MonthlyPnlPoint[]): BudgetDrivers {
+  return {
+    salesGrowthPct: deriveSalesGrowthPct(history),
+    inflationPct: AUTO_INFLATION_PCT,
+    headcount: 0,
+    headcountCostMonthly: 0,
+    debtInterestMonthly: 0,
+    depreciationMonthly: 0,
+  };
+}
+
+/** Los supuestos guardados mandan; sin ellos se usan los automáticos. */
+export function resolveBudgetDrivers(
+  saved: BudgetDrivers | null,
+  history: MonthlyPnlPoint[],
+): { drivers: BudgetDrivers; source: BudgetAssumptionsSource } {
+  return saved ? { drivers: saved, source: "manual" } : { drivers: deriveAutoBudgetDrivers(history), source: "auto" };
+}
 
 function scaleMonth(month: HorizonMonth, factor: number, additive: number): HorizonMonth {
   return {
