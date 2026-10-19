@@ -105,7 +105,7 @@ export function EbitdaEbitTtmChart({
     <ExpandableShell className="p-6">
       {(toggle, expanded) => (
         <>
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3 pr-10">
             <h3 className="font-sans text-xl font-medium text-foreground">{t("resultados.operativo.ttm.title")}</h3>
             <div className="flex shrink-0 items-center gap-1">
               <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ebitdaEbitTtm} label={t("resultados.operativo.ttm.title")} />

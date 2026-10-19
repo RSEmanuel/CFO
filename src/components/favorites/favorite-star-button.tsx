@@ -33,10 +33,7 @@ export function FavoriteStarButton({
       aria-pressed={active}
       title={active ? t("favorites.remove", { label: translatedLabel }) : t("favorites.add", { label: translatedLabel })}
       className={cn(
-        "touch-hit shrink-0 rounded-full p-1 transition-all",
-        active
-          ? "text-primary"
-          : "text-muted-foreground hover:scale-110 hover:text-primary",
+        "touch-hit absolute right-3 top-3 z-10 shrink-0 rounded-full p-1 text-[color:var(--cifra-warn)] transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         className,
       )}
       onClick={(event) => {
@@ -45,7 +42,7 @@ export function FavoriteStarButton({
         toggleFavorite(widgetId);
       }}
     >
-      <Star className={cn("h-4 w-4", active && "fill-primary text-primary")} />
+      <Star strokeWidth={2} className={cn("h-6 w-6", active && "fill-[color:var(--cifra-warn)]")} />
     </button>
   );
 }

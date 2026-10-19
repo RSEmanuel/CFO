@@ -128,7 +128,7 @@ export function ResultadosPresupuestoView({
       <ExpandableShell className="p-5">
         {(toggle, expanded) => (
           <>
-            <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4 pr-10">
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="font-sans text-xl font-medium text-foreground">

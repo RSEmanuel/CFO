@@ -3,7 +3,7 @@
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
 import { cn } from "@/lib/utils";
-import { categoryTemporalFavoriteId } from "@/services/favoritesRegistry";
+import { categoryTemporalFavoriteId, RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import type { ResultadosCategoryName } from "@/services/financialDataTransformer";
 import type { CategoryTemporalCard } from "@/services/resultadosKpis";
 
@@ -36,8 +36,8 @@ export function CategoryTemporalKpiCard({
   const { t } = useLocale();
   const title = t(card.titleKey);
   return (
-    <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
-      <div className="flex items-start justify-between gap-2">
+    <article className="relative rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
+      <div className="flex items-start justify-between gap-2 pr-10">
         <p className="font-sans text-base font-bold text-foreground">{title}</p>
         <FavoriteStarButton widgetId={categoryTemporalFavoriteId(category, card.key)} label={title} />
       </div>
@@ -79,8 +79,11 @@ export function YearToDateKpiCard({
 }) {
   const { t } = useLocale();
   return (
-    <article className="rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
-      <p className="font-sans text-base font-bold text-foreground">{t("resultados.yearToDate")}</p>
+    <article className="relative rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
+      <div className="flex items-start justify-between gap-2 pr-10">
+        <p className="font-sans text-base font-bold text-foreground">{t("resultados.yearToDate")}</p>
+        <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoAcumulado} label={t("resultados.yearToDate")} />
+      </div>
       <p className="mt-1 text-xs text-muted-foreground">{periodLabel}</p>
       <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
         {value == null ? "N/A" : KPI_FORMATTER.format(value)}

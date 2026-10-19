@@ -181,17 +181,17 @@ function scoreProfile(profile: MappingProfileShape, sheets: SheetFingerprint[]):
 function classifyGeneral(content: string): { source: IngestSourceSystem; type: IngestDocumentType; confidence: number; note: string } {
   const source: IngestSourceSystem = /compac|balanza de comprobacion|auxiliares del catalogo|impreso de polizas/.test(content) ? "compac" : "unknown";
   const rules: Array<[RegExp, IngestDocumentType, number, string]> = [
-    [/auxiliares del catalogo/, "auxiliar_cuentas", 0.9, "Auxiliar de cuentas de CONTPAQi. Elige su formato para poder guardarlo."],
+    [/auxiliares del catalogo/, "auxiliar_cuentas", 0.9, "Auxiliar de cuentas. Elige su formato para poder guardarlo."],
     [/posicion financiera|balance general/, "posicion_financiera", 0.8, "Cifra arma la posición financiera desde la balanza: sube la balanza de comprobación en su lugar."],
     [/estado de resultados/, "estado_resultados", 0.8, "Cifra arma el estado de resultados desde la balanza: sube la balanza de comprobación en su lugar."],
     [/flujo de efectivo/, "flujo_efectivo", 0.78, "Reporte de flujo de efectivo. Elige su formato para poder guardarlo."],
     [/origen y aplicacion/, "origen_recursos", 0.75, "Cifra no guarda este reporte. Sube la balanza de comprobación en su lugar."],
-    [/polizas|impreso de polizas/, "diarios_polizas", 0.88, "Impreso de pólizas de CONTPAQi. Elige su formato para poder guardarlo."],
+    [/polizas|impreso de polizas/, "diarios_polizas", 0.88, "Pólizas. Elige su formato para poder guardarlo."],
   ];
   for (const [pattern, type, confidence, note] of rules) {
     if (pattern.test(content)) return { source, type, confidence, note };
   }
-  return { source, type: "desconocido", confidence: 0.2, note: "Cifra no reconoce este archivo. Sube la balanza, un reporte de CONTPAQi o la plantilla máster." };
+  return { source, type: "desconocido", confidence: 0.2, note: "Cifra no reconoce este archivo. Sube la balanza de comprobación o los auxiliares del mes." };
 }
 
 export async function detectDocument(
@@ -266,15 +266,15 @@ export async function detectDocument(
     );
   const flujoNote =
     selected && documentType === "flujo_efectivo"
-      ? "Flujo de efectivo de CONTPAQi: Cifra guardará tus bancos y sus movimientos por categoría."
+      ? "Flujo de efectivo: Cifra guardará tus bancos y sus movimientos por categoría."
       : selected && documentType === "auxiliar_cuentas"
-        ? "Auxiliar de cuentas de CONTPAQi: Cifra guardará los movimientos diarios y el resumen por cuenta."
+        ? "Auxiliar de cuentas: Cifra guardará los movimientos diarios y el resumen por cuenta."
         : selected && documentType === "diarios_polizas"
-          ? "Impreso de pólizas de CONTPAQi: Cifra guardará las pólizas y sus movimientos."
+          ? "Pólizas: Cifra guardará las pólizas y sus movimientos."
           : selected && documentType === "balanza"
             ? "Balanza de comprobación: Cifra guardará las cuentas y sus saldos del mes."
             : masterStructure
-              ? "Plantilla máster: Cifra guardará cada hoja que traiga datos."
+              ? "Plantilla de Cifra: Cifra guardará cada hoja que traiga datos."
               : general.note;
   return {
     detectionId: randomUUID(),

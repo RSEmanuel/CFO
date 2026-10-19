@@ -128,8 +128,8 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
       {show("calidad") || show("pacing") ? (
       <div className={cn("grid grid-cols-1 gap-4", show("calidad") && show("pacing") && "lg:grid-cols-2")}>
         {show("calidad") ? (
-        <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+        <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+          <div className="mb-4 flex flex-wrap items-start justify-between gap-3 pr-10">
             <div className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
                 <ReceiptText className="h-4 w-4" />
@@ -189,8 +189,8 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
         ) : null}
 
         {show("pacing") ? (
-        <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <div className="mb-4 flex items-center gap-2">
+        <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+          <div className="mb-4 flex items-center gap-2 pr-10">
             <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
               <Gauge className="h-4 w-4" />
             </span>
@@ -251,8 +251,8 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
       ) : null}
 
       {show("tabla") ? (
-      <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <div className="flex items-start justify-between gap-3">
+      <section className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
+        <div className="flex items-start justify-between gap-3 pr-10">
           <div>
             <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.ingreso.tablaTitle")}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{t("resultados.ingreso.tablaHelp")}</p>

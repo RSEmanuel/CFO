@@ -322,7 +322,7 @@ export function TendenciaIngresosCostosChart({
     <ExpandableShell className="p-6">
       {(toggle, expanded) => (
       <>
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3 pr-10">
         <div>
           <h2 className="font-sans text-xl font-medium text-foreground">{t("widgets.trendTitle")}</h2>
           <InsightText text={insightText ?? t("widgets.trendHelp")} />

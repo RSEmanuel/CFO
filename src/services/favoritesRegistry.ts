@@ -120,6 +120,7 @@ const GASTO_CONTROL_TITLE: Record<GastoControlKind, string> = {
 
 export const RESULTADOS_FAVORITE = {
   utilidad: "destacados:utilidad",
+  ingresoAcumulado: "kpi-ingreso-acumulado",
   serieIngreso: "chart-serie-ingreso",
   serieCosto: "chart-serie-costo",
   serieGasto: "chart-serie-gasto",
@@ -161,6 +162,7 @@ export const FAVORITABLE_WIDGETS: FavoritableWidget[] = [
   { id: "destacados:gasto", titleKey: "resultados.expense", category: "RESULTADOS", type: "KPI", componentKey: "destacadosRubro", storage: "metric" },
   { id: "destacados:ebitda", titleKey: "resultados.ebitda", category: "RESULTADOS", type: "KPI", componentKey: "destacadosRubro", storage: "metric" },
   { id: RESULTADOS_FAVORITE.utilidad, titleKey: "resultados.utilidad", category: "RESULTADOS", type: "KPI", componentKey: "destacadosUtilidad", storage: "widget" },
+  { id: RESULTADOS_FAVORITE.ingresoAcumulado, titleKey: "resultados.yearToDate", category: "RESULTADOS", type: "KPI", componentKey: "ingresoYearToDate", storage: "widget" },
   ...TEMPORAL_WIDGETS,
   ...GASTO_CONTROL_WIDGETS,
   { id: "chart-ingresos-costos", titleKey: "widgets.trendTitle", category: "RESULTADOS", type: "CHART", componentKey: "tendenciaIngresosCostos", storage: "widget", wide: true },
@@ -195,6 +197,7 @@ export const FAVORITABLE_WIDGETS: FavoritableWidget[] = [
   { id: "kpi-cobranza-facturacion", titleKey: "cobranza.cartera.facturadoEnMes", category: "COBRANZA", type: "KPI", componentKey: "cobranzaCarteraKpi", storage: "widget" },
   { id: "kpi-cobranza-dso", titleKey: "cobranza.cartera.dsoTitle", category: "COBRANZA", type: "KPI", componentKey: "cobranzaPlazoKpi", storage: "widget" },
   { id: "kpi-cobranza-dpo", titleKey: "cobranza.cartera.dpoTitle", category: "COBRANZA", type: "KPI", componentKey: "cobranzaPlazoKpi", storage: "widget" },
+  { id: "kpi-cobranza-brecha", titleKey: "cobranza.cartera.brechaTitle", category: "COBRANZA", type: "KPI", componentKey: "cobranzaPlazoKpi", storage: "widget" },
   { id: "chart-cobranza-aging", titleKey: "cobranza.aging", category: "COBRANZA", type: "CHART", componentKey: "cobranzaAging", storage: "widget" },
   { id: "chart-cobranza-pareto", titleKey: "cobranza.concentracion.chartTitle", category: "COBRANZA", type: "CHART", componentKey: "cobranzaPareto", storage: "widget" },
 

@@ -11,7 +11,7 @@ import {
   type FlujoOperativoKpiKey,
 } from "@/components/flujo/FlujoOperativoView";
 import { StatementTreeTable } from "@/components/posicion-financiera/StatementTreeTable";
-import { CategoryTemporalKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
+import { CategoryTemporalKpiCard, YearToDateKpiCard } from "@/components/resultados/CategoryTemporalKpiCard";
 import { CategorySeriesCard, IncomeBreakdownCard } from "@/components/resultados/ResultadosCategoryView";
 import { CogsAnalisisCard } from "@/components/resultados/CogsAnalisisCard";
 import { CogsDesgloseCard } from "@/components/resultados/CogsDesgloseCard";
@@ -38,7 +38,13 @@ import {
   type GastoControlKind,
 } from "@/services/favoritesRegistry";
 import { buildStackedSeries, type DestacadosKpis, type DestacadosRubro, type MonthlyFinancials } from "@/services/financialDataTransformer";
-import { calculateTopKPIs, categoryTemporalCards } from "@/services/resultadosKpis";
+import {
+  calculateTopKPIs,
+  calculateYearToDate,
+  categoryTemporalCards,
+  missingMonthsLabel,
+  yearToDateLabels,
+} from "@/services/resultadosKpis";
 import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import type { DisplayUnits } from "@/services/money";
@@ -118,6 +124,35 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
   );
 }
 
+/** «Acumulado del año» (Ingreso): mismo cálculo y nota de meses faltantes que en Resultados. */
+function IngresoYearToDateFavorite({ context }: { context: ControlWidgetContext }) {
+  const { t, locale } = useLocale();
+  const { periodo, rows } = context;
+  const ytd = useMemo(() => {
+    if (!periodo) return null;
+    const calc = calculateYearToDate(rows, "Ingreso", periodo);
+    const labels = yearToDateLabels(periodo, t, locale);
+    return {
+      ...calc,
+      ...labels,
+      missingNote: calc.missing.length
+        ? t("resultados.yearToDateIncomplete", { months: missingMonthsLabel(calc.missing, t, locale) })
+        : null,
+    };
+  }, [rows, periodo, t, locale]);
+  if (!ytd) return null;
+  return (
+    <YearToDateKpiCard
+      category="Ingreso"
+      periodLabel={ytd.current}
+      value={ytd.value}
+      deltaPct={ytd.deltaPct}
+      priorLabel={ytd.prior}
+      missingNote={ytd.missingNote}
+    />
+  );
+}
+
 /**
  * Renderizado dinámico por componentKey: cada widget fijado reutiliza el
  * componente real de su módulo (misma lógica de cálculo, sin duplicarla).
@@ -139,6 +174,8 @@ export function FavoriteWidgetRenderer({
     }
     case "destacadosUtilidad":
       return <UtilidadFavorite context={context} />;
+    case "ingresoYearToDate":
+      return <IngresoYearToDateFavorite context={context} />;
     case "categoryTemporalKpi":
       return <CategoryTemporalFavorite id={widget.id} context={context} />;
     case "gastoControlKpi": {
