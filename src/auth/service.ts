@@ -3,14 +3,16 @@ import {
   adminCreateCognitoUser,
   disableCognitoUser,
   initiatePasswordLogin,
+  refreshCognitoTokens,
   sendWelcomeCode,
 } from "@/auth/cognito";
 import {
   buildDevAccessToken,
   buildDevCognitoSub,
   isDevAuthBypassEnabled,
+  readDevAccessToken,
 } from "@/auth/devAuth";
-import { verifyAccessToken } from "@/auth/jwt";
+import { readUnverifiedUsername, verifyAccessToken } from "@/auth/jwt";
 import { assertCanRegisterRole } from "@/auth/rbac";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@/generated/prisma/enums";
@@ -130,6 +132,28 @@ export async function loginWithPassword(email: string, password: string): Promis
     expiresIn: cognitoResult.expiresIn,
     user: toPublicUser(user),
   };
+}
+
+export type RefreshResponse = {
+  accessToken: string;
+  expiresIn: number;
+};
+
+/**
+ * Cambia el refresh token por un access token nuevo. En modo desarrollo el token no vence, así que
+ * se regresa el mismo sin llamar a Cognito.
+ */
+export async function refreshSession(refreshToken: string, previousAccessToken: string | null): Promise<RefreshResponse> {
+  if (isDevAuthBypassEnabled()) {
+    if (!readDevAccessToken(refreshToken)) {
+      throw new AppError("UNAUTHORIZED", "La sesión venció. Inicia sesión de nuevo.", 401);
+    }
+    return { accessToken: refreshToken, expiresIn: 60 * 60 * 8 };
+  }
+
+  const username = previousAccessToken ? readUnverifiedUsername(previousAccessToken) : undefined;
+  const result = await refreshCognitoTokens(refreshToken, username);
+  return { accessToken: result.accessToken, expiresIn: result.expiresIn };
 }
 
 /** sent: Cognito mandó el correo de bienvenida; failed: el alta quedó pero el correo no salió (se puede reenviar); skipped: modo desarrollo, sin correo. */

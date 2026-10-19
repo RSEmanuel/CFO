@@ -161,6 +161,46 @@ export async function initiatePasswordLogin(
 }
 
 /**
+ * Renueva el access token con el refresh token del login. Con app client con secreto, Cognito exige
+ * SECRET_HASH calculado con el username interno del usuario (el claim `username` del access token
+ * vencido), no con el correo.
+ */
+export async function refreshCognitoTokens(
+  refreshToken: string,
+  username: string | undefined,
+): Promise<{ accessToken: string; idToken?: string; expiresIn: number }> {
+  const { clientId, clientSecret } = getConfig();
+  const client = getClient();
+  if (clientSecret && !username) {
+    throw new AppError("UNAUTHORIZED", "No se pudo renovar la sesión. Inicia sesión de nuevo.", 401);
+  }
+  const secretHash = username ? computeSecretHash(username) : undefined;
+
+  try {
+    const response = await client.send(
+      new InitiateAuthCommand({
+        ClientId: clientId,
+        AuthFlow: AuthFlowType.REFRESH_TOKEN_AUTH,
+        AuthParameters: {
+          REFRESH_TOKEN: refreshToken,
+          ...(secretHash ? { SECRET_HASH: secretHash } : {}),
+        },
+      }),
+    );
+    const result = response.AuthenticationResult;
+    if (!result?.AccessToken) {
+      throw new AppError("UNAUTHORIZED", "No se pudo renovar la sesión. Inicia sesión de nuevo.", 401);
+    }
+    return { accessToken: result.AccessToken, idToken: result.IdToken, expiresIn: result.ExpiresIn ?? 3600 };
+  } catch (error) {
+    if (error instanceof NotAuthorizedException || error instanceof UserNotFoundException) {
+      throw new AppError("UNAUTHORIZED", "La sesión venció. Inicia sesión de nuevo.", 401);
+    }
+    mapCognitoError(error);
+  }
+}
+
+/**
  * El usuario cambia su propia contraseña con su access token. No requiere
  * permisos IAM: Cognito valida la contraseña actual contra el token.
  */

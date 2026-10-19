@@ -77,3 +77,22 @@ export async function verifyAccessToken(token: string): Promise<CognitoAccessPay
     throw unauthorized("El token JWT no es válido.");
   }
 }
+
+/**
+ * Lee el username de un access token sin verificar la firma (puede estar vencido). Solo sirve para
+ * calcular el SECRET_HASH del refresh: quien valida la sesión es Cognito con el refresh token.
+ */
+export function readUnverifiedUsername(token: string): string | undefined {
+  const [, body] = token.split(".");
+  if (!body) {
+    return undefined;
+  }
+  try {
+    const payload = JSON.parse(Buffer.from(body, "base64url").toString("utf8")) as { username?: unknown; sub?: unknown };
+    if (typeof payload.username === "string") return payload.username;
+    if (typeof payload.sub === "string") return payload.sub;
+    return undefined;
+  } catch {
+    return undefined;
+  }
+}
