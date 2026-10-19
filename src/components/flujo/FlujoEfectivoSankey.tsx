@@ -3,7 +3,7 @@
 import { useLocale } from "@/context/LocaleContext";
 import { canvasColor, CHART } from "@/lib/chart-theme";
 import type { FlujoLinea } from "@/services/flujoEfectivo";
-import { buildFlujoSankey, FLUJO_SANKEY_CAJA, type FlujoSankeyNode } from "@/services/flujoSankey";
+import { buildFlujoSankey, FLUJO_SANKEY_TOTAL_INGRESOS, type FlujoSankeyNode } from "@/services/flujoSankey";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { SankeyChart, type SankeySeriesOption } from "echarts/charts";
 import { TooltipComponent, type TooltipComponentOption } from "echarts/components";
@@ -18,13 +18,15 @@ type SankeyOption = echarts.ComposeOption<SankeySeriesOption | TooltipComponentO
 
 const LABEL_COLOR = "var(--cifra-ink)";
 
-// Entradas en verde, salidas en rojo y Caja en grafito neutro.
+// Entradas en verde y salidas en rojo.
 const NODE_COLOR: Record<FlujoSankeyNode["side"], string> = {
   in: CHART.olive,
   totalIn: CHART.olive,
-  caja: CHART.mute,
   out: CHART.coral,
 };
+
+// Ancho de la etiqueta del total: cabe "Total de ingresos" a 18 px en un renglón y el monto debajo.
+const TOTAL_LABEL_WIDTH = 220;
 
 function escapeHtml(value: string): string {
   return value
@@ -48,7 +50,6 @@ export function FlujoEfectivoSankey({
 
   const option = useMemo<SankeyOption>(() => {
     const graph = buildFlujoSankey(ingresos, egresos, {
-      caja: t("flujo.efectivo.caja"),
       totalIngresos: t("flujo.efectivo.totalIngresos"),
     });
     const displayByName = new Map(graph.nodes.map((node) => [node.name, node.display]));
@@ -82,10 +83,10 @@ export function FlujoEfectivoSankey({
       series: [
         {
           type: "sankey",
-          // Cuatro columnas: las etiquetas de los extremos van por fuera y las de en medio arriba.
+          // Tres columnas: las etiquetas de los extremos van por fuera y la del total, centrada arriba.
           left: 220,
           right: 220,
-          top: 56,
+          top: 72,
           bottom: 36,
           layoutIterations: 0,
           nodeAlign: "justify",
@@ -98,14 +99,23 @@ export function FlujoEfectivoSankey({
               color: canvasColor(NODE_COLOR[node.side]),
               borderWidth: 0,
             },
-            label: {
-              position: node.side === "in" ? "left" : node.side === "out" ? "right" : "top",
-            },
+            label:
+              node.side === "totalIn"
+                ? {
+                    position: "top",
+                    align: "center",
+                    width: TOTAL_LABEL_WIDTH,
+                    overflow: "break",
+                    fontSize: 18,
+                    fontWeight: 600,
+                    lineHeight: 24,
+                  }
+                : { position: node.side === "in" ? "left" : "right" },
           })),
-          // Color sólido por enlace (sin degradado): lo que sale de Caja es rojo, todo lo demás verde.
+          // Color sólido por enlace (sin degradado): verde hacia el total, rojo del total a los egresos.
           links: graph.links.map((link) => ({
             ...link,
-            lineStyle: { color: link.source === FLUJO_SANKEY_CAJA ? outflow : inflow },
+            lineStyle: { color: link.source === FLUJO_SANKEY_TOTAL_INGRESOS ? outflow : inflow },
           })),
           label: {
             distance: 12,

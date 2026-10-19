@@ -1,16 +1,18 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, it } from "node:test";
 import ExcelJS from "exceljs";
 import { COMPAC_FLUJO_EFECTIVO_PROFILE } from "./ingest/builtinProfiles";
 import { parseFlujoEfectivoSheet } from "./ingest/parseFlujoEfectivo";
 import type { FlujoLinea } from "./flujoEfectivo";
-import { buildFlujoSankey, FLUJO_SANKEY_CAJA, FLUJO_SANKEY_TOTAL_INGRESOS } from "./flujoSankey";
+import { buildFlujoSankey, FLUJO_SANKEY_TOTAL_INGRESOS } from "./flujoSankey";
 
-const LABELS = { caja: "Caja", totalIngresos: "Total de ingresos" };
+const LABELS = { totalIngresos: "Total de ingresos" };
 
 const JUL_FIXTURE = path.resolve("Data_ejemplo/03. Flujo de Efectivo 31.07.26.xlsx");
+// Data_ejemplo/ tiene datos reales y está en .gitignore: esos casos solo corren donde existe el archivo.
+const SKIP_FIXTURE = existsSync(JUL_FIXTURE) ? false : "falta Data_ejemplo/ (no está en git)";
 
 async function loadLineas(excluirTraspasos = true): Promise<{ ingresos: FlujoLinea[]; egresos: FlujoLinea[] }> {
   const workbook = new ExcelJS.Workbook();
@@ -34,19 +36,17 @@ async function loadLineas(excluirTraspasos = true): Promise<{ ingresos: FlujoLin
   };
 }
 
-describe("flujo Sankey ingresos → total de ingresos → tesorería → egresos", () => {
-  it("los ingresos van a Total de ingresos, de ahí un solo enlace a Caja, y los egresos salen de Caja (jul-2026 sin traspasos)", async () => {
+describe("flujo Sankey ingresos → total de ingresos → egresos", () => {
+  it("los ingresos van a Total de ingresos y los egresos salen de él (jul-2026 sin traspasos)", { skip: SKIP_FIXTURE }, async () => {
     const { ingresos, egresos } = await loadLineas(true);
     const graph = buildFlujoSankey(ingresos, egresos, LABELS);
 
-    assert.equal(graph.nodes.filter((node) => node.side === "caja").length, 1);
     const total = graph.nodes.filter((node) => node.side === "totalIn");
     assert.equal(total.length, 1);
     assert.equal(total[0]?.name, FLUJO_SANKEY_TOTAL_INGRESOS);
     assert.equal(total[0]?.display, "Total de ingresos");
     assert.equal(total[0]?.depth, 1);
-    assert.equal(graph.nodes.find((node) => node.side === "caja")?.depth, 2);
-    assert.ok(graph.nodes.filter((node) => node.side === "out").every((node) => node.depth === 3));
+    assert.ok(graph.nodes.filter((node) => node.side === "out").every((node) => node.depth === 2));
     assert.deepEqual(
       graph.nodes.filter((node) => node.side === "in").map((node) => node.name).sort(),
       ["in:cobranza", "in:diversos", "in:prestamos"].sort(),
@@ -57,23 +57,17 @@ describe("flujo Sankey ingresos → total de ingresos → tesorería → egresos
     assert.ok(!graph.nodes.some((node) => node.name.startsWith("hub.")));
     assert.ok(!graph.nodes.some((node) => node.name === "terminal.residual"));
 
-    const inLinks = graph.links.filter((link) => link.source.startsWith("in:"));
-    assert.ok(inLinks.length > 0);
-    for (const link of inLinks) {
-      assert.equal(link.target, FLUJO_SANKEY_TOTAL_INGRESOS, "un ingreso ya no conecta directo a Caja");
-    }
-    const toCaja = graph.links.filter((link) => link.target === FLUJO_SANKEY_CAJA);
-    assert.equal(toCaja.length, 1);
-    assert.equal(toCaja[0]?.source, FLUJO_SANKEY_TOTAL_INGRESOS);
-    const sumaIngresos = Math.round(inLinks.reduce((sum, link) => sum + link.value, 0) * 100) / 100;
-    assert.equal(toCaja[0]?.value, sumaIngresos);
-
-    for (const link of graph.links.filter((item) => item.source === FLUJO_SANKEY_CAJA)) {
-      assert.ok(link.target.startsWith("out:"));
+    for (const link of graph.links) {
+      if (link.source.startsWith("in:")) {
+        assert.equal(link.target, FLUJO_SANKEY_TOTAL_INGRESOS);
+      } else {
+        assert.equal(link.source, FLUJO_SANKEY_TOTAL_INGRESOS);
+        assert.ok(link.target.startsWith("out:"));
+      }
     }
   });
 
-  it("con montos de muestra: un enlace a Caja por la suma exacta y profundidades 0-3", () => {
+  it("con montos de muestra: tres columnas y los egresos salen directo del total", () => {
     const linea = (categoriaKey: string, monto: number): FlujoLinea => ({ categoriaKey, label: categoriaKey, monto, esTraspaso: false });
     const graph = buildFlujoSankey(
       [linea("a", 100.1), linea("b", 200.2), linea("cero", 0)],
@@ -86,27 +80,27 @@ describe("flujo Sankey ingresos → total de ingresos → tesorería → egresos
         ["in:a", 0],
         ["in:b", 0],
         [FLUJO_SANKEY_TOTAL_INGRESOS, 1],
-        [FLUJO_SANKEY_CAJA, 2],
-        ["out:x", 3],
-        ["out:y", 3],
+        ["out:x", 2],
+        ["out:y", 2],
       ],
     );
     assert.deepEqual(graph.links, [
       { source: "in:a", target: FLUJO_SANKEY_TOTAL_INGRESOS, value: 100.1 },
       { source: "in:b", target: FLUJO_SANKEY_TOTAL_INGRESOS, value: 200.2 },
-      { source: FLUJO_SANKEY_TOTAL_INGRESOS, target: FLUJO_SANKEY_CAJA, value: 300.3 },
-      { source: FLUJO_SANKEY_CAJA, target: "out:x", value: 50 },
-      { source: FLUJO_SANKEY_CAJA, target: "out:y", value: 25 },
+      { source: FLUJO_SANKEY_TOTAL_INGRESOS, target: "out:x", value: 50 },
+      { source: FLUJO_SANKEY_TOTAL_INGRESOS, target: "out:y", value: 25 },
     ]);
+    assert.ok(!graph.nodes.some((node) => node.name === "__caja__"));
   });
 
-  it("sin ingresos no dibuja Total de ingresos", () => {
+  it("sin ingresos no dibuja Total de ingresos ni inventa un origen para los egresos", () => {
     const graph = buildFlujoSankey([], [{ categoriaKey: "sueldos", label: "Egr sueldos", monto: 100, esTraspaso: false }], LABELS);
     assert.ok(!graph.nodes.some((node) => node.side === "totalIn"));
-    assert.ok(!graph.links.some((link) => link.target === FLUJO_SANKEY_CAJA));
+    assert.deepEqual(graph.nodes.map((node) => node.name), ["out:sueldos"]);
+    assert.deepEqual(graph.links, []);
   });
 
-  it("incluye traspasos de ingreso cuando no se excluyen", async () => {
+  it("incluye traspasos de ingreso cuando no se excluyen", { skip: SKIP_FIXTURE }, async () => {
     const { ingresos, egresos } = await loadLineas(false);
     assert.ok(ingresos.some((linea) => linea.esTraspaso));
     const graph = buildFlujoSankey(ingresos, egresos, LABELS);
