@@ -1,7 +1,9 @@
 "use client";
 
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
+import { usePosicionFinanciera } from "@/hooks/use-posicion-financiera";
 import { CHART_VARS } from "@/lib/chart-theme";
 import {
   extractRatioGaugeValues,
@@ -11,6 +13,11 @@ import {
   type RatioGaugeId,
   type RatioGaugeZone,
 } from "@/lib/posicion-financiera/ratioGaugeZones";
+import {
+  POSICION_GAUGE_FAVORITE_ID,
+  POSICION_GAUGE_KIND,
+  type PosicionGaugeKind,
+} from "@/services/favoritesRegistry";
 import { formatStatementRatio, type StatementNode } from "@/services/posicionFinanciera";
 import { useMemo } from "react";
 import {
@@ -36,7 +43,7 @@ const ZONE_FILL: Record<RatioGaugeZone, string> = {
 };
 
 // ROE no lleva tarjeta: sigue en la tabla de razones de abajo.
-const GAUGE_IDS: RatioGaugeId[] = ["currentRatio", "operatingMargin", "dso"];
+const GAUGE_IDS = POSICION_GAUGE_KIND;
 
 const GAUGE_FORMAT: Record<RatioGaugeId, "x" | "pct" | "days"> = {
   currentRatio: "x",
@@ -73,7 +80,7 @@ function RatioBullet({
   value,
   title,
 }: {
-  id: RatioGaugeId;
+  id: PosicionGaugeKind;
   value: number | null;
   title: string;
 }) {
@@ -95,8 +102,10 @@ function RatioBullet({
     zone == null ? t("posicionFinanciera.gauges.na") : t(`posicionFinanciera.gauges.zones.${zone}`);
 
   return (
-    <article className="flex h-full flex-col rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-3">
+    <article className="relative flex h-full flex-col rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)]">
+      <FavoriteStarButton widgetId={POSICION_GAUGE_FAVORITE_ID[id]} label={title} />
+      {/* pr-9 deja libre la esquina de la estrella. */}
+      <div className="flex items-start justify-between gap-3 pr-9">
         <div className="min-w-0">
           <h3 className="font-sans text-base font-bold tracking-tight text-foreground">{title}</h3>
           {/* Alto fijo de tres renglones: la gráfica empieza a la misma altura en todas las tarjetas. */}
@@ -208,4 +217,22 @@ export function RatioGaugeGrid({ nodes, yearKey, loading, empty }: RatioGaugeGri
       )}
     </section>
   );
+}
+
+/** Tarjeta fijada en el Panel de Control: mismo cálculo y semáforo que en Razones (año de corte de la API). */
+export function RatioGaugeFavorite({ id }: { id: PosicionGaugeKind }) {
+  const { t } = useLocale();
+  const { data, loading, error } = usePosicionFinanciera(null, null);
+  const values = useMemo(
+    () => (data ? extractRatioGaugeValues(data.statements.razones, String(data.year)) : null),
+    [data],
+  );
+
+  if (error) {
+    return null;
+  }
+  if (loading || !values) {
+    return <div className="h-36 animate-pulse rounded-card bg-muted" />;
+  }
+  return <RatioBullet id={id} value={values[id]} title={t(`posicionFinanciera.gauges.metrics.${id}`)} />;
 }

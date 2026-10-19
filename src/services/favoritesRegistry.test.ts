@@ -12,6 +12,8 @@ import {
   hasFavoritesInCategory,
   isRegisteredFavoriteId,
   isWidgetFavorited,
+  POSICION_GAUGE_FAVORITE_ID,
+  POSICION_GAUGE_KIND,
   resolveStorageBucket,
   type FavoritesCategory,
 } from "./favoritesRegistry";
@@ -53,6 +55,7 @@ describe("favoritesRegistry", () => {
       "destacados:gasto",
       "destacados:ingreso",
       "destacados:utilidad",
+      "kpi-cobranza-brecha",
       "kpi-cobranza-cobrado",
       "kpi-cobranza-dpo",
       "kpi-cobranza-dso",
@@ -76,11 +79,15 @@ describe("favoritesRegistry", () => {
       "kpi-gasto-promedio-3-meses",
       "kpi-gasto-split",
       "kpi-gasto-trimestre-anterior",
+      "kpi-ingreso-acumulado",
       "kpi-ingreso-mes",
       "kpi-ingreso-mes-anterior",
       "kpi-ingreso-mismo-mes-ano-anterior",
       "kpi-ingreso-promedio-3-meses",
       "kpi-ingreso-trimestre-anterior",
+      "kpi-posicion-dias-cobranza",
+      "kpi-posicion-margen-operativo",
+      "kpi-posicion-razon-circulante",
       "table-estado-operativo",
       "table-ingreso-resumen",
       "table-posicion-balance",
@@ -108,7 +115,7 @@ describe("favoritesRegistry", () => {
         `${category} sin gráficos/tablas fijables`,
       );
     }
-    for (const category of ["RESULTADOS", "FLUJO", "COBRANZA"] as const) {
+    for (const category of ["RESULTADOS", "FLUJO", "COBRANZA", "POSICION"] as const) {
       assert.ok(
         FAVORITABLE_WIDGETS.some((widget) => widget.category === category && widget.type === "KPI"),
         `${category} sin KPIs fijables`,
@@ -121,6 +128,23 @@ describe("favoritesRegistry", () => {
     for (const category of FAVORITES_CATEGORY_ORDER) {
       assert.equal(FAVORITES_CATEGORY_LABEL_KEYS[category], `control.categories.${category}`);
     }
+  });
+
+  it("registra las tres tarjetas de Razones como KPI de Posición", () => {
+    for (const kind of POSICION_GAUGE_KIND) {
+      const widget = getFavoritableWidget(POSICION_GAUGE_FAVORITE_ID[kind]);
+      assert.ok(widget, `sin registro: ${kind}`);
+      assert.equal(widget.category, "POSICION");
+      assert.equal(widget.type, "KPI");
+      assert.equal(widget.storage, "widget");
+      assert.equal(widget.componentKey, "posicionGaugeKpi");
+      assert.equal(widget.titleKey, `posicionFinanciera.gauges.metrics.${kind}`);
+    }
+    const state = stateWith({ favoriteWidgetIds: ["kpi-posicion-dias-cobranza", "table-posicion-razones"] });
+    assert.deepEqual(
+      getFavoritesByCategory(state, "POSICION").map((widget) => widget.id),
+      ["kpi-posicion-dias-cobranza", "table-posicion-razones"],
+    );
   });
 
   it("resuelve el bucket de persistencia por id", () => {
