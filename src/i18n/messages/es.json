@@ -40,7 +40,8 @@
       "CFO_PARTNER": "Socio que opera la empresa",
       "CLIENT_VIEWER": "Quien solo consulta"
     },
-    "and": "y"
+    "and": "y",
+    "retry": "Reintentar"
   },
   "nav": {
     "results": "Resultados",
@@ -1779,7 +1780,8 @@
       "title": "Algo falló en esta pantalla",
       "message": "Cifra registró el error para revisarlo. Recarga la página para seguir trabajando.",
       "reload": "Recargar página"
-    }
+    },
+    "loadRetry": "No pudimos traer tus cifras. Reintenta."
   },
   "emptyStates": {
     "noSource": "La empresa seleccionada no tiene esta fuente de datos."

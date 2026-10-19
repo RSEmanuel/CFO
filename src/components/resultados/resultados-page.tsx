@@ -13,7 +13,7 @@ import { EstadoResultadosView } from "@/components/resultados/EstadoResultadosVi
 import { ResultadosPresupuestoView } from "@/components/resultados/ResultadosPresupuestoView";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useBudgetProjection } from "@/hooks/use-budget-projection";
@@ -157,7 +157,7 @@ export function ResultadosPage() {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   }
   if (error) {
-    return <DataEmptyState title={t("resultados.loadError")} message={error} />;
+    return <DataErrorState title={t("resultados.loadError")} error={error} />;
   }
   if (!data?.hasData) {
     return (

@@ -40,7 +40,8 @@
       "CFO_PARTNER": "Operating partner",
       "CLIENT_VIEWER": "View only"
     },
-    "and": "and"
+    "and": "and",
+    "retry": "Retry"
   },
   "nav": {
     "results": "Results",
@@ -1779,7 +1780,8 @@
       "title": "Something failed on this screen",
       "message": "Cifra logged the error for review. Reload the page to keep working.",
       "reload": "Reload page"
-    }
+    },
+    "loadRetry": "We couldn't load your numbers. Retry."
   },
   "emptyStates": {
     "noSource": "The selected company does not have this data source."

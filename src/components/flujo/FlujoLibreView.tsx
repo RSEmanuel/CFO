@@ -1,7 +1,7 @@
 "use client";
 
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoLibre } from "@/hooks/use-flujo-libre";
 import { CHART, CHART_AXIS, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
@@ -137,7 +137,7 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   }
   if (error) {
-    return <DataEmptyState title={t("flujo.libre.loadError")} message={error} />;
+    return <DataErrorState title={t("flujo.libre.loadError")} error={error} />;
   }
   if (!data?.hasBalanza || !data.hasPrior || data.steps.length < 2) {
     return (

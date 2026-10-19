@@ -6,7 +6,7 @@ import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
 import { ClientesQueNoPaganSection, type NoPaganRow } from "@/components/cobranza/ClientesQueNoPaganSection";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
 import { ConcentracionRiesgoSection } from "@/components/cobranza/ConcentracionRiesgoSection";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { HeroBarChart } from "@/components/charts/HeroBarChart";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -164,7 +164,7 @@ export function CobranzaPage() {
 
         <TabsContent value="antiguedad" className="mt-4">
       <div className="space-y-4">
-      {error ? <DataEmptyState title={t("cobranza.loadError")} message={error} /> : null}
+      {error ? <DataErrorState title={t("cobranza.loadError")} error={error} /> : null}
       {!error && data && !data.hasData ? (
         <DataEmptyState title={t("cobranza.emptyTitle")} message={t("cobranza.emptyMessage")} />
       ) : null}

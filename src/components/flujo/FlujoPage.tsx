@@ -9,7 +9,7 @@ import {
   ResultadosFilterBar,
   type ResultadosFilters,
 } from "@/components/resultados/resultados-filter-bar";
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataErrorState } from "@/components/data-empty-state";
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujo } from "@/hooks/use-flujo";
@@ -26,7 +26,7 @@ export function FlujoPage() {
   }, [activePeriod, data?.latestPeriod]);
 
   if (loading) return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
-  if (error) return <DataEmptyState title={t("flujo.loadError")} message={error} />;
+  if (error) return <DataErrorState title={t("flujo.loadError")} error={error} />;
 
   const treasuryPeriods = data?.rows.map((row) => row.periodo) ?? [];
   const periodOptions = treasuryPeriods.length > 0 ? treasuryPeriods : availablePeriods;

@@ -1,6 +1,6 @@
 "use client";
 
-import { DataEmptyState } from "@/components/data-empty-state";
+import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -467,7 +467,7 @@ export function CobranzaCarteraSection() {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   }
   if (error) {
-    return <DataEmptyState title={t("cobranza.loadError")} message={error} />;
+    return <DataErrorState title={t("cobranza.loadError")} error={error} />;
   }
   if (!data?.hasData) {
     return (
