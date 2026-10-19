@@ -2,8 +2,7 @@ import { prisma, requireBudgetAssumptionDelegate } from "@/lib/prisma";
 import { projectFromPoints } from "@/services/forecast/budgetProjection";
 import { rowToBudgetDrivers } from "@/services/budgetAssumptionService";
 import {
-  applyBudgetDrivers,
-  resolveBudgetDrivers,
+  resolveProjectionDrivers,
   type BudgetAssumptionsSource,
   type BudgetDrivers,
 } from "@/services/forecast/drivers";
@@ -32,9 +31,11 @@ export type BudgetProjectionPayload = {
   sourceMonths: number;
   hasOfficialBudget: boolean;
   status: "available" | "insufficient_history";
-  /** Supuestos efectivos aplicados a la proyección (automáticos o guardados). */
+  /** Supuestos efectivos aplicados a la proyección (ceros si la base ya trae la tendencia). */
   drivers: BudgetDrivers;
   assumptionsSource: BudgetAssumptionsSource;
+  /** false: modo automático con Holt-Winters; la proyección es solo la tendencia, sin ajustes encima. */
+  driversApplied: boolean;
   /** Fecha del último guardado cuando assumptionsSource es "manual". */
   assumptionsUpdatedAt: string | null;
 };
@@ -113,9 +114,12 @@ export async function getBudgetProjection(
     anchorPeriodo,
   );
 
-  // Sin supuestos guardados, Cifra los deriva del historial del tenant (tendencia de ventas e inflación).
-  const { drivers, source } = resolveBudgetDrivers(assumptionRow ? rowToBudgetDrivers(assumptionRow) : null, history);
-  const projection = applyBudgetDrivers(baseProjection, drivers);
+  // Sin supuestos guardados, Cifra decide si aplica supuestos automáticos según si la base ya trae tendencia.
+  const { projection, drivers, source, driversApplied } = resolveProjectionDrivers(
+    baseProjection,
+    assumptionRow ? rowToBudgetDrivers(assumptionRow) : null,
+    history,
+  );
 
   return {
     tenantId,
@@ -129,6 +133,7 @@ export async function getBudgetProjection(
     status: history.length >= 8 ? "available" : "insufficient_history",
     drivers,
     assumptionsSource: source,
+    driversApplied,
     assumptionsUpdatedAt: assumptionRow ? assumptionRow.updatedAt.toISOString() : null,
   };
 }

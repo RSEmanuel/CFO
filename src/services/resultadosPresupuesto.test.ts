@@ -64,6 +64,7 @@ function payload(withOfficial: boolean): BudgetProjectionPayload {
     status: "available",
     drivers: deriveAutoBudgetDrivers(points),
     assumptionsSource: "auto",
+    driversApplied: true,
     assumptionsUpdatedAt: null,
   };
 }

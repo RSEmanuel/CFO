@@ -89,6 +89,32 @@ export function resolveBudgetDrivers(
   return saved ? { drivers: saved, source: "manual" } : { drivers: deriveAutoBudgetDrivers(history), source: "auto" };
 }
 
+/**
+ * Proyección final con sus supuestos. Si la base ya extrapola la tendencia (Holt-Winters, desde 18
+ * meses), los supuestos automáticos no se vuelven a aplicar: multiplicar encima contaría la tendencia dos
+ * veces. Con menos historial la base repite el año anterior y ahí sí se aplican. Los supuestos guardados
+ * por el usuario siempre se aplican.
+ */
+export function resolveProjectionDrivers(
+  base: BudgetProjectionResult,
+  saved: BudgetDrivers | null,
+  history: MonthlyPnlPoint[],
+): {
+  projection: BudgetProjectionResult;
+  drivers: BudgetDrivers;
+  source: BudgetAssumptionsSource;
+  driversApplied: boolean;
+} {
+  if (saved) {
+    return { projection: applyBudgetDrivers(base, saved), drivers: saved, source: "manual", driversApplied: true };
+  }
+  if (base.rubros.ingreso.method === "holt_winters") {
+    return { projection: base, drivers: { ...DEFAULT_BUDGET_DRIVERS }, source: "auto", driversApplied: false };
+  }
+  const drivers = deriveAutoBudgetDrivers(history);
+  return { projection: applyBudgetDrivers(base, drivers), drivers, source: "auto", driversApplied: true };
+}
+
 function scaleMonth(month: HorizonMonth, factor: number, additive: number): HorizonMonth {
   return {
     periodo: month.periodo,

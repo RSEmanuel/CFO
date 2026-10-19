@@ -154,6 +154,7 @@ export function ResultadosPresupuestoView({
                   anio={anchorYear}
                   drivers={data.drivers}
                   source={data.assumptionsSource}
+                  driversApplied={data.driversApplied}
                   updatedAt={data.assumptionsUpdatedAt}
                   onReset={() => onDriversSaved?.()}
                 />

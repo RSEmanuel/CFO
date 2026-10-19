@@ -8,6 +8,7 @@ import {
   deriveAutoBudgetDrivers,
   deriveSalesGrowthPct,
   resolveBudgetDrivers,
+  resolveProjectionDrivers,
   type BudgetDrivers,
 } from "./drivers";
 import { fromBalanzaPnl, hasOfficialBudget } from "./series";
@@ -216,5 +217,63 @@ describe("supuestos de la proyección", () => {
     const baseCosto = base.rubros.costo.months[0].p50;
     assert.ok(Math.abs(adjusted.rubros.ingreso.months[0].p50 - baseIngreso * (1 + drivers.salesGrowthPct / 100)) < 0.02);
     assert.ok(Math.abs(adjusted.rubros.costo.months[0].p50 - baseCosto * (1 + AUTO_INFLATION_PCT / 100)) < 0.02);
+  });
+});
+
+describe("supuestos automáticos sin doble conteo", () => {
+  it("24 meses en modo auto: la base ya trae la tendencia y el p50 de ventas queda igual al de la base", () => {
+    // Ventas cayendo 3% al mes: el crecimiento automático pegaría en el límite de -10%.
+    const history = growingSeries(24, -0.03);
+    const base = projectFromPoints(history);
+    assert.equal(base.rubros.ingreso.method, "holt_winters");
+    assert.equal(deriveSalesGrowthPct(history), -10);
+
+    const resolved = resolveProjectionDrivers(base, null, history);
+    assert.equal(resolved.source, "auto");
+    assert.equal(resolved.driversApplied, false);
+    assert.deepEqual(
+      resolved.projection.rubros.ingreso.months.map((month) => month.p50),
+      base.rubros.ingreso.months.map((month) => month.p50),
+    );
+    assert.deepEqual(
+      resolved.projection.rubros.costo.months.map((month) => month.p50),
+      base.rubros.costo.months.map((month) => month.p50),
+    );
+    assert.equal(resolved.drivers.salesGrowthPct, 0);
+    assert.equal(resolved.drivers.inflationPct, 0);
+  });
+
+  it("historial corto en modo auto: la base no trae tendencia y sí se aplican los drivers automáticos", () => {
+    const history = growingSeries(12, 0.01);
+    const base = projectFromPoints(history);
+    assert.notEqual(base.rubros.ingreso.method, "holt_winters");
+
+    const resolved = resolveProjectionDrivers(base, null, history);
+    assert.equal(resolved.source, "auto");
+    assert.equal(resolved.driversApplied, true);
+    assert.equal(resolved.drivers.salesGrowthPct, 12.7);
+    assert.equal(resolved.drivers.inflationPct, AUTO_INFLATION_PCT);
+    const baseIngreso = base.rubros.ingreso.months[0].p50;
+    const baseCosto = base.rubros.costo.months[0].p50;
+    assert.ok(Math.abs(resolved.projection.rubros.ingreso.months[0].p50 - baseIngreso * 1.127) < 0.02);
+    assert.ok(Math.abs(resolved.projection.rubros.costo.months[0].p50 - baseCosto * (1 + AUTO_INFLATION_PCT / 100)) < 0.02);
+  });
+
+  it("supuestos guardados a mano se aplican aunque la base ya traiga la tendencia", () => {
+    const history = growingSeries(24, -0.03);
+    const base = projectFromPoints(history);
+    const saved: BudgetDrivers = {
+      salesGrowthPct: 5,
+      inflationPct: 3,
+      headcount: 0,
+      headcountCostMonthly: 0,
+      debtInterestMonthly: 0,
+      depreciationMonthly: 0,
+    };
+    const resolved = resolveProjectionDrivers(base, saved, history);
+    assert.equal(resolved.source, "manual");
+    assert.equal(resolved.driversApplied, true);
+    assert.deepEqual(resolved.drivers, saved);
+    assert.ok(Math.abs(resolved.projection.rubros.ingreso.months[0].p50 - base.rubros.ingreso.months[0].p50 * 1.05) < 0.02);
   });
 });

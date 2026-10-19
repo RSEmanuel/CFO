@@ -575,7 +575,8 @@
       "resetConfirm": "Delete your assumptions and go back to the projection Cifra calculates?",
       "resetDone": "Done: the projection uses Cifra's assumptions again.",
       "resetError": "We couldn't delete your assumptions. Try again.",
-      "advancedToggle": "Adjust assumptions (advanced)"
+      "advancedToggle": "Adjust assumptions (advanced)",
+      "trendOnly": "We project with your recent sales and cost trend; we don't add extra growth or inflation on top, and we don't count new hires."
     }
   },
   "widgets": {

@@ -21,9 +21,13 @@ function pct(value: number, locale: Locale): string {
 export function budgetAssumptionsSentence(
   drivers: BudgetDrivers,
   source: BudgetAssumptionsSource,
+  driversApplied: boolean,
   t: TranslateFn,
   locale: Locale,
 ): string {
+  if (source === "auto" && !driversApplied) {
+    return t("resultados.budgetAssumptions.trendOnly");
+  }
   const growth = drivers.salesGrowthPct;
   const salesBase =
     growth > 0
@@ -54,12 +58,14 @@ export function BudgetAssumptionsSummary({
   anio,
   drivers,
   source,
+  driversApplied,
   updatedAt,
   onReset,
 }: {
   anio: number;
   drivers: BudgetDrivers;
   source: BudgetAssumptionsSource;
+  driversApplied: boolean;
   updatedAt: string | null;
   onReset: () => void;
 }) {
@@ -93,7 +99,7 @@ export function BudgetAssumptionsSummary({
           <p className="text-sm font-medium text-foreground">
             {manual ? t("resultados.budgetAssumptions.manualTitle") : t("resultados.budgetAssumptions.autoTitle")}
           </p>
-          <p className="mt-1 text-sm text-foreground">{budgetAssumptionsSentence(drivers, source, t, locale)}</p>
+          <p className="mt-1 text-sm text-foreground">{budgetAssumptionsSentence(drivers, source, driversApplied, t, locale)}</p>
           <p className="mt-1 text-xs text-muted-foreground">
             {manual && updatedAt
               ? t("resultados.budgetAssumptions.manualSaved", {

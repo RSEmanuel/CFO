@@ -575,7 +575,8 @@
       "resetConfirm": "¿Borrar tus supuestos y volver a la proyección que calcula Cifra?",
       "resetDone": "Listo: la proyección vuelve a usar los supuestos de Cifra.",
       "resetError": "No pudimos borrar tus supuestos. Intenta de nuevo.",
-      "advancedToggle": "Ajustar supuestos (avanzado)"
+      "advancedToggle": "Ajustar supuestos (avanzado)",
+      "trendOnly": "Proyectamos con tu tendencia reciente de ventas y costos; no sumamos un crecimiento extra ni inflación encima, y no contamos nuevas contrataciones."
     }
   },
   "widgets": {
