@@ -2028,6 +2028,7 @@
   "setPassword": {
     "title": "Establece tu contraseña",
     "help": "Escribe tu correo, el código de 6 dígitos que te llegó en el correo de bienvenida y tu nueva contraseña.",
+    "helpPrefilled": "Revisa que tu correo y código sean correctos. Solo necesitas crear tu contraseña.",
     "submit": "Guardar contraseña",
     "emailFirst": "Escribe primero tu correo.",
     "doneTitle": "Contraseña lista",

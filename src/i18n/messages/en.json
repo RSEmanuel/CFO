@@ -2028,6 +2028,7 @@
   "setPassword": {
     "title": "Set your password",
     "help": "Enter your email, the 6-digit code from your welcome email and your new password.",
+    "helpPrefilled": "Check that your email and code are correct. You only need to create your password.",
     "submit": "Save password",
     "emailFirst": "Enter your email first.",
     "doneTitle": "Password ready",
