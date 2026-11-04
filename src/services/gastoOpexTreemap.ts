@@ -1,6 +1,7 @@
 import { classifyErCuenta, computeErBuckets } from "@/services/estadoOperativo";
 import { buildGastoOpexGrupos, normalizeCuentaNombre, type GastoOpexRow } from "@/services/gastoOpex";
 import { round2 } from "@/services/money";
+import { presentarNombre } from "@/services/textoPresentable";
 
 /**
  * Treemap jerárquico del OPEX del mes (tab Gasto).
@@ -44,7 +45,7 @@ const OPEX_ETIQUETAS_LIMPIAS: Record<string, string> = {
 
 export function cleanOpexCuentaNombre(nombre: string): string {
   const etiqueta = OPEX_ETIQUETAS_LIMPIAS[normalizeCuentaNombre(nombre)];
-  return etiqueta ?? nombre.trim();
+  return presentarNombre(etiqueta ?? nombre.trim());
 }
 
 const ZERO = 0.005;

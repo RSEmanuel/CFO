@@ -2,6 +2,8 @@
 
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/context/LocaleContext";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
+import { presentarNombre } from "@/services/textoPresentable";
 import { usePolizasByAccount } from "@/hooks/use-polizas-by-account";
 import { cn } from "@/lib/utils";
 import { buildCsv, downloadBlob } from "@/services/tableExport";
@@ -85,8 +87,8 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
       mov.fecha,
       `${mov.tipoPoliza} ${mov.numeroPoliza}`,
       mov.codigoCuenta,
-      mov.nombreCuenta,
-      mov.conceptoMov || mov.conceptoGeneral,
+      nombreCuentaVisible(mov.nombreCuenta, mov.codigoCuenta, locale, t),
+      presentarNombre(mov.conceptoMov || mov.conceptoGeneral),
       mov.referencia,
       mov.cargo,
       mov.abono,
@@ -115,7 +117,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                   </p>
                   <DialogPrimitive.Title className="mt-1 truncate font-sans text-xl font-medium text-foreground">
                     <span className="financial-nums mr-2 text-clay">{target.codigoCuenta}</span>
-                    {target.nombreCuenta}
+                    {nombreCuentaVisible(target.nombreCuenta, target.codigoCuenta, locale, t)}
                   </DialogPrimitive.Title>
                   {data ? (
                     <p className="mt-1 text-sm text-muted-foreground">
@@ -225,13 +227,15 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                           </td>
                           <td className="py-2.5 pr-3">
                             <span className="financial-nums text-foreground">{mov.codigoCuenta}</span>
-                            <span className="ml-1.5 text-xs text-muted-foreground">{mov.nombreCuenta}</span>
+                            <span className="ml-1.5 text-xs text-muted-foreground">
+                              {nombreCuentaVisible(mov.nombreCuenta, mov.codigoCuenta, locale, t)}
+                            </span>
                           </td>
                           <td
                             className="max-w-[260px] truncate py-2.5 pr-3 text-muted-foreground"
-                            title={mov.conceptoMov || mov.conceptoGeneral}
+                            title={presentarNombre(mov.conceptoMov || mov.conceptoGeneral)}
                           >
-                            {mov.conceptoMov || mov.conceptoGeneral || "—"}
+                            {presentarNombre(mov.conceptoMov || mov.conceptoGeneral) || "—"}
                           </td>
                           <td className="max-w-[140px] truncate py-2.5 pr-3 text-muted-foreground" title={mov.referencia}>
                             {mov.referencia || "—"}

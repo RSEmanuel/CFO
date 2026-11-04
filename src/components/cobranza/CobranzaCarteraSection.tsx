@@ -5,6 +5,7 @@ import { FavoriteStarButton } from "@/components/favorites/favorite-star-button"
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useLocale } from "@/context/LocaleContext";
+import { presentarNombre } from "@/services/textoPresentable";
 import { useCobranzaCarteraMovimientos } from "@/hooks/use-cobranza-cartera-movimientos";
 import { useCobranzaCartera } from "@/hooks/use-cobranza-cartera";
 import { cn } from "@/lib/utils";
@@ -420,7 +421,7 @@ function CarteraTable({
                     </td>
                     <td className="py-3 pr-4 text-muted-foreground">{row.accountNumber}</td>
                     <td className="py-3 pr-4 font-sans text-base text-foreground">
-                      {row.entityName}
+                      {presentarNombre(row.entityName)}
                     </td>
                     <td className="financial-nums py-3 text-right text-foreground">
                       {formatMoney(row.saldoInicial, moneda)}

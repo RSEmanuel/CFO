@@ -22,7 +22,7 @@
     "test:cartera": "tsx --test src/lib/parsers/contpaq-auxiliares-parser.test.ts",
     "test:polizas": "tsx --test src/lib/parsers/contpaq-polizas-parser.test.ts",
     "test:origin": "tsx --test src/services/periodOrigins.test.ts",
-    "test:i18n": "tsx --test src/i18n/messages.test.ts src/i18n/cuentaMayor.test.ts",
+    "test:i18n": "tsx --test src/i18n/messages.test.ts src/i18n/cuentaMayor.test.ts src/i18n/nombreVisible.test.ts src/services/textoPresentable.test.ts",
     "test:api": "tsx --test src/lib/api.test.ts",
     "test:resultados": "tsx --test src/services/resultadosService.test.ts src/services/erWaterfall.test.ts",
     "test:ingreso-mix": "tsx --test src/services/ingresoMix.test.ts",

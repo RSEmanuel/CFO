@@ -2129,5 +2129,30 @@
     "7102": "Productos financieros",
     "7104": "Otros productos financieros",
     "8101": "Gastos financieros"
+  },
+  "frasesCuenta": {
+    "sueldos": "Sueldos y salarios",
+    "honorarios": "Honorarios",
+    "honorariosPf": "Honorarios a personas físicas",
+    "honorariosPm": "Honorarios a personas morales",
+    "renta": "Renta",
+    "arrendamientoPm": "Arrendamiento a personas morales",
+    "depreciacion": "Depreciación",
+    "amortizacion": "Amortización",
+    "costoVentas": "Costo de ventas",
+    "gastosGenerales": "Gastos generales",
+    "noDeducibles": "Gastos no deducibles",
+    "devoluciones": "Devoluciones",
+    "intereses": "Intereses",
+    "interesesPagados": "Intereses pagados",
+    "interesesGanados": "Intereses ganados",
+    "cajaChica": "Caja chica",
+    "ivaPorPagar": "IVA por pagar",
+    "papeleria": "Papelería y artículos de oficina",
+    "ventas": "Ventas",
+    "clientes": "Clientes",
+    "proveedores": "Proveedores",
+    "bancos": "Bancos",
+    "caja": "Caja"
   }
 }
