@@ -11,6 +11,7 @@ import {
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useLocale } from "@/context/LocaleContext";
+import { cuentaMayorLabelKey } from "@/i18n/cuentaMayor";
 import {
   collectExpandableIds,
   defaultExpandedIds,
@@ -126,7 +127,11 @@ export function StatementTreeTable({
 }: StatementTreeTableProps) {
   const { t } = useLocale();
   const resolvedEmptyMessage = emptyMessage ?? t("posicionFinanciera.emptyTable");
-  const nodeLabel = (node: StatementNode) => node.labelKey ? t(node.labelKey) : node.label;
+  const nodeLabel = (node: StatementNode) => {
+    if (node.labelKey) return t(node.labelKey);
+    const mayorKey = cuentaMayorLabelKey(node.code, node.id);
+    return mayorKey ? t(mayorKey) : node.label;
+  };
   const valueKeys = useMemo(() => columns.map((column) => column.key), [columns]);
   const [showEmpty, setShowEmpty] = useState(false);
   const [showVertical, setShowVertical] = useState(false);
