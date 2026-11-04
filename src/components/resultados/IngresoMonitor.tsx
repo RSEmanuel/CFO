@@ -290,7 +290,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
                       <p className="font-medium text-foreground" title={row.nombreCuenta || undefined}>
                         {row.esOtrosMenores
                           ? t("resultados.ingreso.otrosMenores")
-                          : nombreCuentaVisible(row.nombreCuenta, row.idCuenta, locale, t)}
+                          : nombreCuentaVisible(row.nombreCuenta, row.idCuenta ?? undefined, locale, t)}
                       </p>
                       {row.idCuenta ? (
                         <p className="font-mono text-[11px] text-muted-foreground">{row.idCuenta}</p>
