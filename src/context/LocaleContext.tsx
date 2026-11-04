@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { NextIntlClientProvider } from "next-intl";
 import {
   createContext,
@@ -10,7 +11,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale, type Locale } from "@/i18n/config";
+import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale, screenLocale, type Locale } from "@/i18n/config";
 import { formatDate as formatDateValue, formatNumber as formatNumberValue } from "@/i18n/format";
 import { MESSAGES, createT, type TranslateFn } from "@/i18n/translate";
 
@@ -25,13 +26,15 @@ type LocaleContextValue = {
 const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const pathname = usePathname();
+  const [storedLocale, setStoredLocale] = useState<Locale>(DEFAULT_LOCALE);
   const [hydrated, setHydrated] = useState(false);
+  const locale = screenLocale(pathname, storedLocale);
 
   useEffect(() => {
     const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY);
     if (isLocale(stored)) {
-      setLocaleState(stored);
+      setStoredLocale(stored);
     }
     setHydrated(true);
   }, []);
@@ -41,11 +44,14 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
       return;
     }
     document.documentElement.lang = locale;
-    window.localStorage.setItem(LOCALE_STORAGE_KEY, locale);
-  }, [hydrated, locale]);
+    // En /login no se guarda el idioma: la pantalla es fija en español y la preferencia del portal se queda.
+    if (pathname !== "/login") {
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, storedLocale);
+    }
+  }, [hydrated, locale, pathname, storedLocale]);
 
   const setLocale = useCallback((next: Locale) => {
-    setLocaleState(next);
+    setStoredLocale(next);
   }, []);
 
   const t = useMemo(() => createT(locale), [locale]);

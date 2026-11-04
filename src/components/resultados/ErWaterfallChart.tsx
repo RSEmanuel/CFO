@@ -13,7 +13,8 @@ import {
 } from "@/services/erWaterfall";
 import { formatCompactAxis, formatMxn } from "@/services/money";
 import type { StatementNode } from "@/services/posicionFinanciera";
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import { splitAxisLabel, waterfallLabelsOverlap } from "@/components/resultados/waterfallAxis";
 import {
   Bar,
   BarChart,
@@ -25,35 +26,41 @@ import {
   YAxis,
 } from "recharts";
 
-function splitAxisLabel(label: string): string[] {
-  const words = label.trim().split(/\s+/).filter(Boolean);
-  if (words.length < 2) {
-    return [label];
-  }
-  return [words[0], words.slice(1).join(" ")];
-}
-
 function WaterfallXTick({
-  x,
-  y,
+  x = 0,
+  y = 0,
   payload,
+  angled,
 }: {
-  x?: number;
-  y?: number;
+  x?: number | string;
+  y?: number | string;
   payload?: { value?: string };
+  angled?: boolean;
 }) {
-  const lines = splitAxisLabel(String(payload?.value ?? ""));
+  const xPos = Number(x);
+  const yPos = Number(y);
+  const label = String(payload?.value ?? "");
+  if (angled) {
+    return (
+      <g transform={`translate(${xPos},${yPos})`}>
+        <text
+          transform="rotate(-38)"
+          textAnchor="end"
+          dy={6}
+          fill={CHART_VARS.mute}
+          fontSize={11}
+          fontWeight={500}
+        >
+          {label}
+        </text>
+      </g>
+    );
+  }
+  const lines = splitAxisLabel(label);
   return (
-    <text
-      x={x}
-      y={y}
-      textAnchor="middle"
-      fill={CHART_VARS.mute}
-      fontSize={12}
-      fontWeight={500}
-    >
+    <text x={xPos} y={yPos} textAnchor="middle" fill={CHART_VARS.mute} fontSize={12} fontWeight={500}>
       {lines.map((line, index) => (
-        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 12 : 15}>
+        <tspan key={`${line}-${index}`} x={xPos} dy={index === 0 ? 12 : 15}>
           {line}
         </tspan>
       ))}
@@ -134,6 +141,22 @@ export function ErWaterfallChart({ nodes, yearKey, loading, empty }: ErWaterfall
     () => (model ? toErWaterfallRows(model).map((row) => ({ ...row, label: t(row.labelKey) })) : []),
     [model, t],
   );
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState(0);
+  const angled = waterfallLabelsOverlap(
+    width,
+    data.map((row) => row.label),
+  );
+
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const update = () => setWidth(el.clientWidth);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [data.length, loading, empty]);
 
   return (
     <ExpandableShell className="p-6">
@@ -163,14 +186,17 @@ export function ErWaterfallChart({ nodes, yearKey, loading, empty }: ErWaterfall
               </p>
             ) : (
               <>
-                <div className={cn("w-full", expanded ? "min-h-0 flex-1" : "h-[320px]")}>
+                <div
+                  ref={boxRef}
+                  className={cn("w-full", expanded ? "min-h-0 flex-1" : angled ? "h-[420px]" : "h-[320px]")}
+                >
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={data} margin={{ top: 28, right: 8, left: 8, bottom: 48 }}>
+                    <BarChart data={data} margin={{ top: 28, right: 8, left: 8, bottom: angled ? 8 : 48 }}>
                       <XAxis
                         dataKey="label"
                         interval={0}
-                        height={48}
-                        tick={<WaterfallXTick />}
+                        height={angled ? 124 : 48}
+                        tick={(props) => <WaterfallXTick {...props} angled={angled} />}
                         axisLine={{ stroke: CHART_VARS.axis }}
                         tickLine={false}
                       />

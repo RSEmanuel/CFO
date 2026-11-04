@@ -34,7 +34,12 @@ export default function LoginPage() {
     try {
       await login(email, password);
     } catch (err) {
-      setError(err instanceof ApiError ? t(`errors.${err.code}`) : t("auth.loginFailed"));
+      // Preferimos el mensaje del servidor: "No autenticado" tapa "correo o contraseña incorrectos".
+      setError(
+        err instanceof ApiError
+          ? err.message || t(`errors.${err.code}`)
+          : t("auth.loginFailed"),
+      );
     } finally {
       setPending(false);
     }
@@ -147,7 +152,7 @@ export default function LoginPage() {
                 <div className="flex flex-col gap-4">
                   <label className="flex flex-col gap-[7px]" htmlFor="email">
                     <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {t("auth.email")}
+                      Email
                     </span>
                     <Input
                       id="email"
@@ -161,7 +166,7 @@ export default function LoginPage() {
                   </label>
                   <label className="flex flex-col gap-[7px]" htmlFor="password">
                     <span className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
-                      {t("auth.password")}
+                      Password
                     </span>
                     <Input
                       id="password"

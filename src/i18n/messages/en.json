@@ -809,7 +809,27 @@
       "salidasOperativas": "Operating outflows",
       "emptyTitle": "Cash flow not available yet",
       "emptyMessage": "Upload the cash flow report (or the master template) to see category detail.",
-      "totalIngresos": "Total income"
+      "totalIngresos": "Total income",
+      "categorias": {
+        "cobranza": "Collections",
+        "diversos": "Other",
+        "prestamos": "Loans",
+        "reembolsos": "Refunds",
+        "traspasos": "Transfers",
+        "chequesDevueltos": "Returned checks",
+        "gastosViaje": "Travel expenses",
+        "gastosPorComprobar": "Expenses pending receipts",
+        "honorarios": "Professional fees",
+        "impuestos": "Taxes",
+        "intereses": "Interest",
+        "pagoPrestamos": "Loan payments",
+        "proveedores": "Suppliers",
+        "publicidad": "Advertising",
+        "reembolsoGastos": "Expense reimbursements",
+        "reposicionCaja": "Petty cash replenishment",
+        "situacionBancaria": "Bank movements",
+        "sueldos": "Payroll"
+      }
     },
     "libre": {
       "title": "From profit to cash",

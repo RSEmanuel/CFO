@@ -1,5 +1,6 @@
 "use client";
 
+import { sankeyFrame } from "@/components/flujo/sankeyLayout";
 import { useLocale } from "@/context/LocaleContext";
 import { canvasColor, CHART } from "@/lib/chart-theme";
 import type { FlujoLinea } from "@/services/flujoEfectivo";
@@ -10,7 +11,7 @@ import { TooltipComponent, type TooltipComponentOption } from "echarts/component
 import * as echarts from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import ReactEChartsCore from "echarts-for-react/lib/core";
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 
 echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
 
@@ -47,6 +48,23 @@ export function FlujoEfectivoSankey({
   units: DisplayUnits;
 }) {
   const { t } = useLocale();
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [box, setBox] = useState({ width: 0, height: 0 });
+
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const update = () => setBox({ width: el.clientWidth, height: el.clientHeight });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const frame = useMemo(
+    () => sankeyFrame(box.width, box.height, Math.max(ingresos.length, egresos.length)),
+    [box.width, box.height, ingresos.length, egresos.length],
+  );
 
   const option = useMemo<SankeyOption>(() => {
     const graph = buildFlujoSankey(ingresos, egresos, {
@@ -84,14 +102,14 @@ export function FlujoEfectivoSankey({
         {
           type: "sankey",
           // Tres columnas: las etiquetas de los extremos van por fuera y la del total, centrada arriba.
-          left: 220,
-          right: 220,
-          top: 72,
-          bottom: 36,
+          left: frame.left,
+          right: frame.right,
+          top: frame.top,
+          bottom: frame.bottom,
           layoutIterations: 0,
           nodeAlign: "justify",
           nodeWidth: 16,
-          nodeGap: 32,
+          nodeGap: frame.nodeGap,
           draggable: false,
           data: graph.nodes.map((node) => ({
             name: node.name,
@@ -106,11 +124,15 @@ export function FlujoEfectivoSankey({
                     align: "center",
                     width: TOTAL_LABEL_WIDTH,
                     overflow: "break",
-                    fontSize: 18,
+                    fontSize: frame.totalFontSize,
                     fontWeight: 600,
                     lineHeight: 24,
                   }
-                : { position: node.side === "in" ? "left" : "right" },
+                : {
+                    position: node.side === "in" ? "left" : "right",
+                    width: frame.labelWidth,
+                    overflow: "truncate",
+                  },
           })),
           // Color sólido por enlace (sin degradado): verde hacia el total, rojo del total a los egresos.
           links: graph.links.map((link) => ({
@@ -119,14 +141,18 @@ export function FlujoEfectivoSankey({
           })),
           label: {
             distance: 12,
-            fontSize: 13,
+            fontSize: frame.fontSize,
             fontWeight: 500,
             color: canvasColor(LABEL_COLOR),
-            lineHeight: 18,
-            overflow: "none",
+            lineHeight: frame.lineHeight,
+            overflow: "truncate",
             formatter: (params) => {
               const name = displayByName.get(String(params.name)) ?? String(params.name);
-              return `${name}\n${formatAxisTick(Number(params.value) || 0, units)}`;
+              const amount = formatAxisTick(Number(params.value) || 0, units);
+              if (params.name === FLUJO_SANKEY_TOTAL_INGRESOS || frame.showAmount) {
+                return `${name}\n${amount}`;
+              }
+              return name;
             },
           },
           lineStyle: {
@@ -140,16 +166,18 @@ export function FlujoEfectivoSankey({
         },
       ],
     };
-  }, [ingresos, egresos, units, t]);
+  }, [ingresos, egresos, units, t, frame]);
 
   return (
-    <ReactEChartsCore
-      echarts={echarts}
-      option={option}
-      notMerge
-      lazyUpdate
-      style={{ height: "100%", width: "100%" }}
-      opts={{ renderer: "canvas" }}
-    />
+    <div ref={boxRef} className="h-full w-full">
+      <ReactEChartsCore
+        echarts={echarts}
+        option={option}
+        notMerge
+        lazyUpdate
+        style={{ height: "100%", width: "100%" }}
+        opts={{ renderer: "canvas" }}
+      />
+    </div>
   );
 }
