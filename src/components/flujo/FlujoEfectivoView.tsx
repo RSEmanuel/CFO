@@ -10,7 +10,10 @@ import { useLocale } from "@/context/LocaleContext";
 import { cn } from "@/lib/utils";
 import { useFlujoEfectivo } from "@/hooks/use-flujo-efectivo";
 import { CHART, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
+import { etiquetaFlujoCategoria } from "@/i18n/flujoCategoria";
+import type { TranslateFn } from "@/i18n/translate";
 import type { FlujoEfectivoPeriodo, FlujoLinea } from "@/services/flujoEfectivo";
+import { sankeyChartHeight } from "@/components/flujo/sankeyLayout";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
 import { useMemo, useState } from "react";
 import { Bar, BarChart, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
@@ -20,8 +23,9 @@ type FlujoEfectivoViewProps = {
   units: DisplayUnits;
 };
 
-function lineaLabel(linea: FlujoLinea, t: (key: string) => string): string {
-  return linea.labelKey ? t(linea.labelKey) : linea.label;
+function lineaLabel(linea: FlujoLinea, t: TranslateFn): string {
+  if (linea.labelKey) return t(linea.labelKey);
+  return etiquetaFlujoCategoria(linea.categoriaKey, linea.label, t);
 }
 
 function FlujoEfectivoWaterfallFallback({
@@ -145,6 +149,7 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
 
   const flujo = data.data;
   const hasTraspasos = flujo.traspasos > 0;
+  const sideNodes = Math.max(chartLineas.ingresos.length, chartLineas.egresos.length);
 
   return (
     <ExpandableShell className="w-full">
@@ -172,7 +177,10 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
             </div>
           </CardHeader>
           <CardContent className={cn(expanded && "flex min-h-0 flex-1 flex-col")}>
-            <div className={cn("w-full", expanded ? "min-h-0 flex-1" : "h-[540px] min-h-[540px]")}>
+            <div
+              className={cn("w-full", expanded ? "min-h-0 flex-1" : "min-h-[540px]")}
+              style={expanded ? undefined : { height: sankeyChartHeight(sideNodes) }}
+            >
               <ChartErrorBoundary fallback={<FlujoEfectivoWaterfallFallback data={flujo} units={units} />}>
                 {chartLineas.ingresos.length > 0 && chartLineas.egresos.length > 0 ? (
                   <FlujoEfectivoSankey

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale } from "./config";
+import { DEFAULT_LOCALE, LOCALE_STORAGE_KEY, isLocale, screenLocale } from "./config";
 import { collectKeys, createT, MESSAGES } from "./translate";
 
 describe("i18n catalogs", () => {
@@ -38,6 +38,8 @@ describe("i18n catalogs", () => {
     assert.equal(isLocale("es"), true);
     assert.equal(isLocale("en"), true);
     assert.equal(isLocale("fr"), false);
+    assert.equal(screenLocale("/login", "en"), "es");
+    assert.equal(screenLocale("/dashboard", "en"), "en");
   });
 
   it("translates the new client-feedback surfaces", () => {

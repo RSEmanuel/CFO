@@ -809,7 +809,27 @@
       "salidasOperativas": "Salidas operativas",
       "emptyTitle": "Flujo de efectivo aún no disponible",
       "emptyMessage": "Carga el reporte de flujo de efectivo (o la plantilla máster) para ver el detalle por categoría.",
-      "totalIngresos": "Total de ingresos"
+      "totalIngresos": "Total de ingresos",
+      "categorias": {
+        "cobranza": "Cobranza",
+        "diversos": "Diversos",
+        "prestamos": "Préstamos",
+        "reembolsos": "Reembolsos",
+        "traspasos": "Traspasos",
+        "chequesDevueltos": "Cheques devueltos",
+        "gastosViaje": "Gastos de viaje",
+        "gastosPorComprobar": "Gastos por comprobar",
+        "honorarios": "Honorarios",
+        "impuestos": "Impuestos",
+        "intereses": "Intereses",
+        "pagoPrestamos": "Pago de préstamos",
+        "proveedores": "Proveedores",
+        "publicidad": "Publicidad",
+        "reembolsoGastos": "Reembolso de gastos",
+        "reposicionCaja": "Reposición de caja",
+        "situacionBancaria": "Movimientos del banco",
+        "sueldos": "Sueldos"
+      }
     },
     "libre": {
       "title": "De la utilidad al efectivo",
