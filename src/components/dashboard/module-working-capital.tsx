@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { arr, fmtDays, fmtMoney } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
 import { TableScroll } from "@/components/ui/table-scroll";
+import { presentarNombre } from "@/services/textoPresentable";
 
 export function ModuleWorkingCapital({ pack, loading }: { pack: ModulePack | null; loading: boolean }) {
   const wc = pack?.capitalTrabajo;
@@ -58,7 +59,7 @@ export function ModuleWorkingCapital({ pack, loading }: { pack: ModulePack | nul
                 <tbody>
                   {vendors.map((row) => (
                     <tr key={row.idProveedor} className="border-b last:border-0">
-                      <td className="py-2 pr-3">{row.nombreProveedor}</td>
+                      <td className="py-2 pr-3">{presentarNombre(row.nombreProveedor)}</td>
                       <td className="py-2 pr-3">{fmtMoney(row.volumen, row.volumenFormatted)}</td>
                       <td className="py-2">{fmtMoney(row.pendiente, row.pendienteFormatted)}</td>
                     </tr>

@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { arr, fmtMoney, fmtPct } from "@/components/dashboard/safe";
 import type { ModulePack } from "@/services/metricsTypes";
 import { TableScroll } from "@/components/ui/table-scroll";
+import { presentarNombre } from "@/services/textoPresentable";
 
 function BudgetTable({
   title,
@@ -89,7 +90,7 @@ export function ModuleCommercial({ pack, loading }: { pack: ModulePack | null; l
                   <tbody>
                     {lineas.map((row) => (
                       <tr key={row.lineaNegocio} className="border-b last:border-0">
-                        <td className="py-2 pr-3">{row.lineaNegocio}</td>
+                        <td className="py-2 pr-3">{presentarNombre(row.lineaNegocio)}</td>
                         <td className="py-2 pr-3">{fmtMoney(row.facturacion, row.facturacionFormatted)}</td>
                         <td className="py-2">{fmtPct(row.margenBrutoPct)}</td>
                       </tr>

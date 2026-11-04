@@ -6,6 +6,7 @@ import { ExportMenu } from "@/components/export/ExportMenu";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { useLocale } from "@/context/LocaleContext";
+import { presentarNombre } from "@/services/textoPresentable";
 import { useSession } from "@/context/SessionContext";
 import { useConcentracionRiesgo } from "@/hooks/use-concentracion-riesgo";
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
@@ -95,7 +96,7 @@ function ParetoTooltip({
   if (!point) return null;
   return (
     <div style={TOOLTIP_STYLE} className="px-3 py-2 text-xs">
-      <p className="font-sans text-sm text-foreground">{point.entityName}</p>
+      <p className="font-sans text-sm text-foreground">{presentarNombre(point.entityName)}</p>
       <p className="financial-nums mt-1 text-foreground">
         {formatMoney(point.monto, moneda)} · {point.pctIndividual.toFixed(1)}%
       </p>
@@ -259,8 +260,8 @@ export function ConcentracionRiesgoSection() {
   const { model } = data;
   const asOf = `${data.anio}-${String(data.periodo).padStart(2, "0")}`;
   const chartData: ParetoPoint[] = model.rows.slice(0, PARETO_MAX_BARRAS).map((row) => ({
-    name: truncateName(row.entityName),
-    entityName: row.entityName,
+    name: truncateName(presentarNombre(row.entityName)),
+    entityName: presentarNombre(row.entityName),
     monto: row.monto,
     pctIndividual: row.pctIndividual,
     pctAcumulado: row.pctAcumulado,
@@ -402,7 +403,7 @@ export function ConcentracionRiesgoSection() {
                       title={t("polizas.audit.drillHint")}
                       className="font-sans text-base text-foreground underline-offset-4 hover:text-clay hover:underline"
                     >
-                      {row.entityName}
+                      {presentarNombre(row.entityName)}
                     </button>
                   </td>
                   <td className="financial-nums py-3 text-right text-foreground">
@@ -466,8 +467,8 @@ export function ConcentracionParetoCard() {
   }
 
   const chartData: ParetoPoint[] = data.model.rows.slice(0, PARETO_MAX_BARRAS).map((row) => ({
-    name: truncateName(row.entityName),
-    entityName: row.entityName,
+    name: truncateName(presentarNombre(row.entityName)),
+    entityName: presentarNombre(row.entityName),
     monto: row.monto,
     pctIndividual: row.pctIndividual,
     pctAcumulado: row.pctAcumulado,

@@ -5,6 +5,7 @@ import { arr, chartMoney, n } from "@/components/dashboard/safe";
 import { CHART, CHART_AXIS, CHART_SERIES } from "@/lib/chart-theme";
 import type { ClienteConcentracion, ModulePack } from "@/services/metricsTypes";
 import { useLocale } from "@/context/LocaleContext";
+import { presentarNombre } from "@/services/textoPresentable";
 import type { ReactNode } from "react";
 import { Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -108,7 +109,7 @@ export function ClientConcentrationChart({ pack, loading }: { pack: ModulePack |
   const pie = [...arr(pack?.unitEconomics?.concentracionClientes?.top5), pack?.unitEconomics?.concentracionClientes?.resto]
     .filter((item): item is ClienteConcentracion => Boolean(item && n(item.facturacion) > 0))
     .map((item) => ({
-      name: item.nombreCliente,
+      name: presentarNombre(item.nombreCliente),
       value: n(item.facturacion),
     }));
 

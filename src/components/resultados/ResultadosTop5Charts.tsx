@@ -4,6 +4,7 @@ import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
+import { presentarNombre } from "@/services/textoPresentable";
 import { useResultadosTop5 } from "@/hooks/use-resultados-top5";
 import { CHART, CHART_AXIS, TOP5_RESTO, TOP5_SERIES } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
@@ -92,8 +93,8 @@ function Top5Tooltip({
               className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: colors.get(row.key) ?? TOP5_RESTO }}
             />
-            <span className="min-w-0 flex-1 truncate text-foreground" title={row.label}>
-              {row.label}
+            <span className="min-w-0 flex-1 truncate text-foreground" title={presentarNombre(row.label)}>
+              {presentarNombre(row.label)}
             </span>
             <span className="financial-nums shrink-0 text-foreground">{formatMxn(row.monto)}</span>
             <span className="financial-nums w-12 shrink-0 text-right font-semibold tabular-nums">
@@ -258,7 +259,8 @@ function Top5Card({
     );
   }
 
-  const { rows, periodTotal } = top5ActiveMonthRows(series, restLabel);
+  const { rows: rawRows, periodTotal } = top5ActiveMonthRows(series, restLabel);
+  const rows = rawRows.map((row) => ({ ...row, label: presentarNombre(row.label) }));
   const pieRows = rows.filter((row) => row.monto > 0.005);
   const lastLabel = series.months[series.months.length - 1]?.label ?? "";
 

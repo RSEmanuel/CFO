@@ -4,6 +4,7 @@ import { FavoriteStarButton } from "@/components/favorites/favorite-star-button"
 import { InfoDialog } from "@/components/ui/info-dialog";
 import { Tooltip as Hint, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useLocale } from "@/context/LocaleContext";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
 import { useGastoOpex } from "@/hooks/use-gasto-opex";
 import { monthLabelKey } from "@/i18n/format";
 import { OPEX_SPLIT } from "@/lib/chart-theme";
@@ -65,7 +66,7 @@ function TitleRow({ title, widgetId, extra }: { title: string; widgetId: string;
 }
 
 export function GastoControlCard({ kind, control }: { kind: GastoControlKind; control: GastoOpexControl }) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
 
   if (kind === "absorcion") {
     const title = t("resultados.opex.absorptionTitle");
@@ -157,7 +158,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
     const title = t("resultados.opex.laborTitle");
     const laborHintAccounts = control.laboral.cuentas
       .filter((cuenta) => Math.abs(cuenta.monto) > 0.005)
-      .map((cuenta) => `${cuenta.idCuenta} ${cuenta.nombreCuenta}`)
+      .map((cuenta) => `${cuenta.idCuenta} ${nombreCuentaVisible(cuenta.nombreCuenta, cuenta.idCuenta, locale, t)}`)
       .join(" · ");
     return (
       <article className="relative rounded-card border border-category-efficiencyFg/20 bg-category-efficiency px-4 py-3 shadow-[var(--shadow-card)]">

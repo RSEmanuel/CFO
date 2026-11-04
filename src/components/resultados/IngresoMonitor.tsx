@@ -4,6 +4,7 @@ import { FavoriteStarButton } from "@/components/favorites/favorite-star-button"
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
 import { useIngresoCalidad } from "@/hooks/use-ingreso-calidad";
 import { cn } from "@/lib/utils";
 import { parseIngresoPeriodo } from "@/services/ingresoMix";
@@ -86,7 +87,7 @@ function ImpactBar({
 }
 
 export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { data, loading, error } = useIngresoCalidad(periodo);
   const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
   const auditPeriod = parseIngresoPeriodo(periodo);
@@ -115,7 +116,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
     if (!row.idCuenta || !auditPeriod) return;
     setAuditTarget({
       codigoCuenta: row.idCuenta,
-      nombreCuenta: row.nombreCuenta,
+      nombreCuenta: nombreCuentaVisible(row.nombreCuenta, row.idCuenta, locale, t),
       anio: auditPeriod.anio,
       periodo: auditPeriod.mes,
     });
@@ -287,7 +288,9 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
                   >
                     <td className="py-2.5 pr-3">
                       <p className="font-medium text-foreground" title={row.nombreCuenta || undefined}>
-                        {row.esOtrosMenores ? t("resultados.ingreso.otrosMenores") : row.nombreCuenta}
+                        {row.esOtrosMenores
+                          ? t("resultados.ingreso.otrosMenores")
+                          : nombreCuentaVisible(row.nombreCuenta, row.idCuenta, locale, t)}
                       </p>
                       {row.idCuenta ? (
                         <p className="font-mono text-[11px] text-muted-foreground">{row.idCuenta}</p>

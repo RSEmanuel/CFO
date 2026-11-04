@@ -3,6 +3,7 @@
 import { ChartBody, ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { useLocale } from "@/context/LocaleContext";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
 import { useCogsDesglose } from "@/hooks/use-cogs-desglose";
 import { CHART } from "@/lib/chart-theme";
 import type { CogsRubroKey } from "@/services/cogsDesglose";
@@ -28,7 +29,7 @@ type CogsDesgloseCardProps = {
 };
 
 export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { data, loading, error } = useCogsDesglose(periodo);
 
   if (loading) {
@@ -61,7 +62,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
     }
     return rubro.cuentas.map((cuenta) => ({
       key: cuenta.idCuenta,
-      name: cuenta.nombreCuenta,
+      name: nombreCuentaVisible(cuenta.nombreCuenta, cuenta.idCuenta, locale, t),
       monto: cuenta.monto,
       pctCosto: data.totalCosto > 0.005 ? (cuenta.monto / data.totalCosto) * 100 : 0,
       pctVentas: data.ventasNetas > 0.005 ? (cuenta.monto / data.ventasNetas) * 100 : null,

@@ -4,6 +4,7 @@ import { FavoriteStarButton } from "@/components/favorites/favorite-star-button"
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { InfoDialog } from "@/components/ui/info-dialog";
 import { useLocale } from "@/context/LocaleContext";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
 import { useGastoOpex } from "@/hooks/use-gasto-opex";
 import { monthLabelKey } from "@/i18n/format";
 import { canvasColor, CHART } from "@/lib/chart-theme";
@@ -110,7 +111,7 @@ function formatSignedPct(value: number): string {
 }
 
 export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
   const auditPeriod = parseIngresoPeriodo(periodo);
 
@@ -151,7 +152,7 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
           return {
             name: leaf.esOtrosMenores
               ? t("resultados.opex.treemap.otrosMenores")
-              : cleanOpexCuentaNombre(leaf.nombreCuenta),
+              : nombreCuentaVisible(cleanOpexCuentaNombre(leaf.nombreCuenta), leaf.idCuenta ?? undefined, locale, t),
             value: leaf.monto,
             pctTotal: leaf.pctTotal,
             deltaMomPct: leaf.deltaMomPct,
@@ -259,7 +260,7 @@ export function GastoOpexTreemap({ periodo, treemap }: GastoOpexTreemapProps) {
     };
     // bucketLabel es estable (usa t); priorLabel se memoiza aparte.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [treemap, t, priorLabel]);
+  }, [treemap, t, locale, priorLabel]);
 
   if (treemap.buckets.length === 0) {
     return null;

@@ -2129,5 +2129,30 @@
     "7102": "Financial income",
     "7104": "Other financial income",
     "8101": "Financial expenses"
+  },
+  "frasesCuenta": {
+    "sueldos": "Payroll",
+    "honorarios": "Professional fees",
+    "honorariosPf": "Professional fees, individuals",
+    "honorariosPm": "Professional fees, companies",
+    "renta": "Rent",
+    "arrendamientoPm": "Rent from companies",
+    "depreciacion": "Depreciation",
+    "amortizacion": "Amortization",
+    "costoVentas": "Cost of sales",
+    "gastosGenerales": "General expenses",
+    "noDeducibles": "Nondeductible expenses",
+    "devoluciones": "Returns",
+    "intereses": "Interest",
+    "interesesPagados": "Interest paid",
+    "interesesGanados": "Interest earned",
+    "cajaChica": "Petty cash",
+    "ivaPorPagar": "VAT payable",
+    "papeleria": "Office supplies",
+    "ventas": "Sales",
+    "clientes": "Customers",
+    "proveedores": "Suppliers",
+    "bancos": "Banks",
+    "caja": "Cash"
   }
 }
