@@ -32,15 +32,17 @@ function WaterfallXTick({
   payload,
   angled,
 }: {
-  x?: number;
-  y?: number;
+  x?: number | string;
+  y?: number | string;
   payload?: { value?: string };
   angled?: boolean;
 }) {
+  const xPos = Number(x);
+  const yPos = Number(y);
   const label = String(payload?.value ?? "");
   if (angled) {
     return (
-      <g transform={`translate(${x},${y})`}>
+      <g transform={`translate(${xPos},${yPos})`}>
         <text
           transform="rotate(-38)"
           textAnchor="end"
@@ -56,9 +58,9 @@ function WaterfallXTick({
   }
   const lines = splitAxisLabel(label);
   return (
-    <text x={x} y={y} textAnchor="middle" fill={CHART_VARS.mute} fontSize={12} fontWeight={500}>
+    <text x={xPos} y={yPos} textAnchor="middle" fill={CHART_VARS.mute} fontSize={12} fontWeight={500}>
       {lines.map((line, index) => (
-        <tspan key={`${line}-${index}`} x={x} dy={index === 0 ? 12 : 15}>
+        <tspan key={`${line}-${index}`} x={xPos} dy={index === 0 ? 12 : 15}>
           {line}
         </tspan>
       ))}
