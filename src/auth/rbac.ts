@@ -6,6 +6,11 @@ export type AuthContext = {
   email: string;
   role: UserRole;
   tenantId: string;
+  /**
+   * Empresas extra que esta persona de solo consulta puede ver, además de la suya
+   * (tabla user_tenant_access). Vacío para casi todos; ADMIN y CFO_PARTNER no lo usan.
+   */
+  extraTenantIds?: readonly string[];
   cognitoSub: string;
   tokenUse: string;
 };
@@ -32,28 +37,42 @@ export function assertCanRegisterRole(actorRole: UserRole, targetRole: UserRole)
 }
 
 /**
- * CLIENT_VIEWER solo accede a su empresa. ADMIN y CFO_PARTNER ven todos los clientes.
+ * Empresas que puede consultar quien solo ve: la suya y, solo si se le concedieron, las extra.
+ * Devuelve null para ADMIN y CFO_PARTNER, que ven todas.
+ */
+export function viewerTenantIds(auth: AuthContext): readonly string[] | null {
+  if (auth.role !== "CLIENT_VIEWER") {
+    return null;
+  }
+  return [auth.tenantId, ...(auth.extraTenantIds ?? []).filter((id) => id !== auth.tenantId)];
+}
+
+function denyTenant(): never {
+  throw new AppError(
+    "FORBIDDEN",
+    "Solo puedes consultar la información de las empresas a las que tienes acceso.",
+    403,
+  );
+}
+
+/**
+ * CLIENT_VIEWER solo accede a su empresa y a las que se le concedieron una por una.
+ * ADMIN y CFO_PARTNER ven todos los clientes.
  */
 export function assertTenantAccess(auth: AuthContext, requestedTenantId: string): void {
-  if (auth.role === "CLIENT_VIEWER" && auth.tenantId !== requestedTenantId) {
-    throw new AppError(
-      "FORBIDDEN",
-      "Solo puedes consultar la información de tu propia empresa.",
-      403,
-    );
+  const allowed = viewerTenantIds(auth);
+  if (allowed && !allowed.includes(requestedTenantId)) {
+    denyTenant();
   }
 }
 
 export function resolveScopedTenantId(auth: AuthContext, requestedTenantId?: string): string {
-  if (auth.role === "CLIENT_VIEWER") {
-    if (requestedTenantId && requestedTenantId !== auth.tenantId) {
-      throw new AppError(
-        "FORBIDDEN",
-        "Solo puedes consultar la información de tu propia empresa.",
-        403,
-      );
+  const allowed = viewerTenantIds(auth);
+  if (allowed) {
+    if (requestedTenantId && !allowed.includes(requestedTenantId)) {
+      denyTenant();
     }
-    return auth.tenantId;
+    return requestedTenantId ?? auth.tenantId;
   }
 
   if (!requestedTenantId) {

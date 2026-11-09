@@ -2079,6 +2079,10 @@
     "doneHelp": "You can now sign in to Cifra with {email} and the password you just created.",
     "goLogin": "Go to sign in"
   },
+  "exampleTenant": {
+    "banner": "Demo company: these figures are examples.",
+    "bannerHelp": "They are not any client's accounting. To see your real figures, pick your company in the \"Client\" selector."
+  },
   "clientPreview": {
     "enter": "View as client",
     "enterAria": "See the portal the way your client sees it",

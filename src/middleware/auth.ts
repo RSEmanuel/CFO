@@ -39,11 +39,18 @@ export function withAuth(handler: AuthenticatedHandler, options: WithAuthOptions
         throw forbidden("Tu rol no tiene permiso para esta operación.");
       }
 
+      // Solo quien únicamente consulta puede tener empresas extra; el resto ya ve todas.
+      const extra =
+        user.role === "CLIENT_VIEWER"
+          ? await prisma.userTenantAccess.findMany({ where: { userId: user.id }, select: { tenantId: true } })
+          : [];
+
       auth = {
         userId: user.id,
         email: user.email,
         role: user.role,
         tenantId: user.tenantId,
+        extraTenantIds: extra.map((row) => row.tenantId),
         cognitoSub: user.cognitoSub,
         tokenUse: payload.token_use,
       };

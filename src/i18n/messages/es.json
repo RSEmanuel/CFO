@@ -2079,6 +2079,10 @@
     "doneHelp": "Ya puedes entrar a Cifra con {email} y la contraseña que acabas de crear.",
     "goLogin": "Ir a iniciar sesión"
   },
+  "exampleTenant": {
+    "banner": "Empresa de demostración: estas cifras son de ejemplo.",
+    "bannerHelp": "No son la contabilidad de ningún cliente. Para ver tus cifras reales, elige tu empresa en el selector «Cliente»."
+  },
   "clientPreview": {
     "enter": "Ver como cliente",
     "enterAria": "Ver el portal como lo ve tu cliente",

@@ -1,4 +1,5 @@
 import { jsonSuccess } from "@/auth/http";
+import { viewerTenantIds } from "@/auth/rbac";
 import { onboardTenantSchema } from "@/auth/schemas";
 import { prisma } from "@/lib/prisma";
 import { withAuth } from "@/middleware/auth";
@@ -6,11 +7,13 @@ import { onboardTenant } from "@/services/tenants/onboarding";
 
 export const GET = withAuth(async (_request, auth) => {
   if (auth.role === "CLIENT_VIEWER") {
-    const tenant = await prisma.tenant.findUnique({
-      where: { id: auth.tenantId },
+    // Su empresa y, solo si se le concedieron, las extra. Su empresa va primero.
+    const allowed = viewerTenantIds(auth) ?? [auth.tenantId];
+    const found = await prisma.tenant.findMany({
+      where: { id: { in: [...allowed] } },
       select: { id: true, name: true, rfc: true },
     });
-    return jsonSuccess(tenant ? [tenant] : []);
+    return jsonSuccess(allowed.flatMap((id) => found.filter((tenant) => tenant.id === id)));
   }
 
   const tenants = await prisma.tenant.findMany({
