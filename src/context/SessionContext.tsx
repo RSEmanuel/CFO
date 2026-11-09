@@ -91,9 +91,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const list = await apiRequest<TenantOption[]>("/api/tenants");
     setTenants(list);
     setTenantId((current) => {
-      if (me.role === "CLIENT_VIEWER") {
-        return me.tenantId;
-      }
+      // Al entrar manda la empresa propia; el menú solo ofrece las que la API permite.
       if (current && list.some((item) => item.id === current)) {
         return current;
       }

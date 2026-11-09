@@ -71,6 +71,7 @@ model Tenant {
   updatedAt DateTime @updatedAt
 
   users                 User[]
+  extraAccess           UserTenantAccess[]
   balanzasPnL           BalanzaPnL[]
   auxiliaresVentas      AuxiliarVentas[]
   auxiliaresEgresos     AuxiliarEgresos[]
@@ -106,11 +107,28 @@ model User {
   ingestBatches    IngestBatch[]
   ingestFileAudits IngestFileAudit[]
   appErrorLogs     AppErrorLog[]
+  extraTenants     UserTenantAccess[]
 
   @@index([tenantId])
   @@index([email])
   @@index([cognitoSub])
   @@map("users")
+}
+
+/// Empresas adicionales que una persona de solo consulta puede ver, además de la suya.
+/// ADMIN y CFO_PARTNER no la necesitan: ya ven todas. Cada fila es una excepción explícita.
+model UserTenantAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  tenantId  String
+  createdAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tenant Tenant @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tenantId])
+  @@index([tenantId])
+  @@map("user_tenant_access")
 }
 
 model BalanzaPnL {

@@ -13,3 +13,16 @@ export const EMPTY_COMPAC_USERS = {
 export function normalizeTenantRfc(rfc: string): string {
   return rfc.trim().toUpperCase();
 }
+
+/**
+ * Empresa de demostración con cifras de ejemplo. Vive aparte de cualquier cliente real.
+ * El nombre lleva «ejemplo» a propósito: el guion de carga se niega a escribir en otra empresa.
+ */
+export const EXAMPLE_TENANT = {
+  name: "Distribuidora Ejemplo (demostración)",
+  rfc: "EJEMPLO261109XX0",
+} as const;
+
+export function isExampleTenantRfc(rfc: string | null | undefined): boolean {
+  return normalizeTenantRfc(rfc ?? "") === EXAMPLE_TENANT.rfc;
+}

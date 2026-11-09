@@ -8,7 +8,9 @@ import {
   assertCanViewIngestHistory,
   canRegisterRole,
   INGEST_HISTORY_ROLES,
+  assertTenantAccess,
   resolveScopedTenantId,
+  viewerTenantIds,
   USER_ADMIN_ROLES,
   type AuthContext,
 } from "@/auth/rbac";
@@ -155,5 +157,34 @@ describe("Control de cargas", () => {
     assert.equal(isPendingLoad("REVIEWED_ONLY", false), true);
     assert.equal(isPendingLoad("REVIEWED_ONLY", true), false);
     assert.equal(isPendingLoad("SAVED", false), false);
+  });
+});
+
+describe("empresas extra de quien solo consulta", () => {
+  const withDemo: AuthContext = { ...viewer, extraTenantIds: ["t-demo"] };
+
+  it("sin concesión solo ve la suya", () => {
+    assert.deepEqual(viewerTenantIds(viewer), ["t-a"]);
+    assert.throws(() => assertTenantAccess(viewer, "t-demo"), forbiddenWith());
+  });
+
+  it("con concesión ve exactamente dos: la suya y la de ejemplo", () => {
+    assert.deepEqual(viewerTenantIds(withDemo), ["t-a", "t-demo"]);
+    assert.doesNotThrow(() => assertTenantAccess(withDemo, "t-a"));
+    assert.doesNotThrow(() => assertTenantAccess(withDemo, "t-demo"));
+    assert.equal(resolveScopedTenantId(withDemo, "t-demo"), "t-demo");
+    assert.equal(resolveScopedTenantId(withDemo), "t-a");
+  });
+
+  it("cualquier otra empresa se rechaza", () => {
+    assert.throws(() => assertTenantAccess(withDemo, "t-b"), forbiddenWith());
+    assert.throws(() => resolveScopedTenantId(withDemo, "t-b"), forbiddenWith());
+  });
+
+  it("administrador y socio no pasan por esta lista", () => {
+    for (const role of ["ADMIN", "CFO_PARTNER"] as const) {
+      assert.equal(viewerTenantIds({ ...viewer, role }), null);
+      assert.doesNotThrow(() => assertTenantAccess({ ...viewer, role }, "t-b"));
+    }
   });
 });

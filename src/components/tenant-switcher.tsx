@@ -10,13 +10,15 @@ const eyebrowClass =
   "mb-1.5 block px-1 font-mono text-[length:var(--cifra-eyebrow-size)] font-medium uppercase leading-[var(--cifra-eyebrow-lh)] tracking-[0.08em] text-muted-foreground";
 
 /**
- * ADMIN y CFO_PARTNER eligen el cliente; quien solo consulta (o la vista de cliente) ve el nombre de su
- * empresa como texto, no como un menú deshabilitado.
+ * ADMIN y CFO_PARTNER eligen el cliente; quien solo consulta ve el nombre de su empresa como texto,
+ * y recibe el menú solo si tiene más de una empresa permitida.
  */
 export function TenantSwitcher({ collapsed = false }: { collapsed?: boolean }) {
-  const { effectiveRole, tenants, tenantId, setTenantId } = useSession();
+  const { effectiveRole, tenants, tenantId, setTenantId, isClientPreviewMode } = useSession();
   const { t } = useLocale();
-  const locked = effectiveRole === "CLIENT_VIEWER";
+  // Quien solo consulta ve su empresa como texto, salvo que tenga más de una permitida.
+  // La vista de cliente del equipo imita a un cliente con una sola empresa, así que sigue bloqueada.
+  const locked = effectiveRole === "CLIENT_VIEWER" && (isClientPreviewMode || tenants.length <= 1);
   const activeName = tenants.find((item) => item.id === tenantId)?.name ?? t("common.company");
 
   if (locked) {
