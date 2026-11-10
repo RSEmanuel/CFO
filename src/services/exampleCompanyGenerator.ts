@@ -456,6 +456,39 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
   let prevIsr = 0;
   let depMonthly = EQUIPO_MONTHLY_DEP;
   const interestByMonth: number[] = [];
+  const tagFolio = (tag: string, suffix: string): string => `EJ-E-${tag}-${suffix}`;
+
+  // Cartera inicial: las facturas del mes anterior a la ventana, que se cobran dentro de ella.
+  // Así el primer mes ya tiene cobranza y el IVA de ese mes anterior se paga en el primero.
+  const firstPeriod = periods[0]!;
+  const beforeIndex = firstPeriod.anio * 12 + firstPeriod.periodo - 2;
+  const before = { anio: Math.floor(beforeIndex / 12), periodo: (beforeIndex % 12) + 1 };
+  const openingAr = new Map<string, number>();
+  let openingIva = 0;
+  CLIENTES.forEach((cliente, cIdx) => {
+    const subtotal = roundTo(cliente.base * SEASON[before.periodo]! * (1 - TREND_PER_MONTH), 1_000);
+    const iva = round2(subtotal * IVA_PCT);
+    const total = round2(subtotal + iva);
+    const fecha = isoDate(before.anio, before.periodo, cliente.dia);
+    const folio = `EJ-V-${before.anio}${pad(before.periodo)}-${pad(cIdx + 1)}`;
+    const fechaCobro = addDays(fecha, cliente.lag);
+    const cobrado = fechaCobro <= cutoff ? total : 0;
+    if (cobrado > 0) {
+      push({
+        fecha: fechaCobro,
+        kind: "cobranza",
+        flujo: { direccion: "ingreso", key: "cobranza", label: "Ingr. Cobranza", monto: total, grupo: "operativa" },
+        lines: [
+          { cuenta: BANCO, cargo: total, abono: 0, concepto: `Cobro de cliente, factura ${folio}`, referencia: folio },
+          { cuenta: cliente.cuenta, cargo: 0, abono: total, concepto: `Cobro ${folio}`, referencia: folio },
+        ],
+      });
+    }
+    invoices.push({ cliente, folio, fecha, vence: addDays(fecha, 30), subtotal, iva, cobrado, linea: cliente.linea });
+    openingAr.set(cliente.cuenta, total);
+    openingIva = round2(openingIva + iva);
+  });
+  prevIva = openingIva;
 
   periods.forEach(({ anio, periodo }, idx) => {
     if (periodo === 1) {
@@ -499,7 +532,7 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
             kind: "cobranza",
             flujo: { direccion: "ingreso", key: "cobranza", label: "Ingr. Cobranza", monto, grupo: "operativa" },
             lines: [
-              { cuenta: BANCO, cargo: monto, abono: 0, concepto: `Cobro ${folio}`, referencia: folio },
+              { cuenta: BANCO, cargo: monto, abono: 0, concepto: `Cobro de cliente, factura ${folio}`, referencia: folio },
               { cuenta: cliente.cuenta, cargo: 0, abono: monto, concepto: `Cobro ${folio}`, referencia: folio },
             ],
           });
@@ -528,7 +561,7 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
     const shares = [0.45, 0.3];
     const parts = [roundTo(compras * shares[0]!, 100), roundTo(compras * shares[1]!, 100)];
     parts.push(round2(compras - parts[0]! - parts[1]!));
-    const addBill = (bill: Omit<Bill, "vence" | "pagado">, debitCuenta: string, flujoKey: string, flujoLabel: string, kind: "pagoProv" | "pagoEquipo"): void => {
+    const addBill = (bill: Omit<Bill, "vence" | "pagado">, debitCuenta: string, flujoKey: string, flujoLabel: string, kind: "pagoProv" | "pagoEquipo", pagoConcepto?: string): void => {
       const vence = addDays(bill.fecha, bill.prov.plazo);
       const fechaPago = addDays(bill.fecha, bill.prov.lag);
       const pagado = fechaPago <= cutoff;
@@ -548,7 +581,7 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
           flujo: { direccion: "egreso", key: flujoKey, label: flujoLabel, monto: bill.subtotal, grupo: kind === "pagoEquipo" ? "capex" : "operativa" },
           lines: [
             { cuenta: bill.prov.cuenta, cargo: bill.subtotal, abono: 0, concepto: `Pago ${bill.folio}`, referencia: bill.folio },
-            { cuenta: BANCO, cargo: 0, abono: bill.subtotal, concepto: `Pago ${bill.folio}`, referencia: bill.folio },
+            { cuenta: BANCO, cargo: 0, abono: bill.subtotal, concepto: pagoConcepto ?? `Pago factura ${bill.folio} a proveedor`, referencia: bill.folio },
           ],
         });
       }
@@ -571,6 +604,7 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
       "proveedores",
       "Egr. Proveedores",
       "pagoProv",
+      `Pago de renta de bodega ${tagFolio(tag, "P004R")}`,
     );
     addBill(
       { prov: servicios, folio: `EJ-E-${tag}-P004S`, fecha: isoDate(anio, periodo, 12), subtotal: 9_000, centro: "Administración", clase: "Variable", inversion: "OpEx" },
@@ -716,8 +750,14 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
   opening.set(EQUIPO, OPENING.equipo);
   opening.set(DEP_ACUM, -OPENING.depAcum);
   opening.set(PRESTAMO, -OPENING.prestamo);
-  const activos = OPENING.banco + OPENING.caja + openingInventory + OPENING.equipo - OPENING.depAcum;
-  opening.set(CAPITAL, -round2(activos - OPENING.prestamo));
+  let cartera = 0;
+  for (const [cuenta, total] of openingAr) {
+    opening.set(cuenta, total);
+    cartera = round2(cartera + total);
+  }
+  opening.set(IVA_POR_PAGAR, -openingIva);
+  const activos = OPENING.banco + OPENING.caja + cartera + openingInventory + OPENING.equipo - OPENING.depAcum;
+  opening.set(CAPITAL, -round2(activos - OPENING.prestamo - openingIva));
 
   const isPnl = (categoria: ExampleCategory): boolean => categoria === "Ingreso" || categoria === "COGS" || categoria === "OpEx";
 
@@ -850,10 +890,17 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
   const polizas: ExamplePoliza[] = [];
   const polizaMovimientos: ExamplePolizaMovimiento[] = [];
   const auxMovimientos: ExampleAuxMovimiento[] = [];
-  const terceros = new Map<string, { nombre: string; tipo: "CLIENTE" | "PROVEEDOR" }>();
+  const terceros = new Map<string, { nombre: string; tipo: "CLIENTE" | "PROVEEDOR" | "EFECTIVO" }>();
   CLIENTES.forEach((c) => terceros.set(c.cuenta, { nombre: c.nombre, tipo: "CLIENTE" }));
   PROVEEDORES.forEach((p) => terceros.set(p.cuenta, { nombre: p.nombre, tipo: "PROVEEDOR" }));
-  const running = new Map<string, number>();
+  // Caja y bancos también van al auxiliar: de ahí sale el Flujo operativo diario.
+  terceros.set(BANCO, { nombre: nameOf(BANCO), tipo: "EFECTIVO" });
+  terceros.set(CAJA, { nombre: nameOf(CAJA), tipo: "EFECTIVO" });
+  const running = new Map<string, number>([
+    [BANCO, OPENING.banco],
+    [CAJA, OPENING.caja],
+    ...openingAr,
+  ]);
   const resumenAcc = new Map<string, { ini: number; cargos: number; abonos: number }>();
   const auxResumen: ExampleAuxResumen[] = [];
 
@@ -899,8 +946,8 @@ export function generateExampleCompany(hasta: { anio: number; periodo: number })
           });
           const tercero = terceros.get(line.cuenta);
           if (tercero) {
-            // Clientes: deudor positivo. Proveedores: magnitud positiva (abonos suman).
-            const delta = tercero.tipo === "CLIENTE" ? line.cargo - line.abono : line.abono - line.cargo;
+            // Clientes y efectivo: deudor positivo. Proveedores: magnitud positiva (abonos suman).
+            const delta = tercero.tipo === "PROVEEDOR" ? line.abono - line.cargo : line.cargo - line.abono;
             const saldo = round2((running.get(line.cuenta) ?? 0) + delta);
             running.set(line.cuenta, saldo);
             const acc = resumenAcc.get(line.cuenta)!;

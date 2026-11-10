@@ -5,6 +5,7 @@ import { computeErBuckets } from "@/services/estadoOperativo";
 import { generateExampleCompany, examplePeriods, lastClosedPeriod } from "@/services/exampleCompanyGenerator";
 import { findCashLeaves } from "@/services/ingest/accountRoles";
 import { balanceSignConvention, capitalContableNif, structureFromBalanza } from "@/services/metricsLedger";
+import { buildFlujoOperativoPuntos, esCuentaEfectivo } from "@/services/flujoOperativo";
 import { round2 } from "@/services/money";
 
 const HASTA = { anio: 2026, periodo: 10 };
@@ -152,7 +153,8 @@ describe("empresa de ejemplo: lo que las pantallas leen", () => {
 
   it("el auxiliar por cuenta: el resumen de cada mes cierra con sus movimientos y con la balanza", () => {
     for (const r of company.auxResumen) {
-      assert.equal(round2(r.saldoInicial + (r.idCuenta.startsWith("1105") ? r.cargos - r.abonos : r.abonos - r.cargos)), r.saldoFinal);
+      const proveedor = r.idCuenta.startsWith("2101");
+      assert.equal(round2(r.saldoInicial + (proveedor ? r.abonos - r.cargos : r.cargos - r.abonos)), r.saldoFinal);
       const bal = rowsOf(r.anio, r.periodo).find((row) => row.idCuenta === r.idCuenta)!;
       assert.equal(Math.abs(bal.saldoFinal), r.saldoFinal);
       assert.equal(bal.debe, r.cargos);
@@ -192,5 +194,37 @@ describe("empresa de ejemplo: lo que las pantallas leen", () => {
     assert.ok(company.egresos.every((e) => e.nombreProveedor.startsWith("Proveedor Ejemplo") && e.folioDocumento.startsWith("EJ-")));
     assert.equal(new Set(company.ventas.map((v) => v.folioFactura)).size, company.ventas.length);
     assert.equal(new Set(company.egresos.map((e) => e.folioDocumento)).size, company.egresos.length);
+  });
+});
+
+describe("empresa de ejemplo: Flujo operativo diario", () => {
+  it("cada mes trae caja y bancos en el auxiliar, y el flujo diario termina en la caja de la balanza", () => {
+    for (const { anio, periodo } of examplePeriods(HASTA)) {
+      const resumen = company.auxResumen.filter((r) => r.anio === anio && r.periodo === periodo && esCuentaEfectivo(r.idCuenta));
+      assert.equal(resumen.length, 2, `${anio}-${periodo}`);
+      const efectivo = new Set(resumen.map((r) => r.idCuenta));
+      const movimientos = company.auxMovimientos
+        .filter((m) => m.anio === anio && m.periodo === periodo && efectivo.has(m.idCuenta))
+        .map((m) => ({ fecha: new Date(`${m.fecha}T00:00:00Z`), idCuenta: m.idCuenta, concepto: m.concepto, referencia: m.referencia, cargos: m.cargos, abonos: m.abonos }));
+      assert.ok(movimientos.length > 5, "hay movimientos bancarios");
+      const saldoInicial = round2(resumen.reduce((s, r) => s + r.saldoInicial, 0));
+      const { totales, saldoFinal } = buildFlujoOperativoPuntos(movimientos, saldoInicial);
+      const caja = round2(findCashLeaves(rowsOf(anio, periodo)).reduce((s, r) => s + r.saldoFinal, 0));
+      assert.equal(saldoFinal, caja, `${anio}-${periodo}`);
+      assert.ok(totales.entradas > 0 && totales.salidas > 0);
+      assert.equal(totales.traspasos, 0);
+    }
+  });
+
+  it("los movimientos se clasifican en cobranza, nómina, proveedores, renta, impuestos y deuda", () => {
+    const efectivo = company.auxMovimientos
+      .filter((m) => m.anio === 2026 && m.periodo === 6 && esCuentaEfectivo(m.idCuenta))
+      .map((m) => ({ fecha: new Date(`${m.fecha}T00:00:00Z`), idCuenta: m.idCuenta, concepto: m.concepto, referencia: m.referencia, cargos: m.cargos, abonos: m.abonos }));
+    const { puntos } = buildFlujoOperativoPuntos(efectivo, 0);
+    const suma = (clave: "cobranza" | "nomina" | "proveedores" | "rentaServicios" | "impuestos" | "pagoDeuda") =>
+      puntos.reduce((s, p) => s + p[clave], 0);
+    for (const clave of ["cobranza", "nomina", "proveedores", "rentaServicios", "impuestos", "pagoDeuda"] as const) {
+      assert.ok(suma(clave) > 0, clave);
+    }
   });
 });
