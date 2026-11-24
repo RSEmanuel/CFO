@@ -1,6 +1,6 @@
 import type { SessionUser } from "@/lib/session-types";
 import { ERROR_VIEW_ROLES, USER_ADMIN_ROLES } from "@/auth/rbac";
-import { Briefcase, Bug, BarChart3, ClipboardCheck, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Upload, Wallet } from "lucide-react";
+import { Briefcase, Bug, History, BarChart3, ClipboardCheck, HandCoins, LayoutDashboard, LineChart, Scale, type LucideIcon, Settings, Upload, Wallet } from "lucide-react";
 
 export type AppNavItem = {
   href: string;
@@ -22,6 +22,8 @@ export const PRIMARY_NAV: AppNavItem[] = [
   { href: "/control-cargas", labelKey: "nav.loadControl", icon: ClipboardCheck, roles: ["ADMIN", "CFO_PARTNER"] },
   // Errores del portal: diagnóstico para el equipo, no para clientes.
   { href: "/dashboard/settings/errores", labelKey: "nav.errorLog", icon: Bug, roles: ERROR_VIEW_ROLES },
+  // Qué pasó: bitácora unificada (personas y cargas) de la empresa abierta, solo para el equipo.
+  { href: "/dashboard/que-paso", labelKey: "nav.whatHappened", icon: History, roles: USER_ADMIN_ROLES },
 ];
 
 export const ACCOUNT_NAV: AppNavItem[] = [

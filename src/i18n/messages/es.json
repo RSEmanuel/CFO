@@ -58,7 +58,8 @@
     "settings": "Configuración",
     "loadControl": "Control de cargas",
     "errorLog": "Errores del portal",
-    "clients": "Clientes"
+    "clients": "Clientes",
+    "whatHappened": "Qué pasó"
   },
   "auth": {
     "title": "Iniciar sesión",
@@ -2011,6 +2012,42 @@
     "deleted": "{email} quedó borrado.",
     "deletedWithUploads": "{email} quedó borrado. Sus {count} cargas de archivos quedaron a tu nombre.",
     "deleteFailed": "No pudimos borrar a esta persona. Intenta de nuevo."
+  },
+  "activity": {
+    "title": "Qué pasó",
+    "subtitle": "Altas, bajas y cambios de perfil de las personas, y cada archivo que se subió en {company}.",
+    "switchHint": "Para ver otra empresa, cámbiala en el selector del menú.",
+    "viewerOnly": "Esta sección es para el equipo que administra la empresa. Pide a tu administrador cualquier duda.",
+    "selectCompany": "Elige una empresa en el selector del menú para ver sus movimientos.",
+    "loadFailed": "No pudimos leer los movimientos. Recarga la página para intentarlo de nuevo.",
+    "empty": "Todavía no hay movimientos en esta empresa.",
+    "truncated": "Se muestran los {count} movimientos más recientes.",
+    "kindUser": "Personas",
+    "kindLoad": "Archivo",
+    "system": "Cifra",
+    "role": {
+      "ADMIN": "administrador",
+      "CFO_PARTNER": "socio",
+      "CLIENT_VIEWER": "cliente",
+      "unknown": "sin perfil"
+    },
+    "user": {
+      "USER_CREATED": "{actor} dio de alta a {target} como {to} el {date}.",
+      "USER_DEACTIVATED": "{actor} le quitó el acceso a {target} el {date}.",
+      "USER_REACTIVATED": "{actor} le devolvió el acceso a {target} el {date}.",
+      "ROLE_CHANGED": "{actor} cambió a {target} de {from} a {to} el {date}.",
+      "USER_DELETED": "{actor} borró a {target} de la empresa el {date}."
+    },
+    "load": {
+      "sentence": "{actor} subió {file} ({period}) el {date} y {result}.",
+      "noPeriod": "sin periodo",
+      "result": {
+        "SAVED": "se aceptó",
+        "REJECTED": "se rechazó",
+        "REVIEWED_ONLY": "se revisó, pero nadie confirmó el guardado",
+        "INTERRUPTED": "el guardado no terminó"
+      }
+    }
   },
   "loads": {
     "selectCompany": "Elige una empresa en el selector de arriba para ver sus cargas.",
