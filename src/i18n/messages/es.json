@@ -1189,8 +1189,7 @@
       },
       "seccion": {
         "comoTeFue": "Cómo te fue",
-        "tuDinero": "Tu dinero",
-        "queHacer": "Qué hacer"
+        "tuDinero": "Tu dinero"
       },
       "ventas": {
         "label": "Ventas del mes",
