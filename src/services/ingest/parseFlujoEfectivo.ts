@@ -1,5 +1,5 @@
-import type ExcelJS from "exceljs";
 import { cellText, normalizeToken, optionalNumber } from "@/services/ingest/cells";
+import type { HojaLegible } from "@/services/ingest/loaders/hojaLegible";
 import type { FlujoSectionTokens, MappingProfileShape } from "@/services/ingest/types";
 import type { QualityIssue, TesoreriaDetalleRow, TesoreriaRow } from "@/services/ingestionTypes";
 import { conciliarFlujo, slugCategoria } from "@/services/flujoEfectivo";
@@ -25,7 +25,7 @@ type AccountAcc = {
   usedKeys: Map<string, number>;
 };
 
-function headerMap(worksheet: ExcelJS.Worksheet, headerRow: number): Map<string, number> {
+function headerMap(worksheet: HojaLegible, headerRow: number): Map<string, number> {
   const map = new Map<string, number>();
   const current = worksheet.getRow(headerRow);
   const previous = headerRow > 1 ? worksheet.getRow(headerRow - 1) : null;
@@ -90,7 +90,7 @@ function uniqueCategoriaKey(base: string, used: Map<string, number>): string {
 }
 
 export function parseFlujoEfectivoSheet(
-  worksheet: ExcelJS.Worksheet,
+  worksheet: HojaLegible,
   profile: MappingProfileShape,
   periodo: number,
   anio: number,

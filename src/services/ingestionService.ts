@@ -5,10 +5,11 @@ import { catalogoPendiente } from "@/services/ingest/catalogoPendiente";
 import { collectQualityIssues } from "@/services/financialValidations";
 import { mapToMasterWorkbook } from "@/services/ingest/applyMapping";
 import { resolveBatchPeriod } from "@/services/ingest/batchPolicy";
-import type { DetectResult, MappingProfileShape } from "@/services/ingest/types";
+import type { DetectResult, DocumentoLeido, MappingProfileShape } from "@/services/ingest/types";
 import { detectDocument } from "@/services/ingest/detectDocument";
 import { listEffectiveProfiles, loadProfileById } from "@/services/ingest/profileStore";
 import { getIngestLimits, validateFileCount, validateWorkbookContainer } from "@/services/ingest/limits";
+import { leerDocumento } from "@/services/ingest/loaders";
 import { ingestionRepository } from "@/services/ingest/ingestionRepository";
 import type { MasterWorkbook, QualityIssue } from "@/services/ingestionTypes";
 import { parseMasterWorkbook } from "@/services/workbookParser";
@@ -286,7 +287,8 @@ export async function previewIngestFiles(
   try {
     for (const file of files) {
       validateWorkbookContainer(file.buffer, file.filename, limits);
-      const result = await detectDocument(file.buffer, file.filename, profiles);
+      const documento = await leerDocumento(file.buffer, file.filename, limits);
+      const result = await detectDocument(file.buffer, file.filename, profiles, documento);
       const profile = result.selectedProfileId
         ? profiles.find((candidate) => candidate.id === result.selectedProfileId)
         : null;
@@ -301,6 +303,7 @@ export async function previewIngestFiles(
         const mapped = await mapToMasterWorkbook({
           buffer: file.buffer,
           filename: file.filename,
+          documento,
           documentType: result.documentType,
           sourceSystem: result.sourceSystem,
           sheetName: result.sheetName,
@@ -407,10 +410,17 @@ async function commitIngestFilesInternal(input: {
   let periodo = input.periodo;
   let anio = input.anio;
 
-  const prepared: Array<{ file: IngestFileInput; detected: DetectResult; profile: MappingProfileShape | null }> = [];
+  const prepared: Array<{
+    file: IngestFileInput;
+    documento: DocumentoLeido;
+    detected: DetectResult;
+    profile: MappingProfileShape | null;
+  }> = [];
   for (const file of input.files) {
     validateWorkbookContainer(file.buffer, file.filename, limits);
-    let detected = await detectDocument(file.buffer, file.filename, profiles);
+    // Cada archivo se lee una sola vez; detección y mapeo usan la misma lectura.
+    const documento = await leerDocumento(file.buffer, file.filename, limits);
+    let detected = await detectDocument(file.buffer, file.filename, profiles, documento);
     const manuallySelectedId = input.selectedProfiles?.[detected.sha256];
     let profile = manuallySelectedId
       ? await loadProfileById(input.tenantId, manuallySelectedId)
@@ -445,7 +455,7 @@ async function commitIngestFilesInternal(input: {
       };
     }
     previews.push(detected);
-    prepared.push({ file, detected, profile });
+    prepared.push({ file, documento, detected, profile });
   }
   if (new Set(previews.map((preview) => preview.sha256)).size !== previews.length) {
     throw new AppError("VALIDATION_ERROR", "El lote contiene archivos duplicados.", 400);
@@ -466,7 +476,7 @@ async function commitIngestFilesInternal(input: {
     input.useFilePeriod,
   ));
 
-  for (const { file, detected, profile } of prepared) {
+  for (const { file, documento, detected, profile } of prepared) {
     if (!detected.persistable) {
       warnings.push({
         rule: "PARSEO",
@@ -479,6 +489,7 @@ async function commitIngestFilesInternal(input: {
     const mapped = await mapToMasterWorkbook({
       buffer: file.buffer,
       filename: file.filename,
+      documento,
       documentType: detected.documentType,
       sourceSystem: detected.sourceSystem,
       sheetName: detected.sheetName,

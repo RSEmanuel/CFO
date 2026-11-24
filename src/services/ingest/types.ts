@@ -17,6 +17,33 @@ export type IngestSourceSystem = "master_template" | "compac" | "unknown";
 
 export type PartidaDobleMode = "full" | "balance_only" | "off";
 
+/** Valor de una celda ya leída, sin importar el formato de origen. Los lectores
+ * de Excel conservan número y fecha; los de texto solo producen texto o null. */
+export type Celda = string | number | Date | null;
+
+/** Rango combinado (1-indexado, inclusivo), solo existe en Excel. */
+export type RangoCombinado = { r1: number; c1: number; r2: number; c2: number };
+
+/** Una tabla del documento: una hoja de Excel o el cuerpo de un CSV/TXT. */
+export type Seccion = {
+  nombre: string;
+  /** filas[0] es la fila 1. Se conservan filas y celdas vacías para que el
+   * número de fila siga siendo el real del archivo. */
+  filas: Celda[][];
+  combinadas?: RangoCombinado[];
+};
+
+export type FormatoDocumento = "xlsx";
+
+/** Representación común de cualquier archivo subido: detección y mapeo
+ * trabajan sobre esto, no sobre la librería de cada formato. */
+export type DocumentoLeido = {
+  formato: FormatoDocumento;
+  secciones: Seccion[];
+  metadatos: Record<string, string>;
+  avisos: string[];
+};
+
 export type ColumnMap = Record<string, string[]>;
 
 export type IngestProfileOrigin = "BUILTIN" | "TENANT";

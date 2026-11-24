@@ -1,12 +1,12 @@
-import ExcelJS from "exceljs";
 import type { CategoriaMaestra } from "@/generated/prisma/enums";
 import { classifyCategoria, isDepreciation } from "@/services/ingest/accountClassify";
 import { cellText, optionalNumber, normalizeToken } from "@/services/ingest/cells";
 import { selectLeafCodes } from "@/services/ingest/leafAccounts";
+import { buscarSeccion, hojaLegible, leerDocumento, type HojaLegible } from "@/services/ingest/loaders";
 import { parseAuxiliarCuentasSheet } from "@/services/ingest/parseAuxiliarCuentas";
 import { parseFlujoEfectivoSheet } from "@/services/ingest/parseFlujoEfectivo";
 import { parseContpaqPolizas } from "@/lib/parsers/contpaq-polizas-parser";
-import type { ColumnMap, MappingProfileShape } from "@/services/ingest/types";
+import type { ColumnMap, DocumentoLeido, MappingProfileShape } from "@/services/ingest/types";
 import type { BalanzaRow, CuentaCatalogoRow, MasterWorkbook, QualityIssue } from "@/services/ingestionTypes";
 import { parseMasterWorkbook } from "@/services/workbookParser";
 
@@ -38,7 +38,7 @@ function resolveColumn(headers: Map<string, number>, aliases: string[]): number 
   return null;
 }
 
-function headerMap(worksheet: ExcelJS.Worksheet, headerRow: number): Map<string, number> {
+function headerMap(worksheet: HojaLegible, headerRow: number): Map<string, number> {
   const map = new Map<string, number>();
   const current = worksheet.getRow(headerRow);
   const previous = headerRow > 1 ? worksheet.getRow(headerRow - 1) : null;
@@ -57,7 +57,7 @@ function signedSaldo(deudor: number, acreedor: number): number {
 }
 
 function parseBalanzaSheet(
-  worksheet: ExcelJS.Worksheet,
+  worksheet: HojaLegible,
   profile: MappingProfileShape,
   periodo: number,
   anio: number,
@@ -153,16 +153,26 @@ function parseBalanzaSheet(
   };
 }
 
-export async function mapToMasterWorkbook(input: {
+type MapInput = {
   buffer: Buffer;
   filename: string;
+  /** El archivo ya leído por la ingesta; si falta, se lee aquí. */
+  documento?: DocumentoLeido;
   documentType: string;
   sourceSystem: string;
   sheetName: string | null;
   profile: MappingProfileShape | null;
   periodo: number;
   anio: number;
-}): Promise<{ workbook: MasterWorkbook; warnings: QualityIssue[] }> {
+};
+
+async function hojaParaMapear(input: MapInput, sheetMatch: string | null): Promise<HojaLegible | undefined> {
+  const documento = input.documento ?? (await leerDocumento(input.buffer, input.filename));
+  const seccion = buscarSeccion(documento, sheetMatch);
+  return seccion ? hojaLegible(seccion) : undefined;
+}
+
+export async function mapToMasterWorkbook(input: MapInput): Promise<{ workbook: MasterWorkbook; warnings: QualityIssue[] }> {
   const warnings: QualityIssue[] = [];
   if (input.documentType === "master_workbook") {
     return { workbook: await parseMasterWorkbook(input.buffer, input.filename), warnings };
@@ -177,17 +187,7 @@ export async function mapToMasterWorkbook(input: {
       });
       return { workbook: emptyWorkbook(), warnings };
     }
-    const flujoWorkbook = new ExcelJS.Workbook();
-    await flujoWorkbook.xlsx.load(input.buffer as unknown as ArrayBuffer);
-    const flujoNeedle = (input.profile.sheetMatch ?? "").toLowerCase();
-    const flujoSheet =
-      flujoWorkbook.worksheets.find((sheet) =>
-        sheet.name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .includes(flujoNeedle),
-      ) ?? flujoWorkbook.worksheets[0];
+    const flujoSheet = await hojaParaMapear(input, input.profile.sheetMatch);
     if (!flujoSheet) {
       warnings.push({
         rule: "PARSEO",
@@ -217,17 +217,7 @@ export async function mapToMasterWorkbook(input: {
       });
       return { workbook: emptyWorkbook(), warnings };
     }
-    const auxWorkbook = new ExcelJS.Workbook();
-    await auxWorkbook.xlsx.load(input.buffer as unknown as ArrayBuffer);
-    const auxNeedle = (input.profile.sheetMatch ?? "").toLowerCase();
-    const auxSheet =
-      auxWorkbook.worksheets.find((sheet) =>
-        sheet.name
-          .toLowerCase()
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .includes(auxNeedle),
-      ) ?? auxWorkbook.worksheets[0];
+    const auxSheet = await hojaParaMapear(input, input.profile.sheetMatch);
     if (!auxSheet) {
       warnings.push({
         rule: "PARSEO",
@@ -283,17 +273,7 @@ export async function mapToMasterWorkbook(input: {
     return { workbook: emptyWorkbook(), warnings };
   }
 
-  const workbook = new ExcelJS.Workbook();
-  await workbook.xlsx.load(input.buffer as unknown as ArrayBuffer);
-  const needle = (input.profile.sheetMatch ?? "").toLowerCase();
-  const worksheet =
-    workbook.worksheets.find((sheet) =>
-      sheet.name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .includes(needle),
-    ) ?? workbook.worksheets[0];
+  const worksheet = await hojaParaMapear(input, input.profile.sheetMatch);
   if (!worksheet) {
     warnings.push({
       rule: "PARSEO",

@@ -1,6 +1,6 @@
-import type ExcelJS from "exceljs";
 import { cellText, normalizeToken, optionalNumber } from "@/services/ingest/cells";
 import { selectLeafCodes } from "@/services/ingest/leafAccounts";
+import type { HojaLegible } from "@/services/ingest/loaders/hojaLegible";
 import type { MappingProfileShape } from "@/services/ingest/types";
 import type {
   AuxiliarCuentaResumenRow,
@@ -60,7 +60,7 @@ function parseFecha(value: unknown): Date | null {
   return new Date(Date.UTC(Number(match[3]), mes - 1, Number(match[1])));
 }
 
-function detectMoneda(worksheet: ExcelJS.Worksheet, filename: string): { moneda: string; known: boolean } {
+function detectMoneda(worksheet: HojaLegible, filename: string): { moneda: string; known: boolean } {
   const headerRows = Math.min(6, worksheet.rowCount);
   for (let r = 1; r <= headerRows; r += 1) {
     const text = normalizeToken(cellText(worksheet.getRow(r).getCell(1).value));
@@ -85,7 +85,7 @@ function detectMoneda(worksheet: ExcelJS.Worksheet, filename: string): { moneda:
  * concepto, referencia, cargos, abonos, saldo) y una fila "Total:" de cierre.
  */
 export function parseAuxiliarCuentasSheet(
-  worksheet: ExcelJS.Worksheet,
+  worksheet: HojaLegible,
   profile: MappingProfileShape,
   periodo: number,
   anio: number,

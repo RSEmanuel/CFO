@@ -17,6 +17,7 @@
     "test:forecast": "tsx --test src/services/forecast/budgetProjection.test.ts src/services/forecast/drivers.test.ts src/services/budgetAssumptionService.test.ts src/services/resultadosPresupuesto.test.ts",
     "test:ingest": "tsx --test src/services/ingest/ingest.test.ts src/services/ingest/catalogoMayor.test.ts",
     "test:caracterizacion": "tsx --test src/services/ingest/caracterizacion.test.ts",
+    "test:loaders": "tsx --test src/services/ingest/loaders/loaders.test.ts",
     "test:flujo": "tsx --test src/services/ingest/flujoEfectivo.test.ts src/services/flujoSankey.test.ts",
     "test:flujo-operativo": "tsx --test src/services/flujoOperativo.test.ts",
     "test:auxiliar": "tsx --test src/services/ingest/parseAuxiliarCuentas.test.ts",

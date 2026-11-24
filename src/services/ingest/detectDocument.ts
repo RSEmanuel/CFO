@@ -1,11 +1,11 @@
 import { createHash, randomUUID } from "node:crypto";
-import ExcelJS from "exceljs";
-import { AppError } from "@/auth/errors";
 import { cellText, inferPeriodFromText, normalizeToken } from "@/services/ingest/cells";
 import { COMPAC_AUXILIAR_PROFILE, COMPAC_BALANZA_PROFILE, COMPAC_FLUJO_EFECTIVO_PROFILE, COMPAC_POLIZAS_PROFILE, MASTER_BALANZA_PROFILE } from "@/services/ingest/builtinProfiles";
 import { getIngestLimits, validateWorkbookContainer } from "@/services/ingest/limits";
+import { hojaLegible, leerDocumento, type HojaLegible } from "@/services/ingest/loaders";
 import type {
   DetectResult,
+  DocumentoLeido,
   IngestDocumentType,
   IngestSourceSystem,
   MappingProfileShape,
@@ -28,14 +28,13 @@ function normalized(value: string): string {
   return normalizeToken(value);
 }
 
-function mergedCellText(sheet: ExcelJS.Worksheet, row: number, col: number): string {
-  const cell = sheet.getCell(row, col);
-  if (cell.isMerged && cell.master) return cellText(cell.master.value);
-  return cellText(cell.value);
+// En una celda combinada, el lector ya deja el valor de la celda maestra.
+function mergedCellText(sheet: HojaLegible, row: number, col: number): string {
+  return cellText(sheet.getRow(row).getCell(col).value);
 }
 
 function fingerprintSheet(
-  sheet: ExcelJS.Worksheet,
+  sheet: HojaLegible,
   maxColumns: number,
   profiles: MappingProfileShape[],
 ): SheetFingerprint {
@@ -198,37 +197,15 @@ export async function detectDocument(
   buffer: Buffer,
   filename: string,
   profiles: MappingProfileShape[] = [MASTER_BALANZA_PROFILE, COMPAC_BALANZA_PROFILE, COMPAC_FLUJO_EFECTIVO_PROFILE, COMPAC_AUXILIAR_PROFILE, COMPAC_POLIZAS_PROFILE],
+  documento?: DocumentoLeido,
 ): Promise<DetectResult> {
   const limits = getIngestLimits();
   validateWorkbookContainer(buffer, filename, limits);
   const sha256 = createHash("sha256").update(buffer).digest("hex");
-  const workbook = new ExcelJS.Workbook();
-  try {
-    await workbook.xlsx.load(buffer as unknown as ArrayBuffer);
-  } catch {
-    throw new AppError(
-      "VALIDATION_ERROR",
-      `${filename}: el archivo Excel está cifrado, corrupto o no puede leerse.`,
-      400,
-    );
-  }
-  if (workbook.worksheets.length > limits.maxSheets) {
-    throw new AppError(
-      "VALIDATION_ERROR",
-      `${filename}: excede el máximo de hojas permitido.`,
-      413,
-    );
-  }
-  const sheets = workbook.worksheets.map((sheet) => {
-    if (sheet.rowCount > limits.maxRows || sheet.columnCount > limits.maxColumns) {
-      throw new AppError(
-        "VALIDATION_ERROR",
-        `${filename}: excede los límites de filas o columnas.`,
-        413,
-      );
-    }
-    return fingerprintSheet(sheet, limits.maxColumns, profiles);
-  });
+  // Quien ya leyó el archivo (la ingesta) lo pasa para no leerlo dos veces.
+  const doc = documento ?? (await leerDocumento(buffer, filename, limits));
+  const sheets = doc.secciones.map((seccion) =>
+    fingerprintSheet(hojaLegible(seccion), limits.maxColumns, profiles));
   const candidates = profiles.filter((profile) => profile.isActive).map((profile) => scoreProfile(profile, sheets))
     .sort((a, b) => b.score - a.score || b.profileVersion - a.profileVersion);
   const best = candidates[0];
