@@ -154,18 +154,18 @@ test("treemap OPEX: mes sin OPEX → buckets vacíos", () => {
 });
 
 test("cleanOpexCuentaNombre: mapea nombres crudos CONTPAQi a etiquetas legibles", () => {
-  assert.equal(cleanOpexCuentaNombre("Gtos no ded (sin requisito fis"), "Gastos No Deducibles");
-  assert.equal(cleanOpexCuentaNombre("Honorarios PF Res Nal"), "Honorarios Personas Físicas");
-  assert.equal(cleanOpexCuentaNombre("Honorarios PM Res Nac"), "Honorarios Personas Morales");
-  assert.equal(cleanOpexCuentaNombre("Arrendamiento PM Res Nac"), "Arrendamiento a Personas Morales");
-  assert.equal(cleanOpexCuentaNombre("Papelería y articulos de ofici"), "Papelería y Artículos de Oficina");
+  assert.equal(cleanOpexCuentaNombre("Gtos no ded (sin requisito fis"), "Gastos no deducibles");
+  assert.equal(cleanOpexCuentaNombre("Honorarios PF Res Nal"), "Honorarios personas físicas");
+  assert.equal(cleanOpexCuentaNombre("Honorarios PM Res Nac"), "Honorarios personas morales");
+  assert.equal(cleanOpexCuentaNombre("Arrendamiento PM Res Nac"), "Arrendamiento a personas morales");
+  assert.equal(cleanOpexCuentaNombre("Papelería y articulos de ofici"), "Papelería y artículos de oficina");
 });
 
 test("cleanOpexCuentaNombre: tolera variantes de captura y no inventa lo desconocido", () => {
   // Normalización: mayúsculas/acentos/espacios no rompen el mapeo.
-  assert.equal(cleanOpexCuentaNombre("  HONORARIOS  PF RES NAL "), "Honorarios Personas Físicas");
-  assert.equal(cleanOpexCuentaNombre("Papeleria y articulos de ofici"), "Papelería y Artículos de Oficina");
+  assert.equal(cleanOpexCuentaNombre("  HONORARIOS  PF RES NAL "), "Honorarios personas físicas");
+  assert.equal(cleanOpexCuentaNombre("Papeleria y articulos de ofici"), "Papelería y artículos de oficina");
   // Nombre no mapeado se conserva (recortado), sin inventar etiquetas.
-  assert.equal(cleanOpexCuentaNombre("Sueldos y Salarios"), "Sueldos y Salarios");
-  assert.equal(cleanOpexCuentaNombre("  Depreciación Equipo de Cómputo "), "Depreciación Equipo de Cómputo");
+  assert.equal(cleanOpexCuentaNombre("Sueldos y Salarios"), "Sueldos y salarios");
+  assert.equal(cleanOpexCuentaNombre("  Depreciación Equipo de Cómputo "), "Depreciación equipo de cómputo");
 });

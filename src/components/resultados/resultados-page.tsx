@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
+import { contextoComparacion } from "@/i18n/format";
 import { useBudgetProjection } from "@/hooks/use-budget-projection";
 import { useEstadoOperativo } from "@/hooks/use-estado-operativo";
 import { useResultados } from "@/hooks/use-resultados";
@@ -133,7 +134,7 @@ export function ResultadosPage() {
           noData: t("pdf.noData"),
         },
         units: filters.units,
-        contextLabel: kpis.contextLabel,
+        contextLabel: contextoComparacion(kpis.contextLabel, t),
         rubros: kpis.rubros.map((rubro) => ({
           title: t(rubroTitleKey(rubro.key)),
           value: rubro.value ?? null,

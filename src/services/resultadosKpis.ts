@@ -83,7 +83,8 @@ function deltaVsCurrent(current: number | null, kpi: number | null): number | nu
 function monthPhrase(periodo: string, t: Translate, locale: Locale, lower: boolean): { name: string; year: number } {
   const { year, month } = parsePeriodo(periodo);
   const raw = t(monthLabelKey(month - 1));
-  return { name: lower ? raw.toLocaleLowerCase(dateLocale(locale)) : raw, year };
+  // En español el mes va en minúscula dentro de un rango («enero–julio»); en inglés siempre con mayúscula.
+  return { name: lower && locale !== "en" ? raw.toLocaleLowerCase(dateLocale(locale)) : raw, year };
 }
 
 function singleMonthLabel(periodo: string, t: Translate, locale: Locale): string {

@@ -6,6 +6,8 @@ import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
 import { presentarNombre } from "@/services/textoPresentable";
 import { useResultadosTop5 } from "@/hooks/use-resultados-top5";
+import { useNombreCuenta } from "@/hooks/use-nombre-cuenta";
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 import { CHART, CHART_AXIS, TOP5_RESTO, TOP5_SERIES } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
 import { formatAxisTick, formatCompactAxis, formatMxn, type DisplayUnits } from "@/services/money";
@@ -93,8 +95,8 @@ function Top5Tooltip({
               className="h-2 w-2 shrink-0 rounded-full"
               style={{ backgroundColor: colors.get(row.key) ?? TOP5_RESTO }}
             />
-            <span className="min-w-0 flex-1 truncate text-foreground" title={presentarNombre(row.label)}>
-              {presentarNombre(row.label)}
+            <span className="min-w-0 flex-1 truncate text-foreground" title={row.label}>
+              {row.label}
             </span>
             <span className="financial-nums shrink-0 text-foreground">{formatMxn(row.monto)}</span>
             <span className="financial-nums w-12 shrink-0 text-right font-semibold tabular-nums">
@@ -203,7 +205,8 @@ function Top5PieTooltip({ active, payload }: { active?: boolean; payload?: Array
 function Top5Card({
   title,
   insightText,
-  series,
+  series: rawSeries,
+  accountLabels = false,
   rankingTotal,
   units,
   restLabel,
@@ -215,6 +218,8 @@ function Top5Card({
   title: string;
   insightText?: string;
   series: Top5ChartSeries;
+  /** Las entidades son cuentas contables (líneas de negocio): se traducen. Si no, nombres propios. */
+  accountLabels?: boolean;
   rankingTotal: number;
   units: DisplayUnits;
   restLabel: string;
@@ -225,7 +230,20 @@ function Top5Card({
   variant?: "bars" | "pie";
 }) {
   const { t } = useLocale();
+  const nombreCuenta = useNombreCuenta();
+  const periodLabel = useEtiquetaPeriodo();
   const narrow = useNarrowScreen();
+  const series = useMemo(
+    () => ({
+      ...rawSeries,
+      months: rawSeries.months.map((month) => ({ ...month, label: periodLabel(month.label) })),
+      entidades: rawSeries.entidades.map((actor) => ({
+        ...actor,
+        label: accountLabels ? nombreCuenta(actor.label) : presentarNombre(actor.label),
+      })),
+    }),
+    [rawSeries, accountLabels, nombreCuenta, periodLabel],
+  );
   const data = useMemo(() => toTop5StackedPoints(series), [series]);
   const stackedKeys = useMemo(() => {
     const keys = series.entidades.map((actor) => actor.key);
@@ -260,7 +278,7 @@ function Top5Card({
   }
 
   const { rows: rawRows, periodTotal } = top5ActiveMonthRows(series, restLabel);
-  const rows = rawRows.map((row) => ({ ...row, label: presentarNombre(row.label) }));
+  const rows = rawRows;
   const pieRows = rows.filter((row) => row.monto > 0.005);
   const lastLabel = series.months[series.months.length - 1]?.label ?? "";
 
@@ -466,6 +484,7 @@ export function ResultadosTop5Charts({ periodo, units }: ResultadosTop5ChartsPro
         title={t("resultados.top5.linesTitle")}
         insightText={t("resultados.top5.linesInsight")}
         series={data.lineasSeries}
+        accountLabels
         rankingTotal={data.lineas.total}
         units={units}
         restLabel={t("resultados.top5.otherLines")}
@@ -529,6 +548,7 @@ export function ResultadosTop5Card({
       title={t("resultados.top5.linesTitle")}
       insightText={t("resultados.top5.linesInsight")}
       series={data.lineasSeries}
+      accountLabels
       rankingTotal={data.lineas.total}
       units={units}
       restLabel={t("resultados.top5.otherLines")}

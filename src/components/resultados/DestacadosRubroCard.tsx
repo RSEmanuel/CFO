@@ -3,6 +3,7 @@
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InsightText } from "@/components/insight-text";
 import { useLocale } from "@/context/LocaleContext";
+import { contextoComparacion } from "@/i18n/format";
 import { cn } from "@/lib/utils";
 import type { DestacadosRubro } from "@/services/financialDataTransformer";
 import { formatAxisTick, type DisplayUnits } from "@/services/money";
@@ -78,7 +79,7 @@ export function DestacadosRubroCard({
             >
               {formatDelta(rubro.deltaPct)}
             </span>
-            {contextLabel ? <span className="text-xs text-muted-foreground">{contextLabel}</span> : null}
+            {contextLabel ? <span className="text-xs text-muted-foreground">{contextoComparacion(contextLabel, t)}</span> : null}
           </>
         )}
       </div>

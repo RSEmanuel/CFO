@@ -1,3 +1,5 @@
+import type { Locale } from "@/i18n/config";
+import { traducirCuentaAlIngles } from "@/i18n/cuentaIngles";
 import { presentarNombre } from "@/services/textoPresentable";
 import type { TranslateFn } from "@/i18n/translate";
 
@@ -26,7 +28,7 @@ const CATEGORIA_KEY: Record<string, string> = {
   sueldos: "flujo.efectivo.categorias.sueldos",
 };
 
-export function etiquetaFlujoCategoria(categoriaKey: string, label: string, t: TranslateFn): string {
+export function etiquetaFlujoCategoria(categoriaKey: string, label: string, t: TranslateFn, locale?: Locale): string {
   const slug = categoriaKey.replace(/-\d+$/, "");
   const key = CATEGORIA_KEY[slug];
   if (key) {
@@ -34,5 +36,7 @@ export function etiquetaFlujoCategoria(categoriaKey: string, label: string, t: T
     if (translated !== key) return translated;
   }
   const limpio = label.replace(/^(?:ingr|egr)\.?\s+/i, "");
+  // Un concepto fuera del glosario se traduce con el mismo glosario de cuentas (p. ej. «Ventas mostrador»).
+  if (locale === "en") return traducirCuentaAlIngles(limpio) ?? presentarNombre(limpio);
   return presentarNombre(limpio);
 }

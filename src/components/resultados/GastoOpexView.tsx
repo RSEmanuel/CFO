@@ -2,6 +2,8 @@
 
 import { useLocale } from "@/context/LocaleContext";
 import { useGastoOpex } from "@/hooks/use-gasto-opex";
+import { useNombreCuenta } from "@/hooks/use-nombre-cuenta";
+import { cleanOpexCuentaNombre } from "@/services/gastoOpexTreemap";
 import { monthLabelKey } from "@/i18n/format";
 import { CHART, CHART_AXIS, TOP5_RESTO, TOP5_SERIES } from "@/lib/chart-theme";
 import { formatAxisTick, formatMxn, type DisplayUnits } from "@/services/money";
@@ -184,7 +186,22 @@ function OpexTooltip({
 export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows, only }: GastoOpexViewProps) {
   const { t, locale } = useLocale();
   const { data, loading, error } = useGastoOpex(periodo);
+  const nombreCuenta = useNombreCuenta();
   const restLabel = t("resultados.opex.others");
+  // Las partidas son cuentas del catálogo: mismo nombre (y traducción) que en el resto del portal.
+  const series = useMemo(
+    () =>
+      data
+        ? {
+            ...data.series,
+            entidades: data.series.entidades.map((actor) => ({
+              ...actor,
+              label: nombreCuenta(cleanOpexCuentaNombre(actor.label)),
+            })),
+          }
+        : null,
+    [data, nombreCuenta],
+  );
   const kpis = useMemo(
     () => calculateTopKPIs(rows, "Gasto", periodo, budgetPayload, data?.totalesPorMes),
     [rows, periodo, budgetPayload, data],
@@ -216,11 +233,11 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows,
   }
 
   const actors: Top5EntitySeries[] = [
-    ...data.series.entidades,
+    ...(series?.entidades ?? []),
     ...(data.series.resto ? [{ ...data.series.resto, label: restLabel }] : []),
   ];
   const names = Object.fromEntries(actors.map((actor) => [actor.key, actor.label || restLabel]));
-  const chartData = chartRows(data.series, t, restLabel);
+  const chartData = chartRows(series ?? data.series, t, restLabel);
   const totalsByMonth = new Map<string, number>();
   for (const row of chartData) {
     if (typeof row.month === "string") {

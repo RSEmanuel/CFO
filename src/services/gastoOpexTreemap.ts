@@ -36,11 +36,11 @@ export const TREEMAP_MIN_SHARE = 0.01;
  * tolerar variantes de captura; lo no mapeado se muestra tal cual viene.
  */
 const OPEX_ETIQUETAS_LIMPIAS: Record<string, string> = {
-  "gtos no ded (sin requisito fis": "Gastos No Deducibles",
-  "honorarios pf res nal": "Honorarios Personas Físicas",
-  "honorarios pm res nac": "Honorarios Personas Morales",
-  "arrendamiento pm res nac": "Arrendamiento a Personas Morales",
-  "papeleria y articulos de ofici": "Papelería y Artículos de Oficina",
+  "gtos no ded (sin requisito fis": "Gastos no deducibles",
+  "honorarios pf res nal": "Honorarios personas físicas",
+  "honorarios pm res nac": "Honorarios personas morales",
+  "arrendamiento pm res nac": "Arrendamiento a personas morales",
+  "papeleria y articulos de ofici": "Papelería y artículos de oficina",
 };
 
 export function cleanOpexCuentaNombre(nombre: string): string {

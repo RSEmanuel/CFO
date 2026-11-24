@@ -1,5 +1,6 @@
 "use client";
 
+import { presentarNombre } from "@/services/textoPresentable";
 import { ExportMenu } from "@/components/export/ExportMenu";
 import { TableScroll } from "@/components/ui/table-scroll";
 import { useLocale } from "@/context/LocaleContext";
@@ -60,7 +61,7 @@ export function ClientesQueNoPaganSection({ variant, total, rows, topCount, topP
       {alerta ? (
         <p className="mt-4 flex items-start gap-2 rounded-control border border-border bg-background px-3 py-2.5 text-sm text-foreground">
           <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-desfavorable" aria-hidden />
-          {t(`${prefix}.alerta`, { cliente: alerta.cliente, monto: formatMxn(alerta.monto), dias: alerta.dias })}
+          {t(`${prefix}.alerta`, { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias })}
         </p>
       ) : null}
 
@@ -78,7 +79,7 @@ export function ClientesQueNoPaganSection({ variant, total, rows, topCount, topP
             <tbody>
               {rows.map((row) => (
                 <tr key={row.cliente} className="border-b border-beige-deep last:border-0">
-                  <td className="py-3 font-sans text-base text-foreground">{row.cliente}</td>
+                  <td className="py-3 font-sans text-base text-foreground">{presentarNombre(row.cliente)}</td>
                   <td className="cifra-num py-3 text-right text-foreground">{formatMxn(row.monto)}</td>
                   <td
                     className="cifra-num py-3 text-right text-foreground"

@@ -277,7 +277,7 @@ export function ConcentracionRiesgoSection() {
 
   const exportTabla = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
     try {
-      const { headers, rows } = concentracionExportTable(model.rows, columnMode, riesgoLabel);
+      const { headers, rows } = concentracionExportTable(model.rows, columnMode, riesgoLabel, t);
       const filename = concentracionExportFilename(empresa, asOf, tipo, data.moneda, fileKind);
       if (fileKind === "csv") {
         downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);

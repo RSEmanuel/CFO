@@ -43,7 +43,8 @@
     "and": "and",
     "retry": "Retry",
     "clientLabel": "Client",
-    "yourCompanyIs": "Your company: {name}"
+    "yourCompanyIs": "Your company: {name}",
+    "close": "Close"
   },
   "nav": {
     "results": "Results",
@@ -70,7 +71,7 @@
     "statPeriod": "Current period",
     "previewTitle": "Income statement · Consolidated",
     "previewFigures": "Figures in MXN",
-    "previewIncome": "Revenue",
+    "previewIncome": "Sales",
     "previewCogs": "Cost of sales",
     "previewGrossProfit": "Gross profit",
     "previewGrossMargin": "Gross margin",
@@ -174,7 +175,7 @@
   },
   "resultados": {
     "tabPl": "Income statement",
-    "tabIncome": "Revenue",
+    "tabIncome": "Sales",
     "tabCost": "Cost",
     "tabExpense": "Expense",
     "tabOperativo": "Operating Statement",
@@ -187,27 +188,27 @@
     "emptyPeriodMessage": "There is no trial balance for this period. Upload the CONTPAQi 05 file for that month in Ingestion; we do not show estimated figures.",
     "sankeyError": "The income-statement flow could not be built. The rest of the dashboard is still available.",
     "companyFallback": "company",
-    "income": "Revenue",
-    "incomeTotal": "Total revenue",
-    "incomeTotalTooltip": "Total revenue: {value}",
-    "incomeBreakdown": "Revenue breakdown",
-    "incomeBreakdownOther": "Other revenue",
-    "incomeBreakdownCenter": "Total revenue",
-    "incomeByClient": "Revenue by customer",
-    "incomeByLine": "Revenue by business line",
+    "income": "Sales",
+    "incomeTotal": "Total sales",
+    "incomeTotalTooltip": "Total sales: {value}",
+    "incomeBreakdown": "Sales breakdown",
+    "incomeBreakdownOther": "Other sales",
+    "incomeBreakdownCenter": "Total sales",
+    "incomeByClient": "Sales by customer",
+    "incomeByLine": "Sales by business line",
     "top3": "Top 3",
-    "incomeMixEmpty": "Upload the trial balance to see revenue by business line and customer.",
-    "incomeMixEmptyPeriod": "The trial balance has no income or customer movement in this period. Switch the period filter to the month you uploaded.",
+    "incomeMixEmpty": "Upload the trial balance to see sales by business line and customer.",
+    "incomeMixEmptyPeriod": "The trial balance has no sales or customer movement in this period. Switch the period filter to the month you uploaded.",
     "incomeMixNoClientes": "The trial balance has no customer subaccounts; configure the 'clientes' role (e.g. 1105/105) in the ingest profile.",
     "verticalAnalysis": "Vertical analysis",
-    "pctOfRevenue": "% of revenue",
+    "pctOfRevenue": "% of sales",
     "others": "Other",
     "goToCatalog": "Open financial metrics",
     "cost": "Cost",
     "expense": "Expense",
     "ebitda": "EBITDA",
     "ebitdaInsight": "Operating profit before tax and depreciation (what the business actually generates).",
-    "utilidad": "Utilidad",
+    "utilidad": "Profit",
     "utilidadInsight": "What you have left after cost, expense, depreciation, interest, and taxes.",
     "vsPreviousMonth": "vs prior month",
     "vsPreviousYear": "vs prior year",
@@ -220,13 +221,13 @@
     "budgetPackage": "Month package",
     "categoryInsight": "{category} changed {change}% in {month} versus the prior month. The {amount} change was driven mainly by the {driver} subcategory.",
     "categoryInsightNoBreakdown": "{category} changed {change}% in {month} versus the prior month. The change was {amount}, with no breakdown available.",
-    "costVsIncome": "Cost vs revenue",
+    "costVsIncome": "Cost vs sales",
     "mom": "Month over month",
     "qoq": "Quarter over quarter",
     "yoy": "Year over year",
     "increased": "increased",
     "decreased": "decreased",
-    "costMixInsight": "{label} {verb} {value}pp relative to revenue",
+    "costMixInsight": "{label} {verb} {value}pp relative to sales",
     "projectionError": "Could not prepare the projection.",
     "budgetProjection": "Budget and projection",
     "budgetOfficialHelp": "We compare the trial balance budget with what history suggests.",
@@ -236,12 +237,12 @@
     "scenarioBase": "Base",
     "scenarioBaseHelp": "Uses the midpoint of the calculated range for each line item.",
     "scenarioConservative": "Conservative",
-    "scenarioConservativeHelp": "Combines low revenue with high costs and expenses.",
+    "scenarioConservativeHelp": "Combines low sales with high costs and expenses.",
     "scenarioStretch": "Stretch",
-    "scenarioStretchHelp": "Combines high revenue with low costs and expenses.",
-    "incomeAdjustment": "Revenue adjustment {sign}{value}%",
+    "scenarioStretchHelp": "Combines high sales with low costs and expenses.",
+    "incomeAdjustment": "Sales adjustment {sign}{value}%",
     "insufficientProjection": "There are not enough months to calculate a projection range.",
-    "incomeHistoryProjection": "Revenue: history and projection",
+    "incomeHistoryProjection": "Sales: history and projection",
     "lineItem": "Line item",
     "actual": "Actual",
     "officialBudget": "Official budget",
@@ -269,7 +270,7 @@
       "saved": "Assumptions saved",
       "saveError": "We couldn't save your assumptions"
     },
-    "monthIncome": "Revenue for the month",
+    "monthIncome": "Sales for the month",
     "monthCost": "Cost for the month",
     "monthExpense": "Expense for the month",
     "average3m": "3-Month Average",
@@ -284,12 +285,12 @@
     "assumptions": {
       "smoothing": "Monthly trend and seasonality are estimated with conservative smoothing.",
       "seasonal": "We use the same month last year and the latest available information.",
-      "ebitdaIdentity": "EBITDA is always revenue less cost and expense; it is not projected separately.",
+      "ebitdaIdentity": "EBITDA is always sales less cost and expense; it is not projected separately.",
       "widerRange": "The range widens as the horizon moves away from the latest close.",
       "insufficientHistory": "The statistical projection requires at least 8 actual months in the ledger."
     },
     "top5": {
-      "clientsTitle": "Top 5 clients by revenue contribution",
+      "clientsTitle": "Top 5 clients by sales contribution",
       "clientsInsight": "The customers that contribute the most to what you sold.",
       "linesTitle": "Top 5 business lines by sales volume",
       "linesInsight": "The business lines that account for the most sales volume.",
@@ -297,15 +298,15 @@
       "rankingPeriod": "Ranking of the selected period",
       "seriesWindow": "Last 12 months combined",
       "tooltipTotal": "Month total",
-      "shareNoteClients": "Share of billed-to-customers activity for the month (auxiliary ledger); it can differ from net P&L revenue because of returns and adjustments",
-      "shareNoteLines": "Share of business-line sales volume for the month (trial balance 4xx, credits − debits); it can differ from net P&L revenue because of other income (7xx) and adjustments",
+      "shareNoteClients": "Share of billed-to-customers activity for the month (auxiliary ledger); it can differ from net P&L sales because of returns and adjustments",
+      "shareNoteLines": "Share of business-line sales volume for the month (trial balance 4xx, credits − debits); it can differ from net P&L sales because of other income (7xx) and adjustments",
       "restoClampedNote": "In months with a negative Rest (returns), the stack clamps it to $0; the tooltip shows the signed actual value.",
       "restClients": "Rest of clients",
       "otherLines": "Other business lines",
       "pctOfTotal": "of total",
       "emptyClients": "The auxiliary ledger has no client charges (105/1105) in this period.",
-      "emptyClientsNoAuxiliar": "No auxiliary ledger for this period. Upload CONTPAQi reports 06/07 in Ingesta.",
-      "emptyLines": "The trial balance has no revenue movement in this period.",
+      "emptyClientsNoAuxiliar": "No auxiliary ledger for this period. Upload CONTPAQi reports 06/07 in Ingest.",
+      "emptyLines": "The trial balance has no sales movement in this period.",
       "loadError": "Could not load the Top 5",
       "pieWindow": "Selected month"
     },
@@ -327,7 +328,7 @@
       "jawsHealthy": "Efficient Growth",
       "jawsInverted": "Expenses Growing Faster",
       "jawsUnavailable": "n/a",
-      "jawsUnavailableHint": "Sign is not inferred: the prior month has zero revenue or OPEX, or no data.",
+      "jawsUnavailableHint": "Sign is not inferred: the prior month has zero sales or OPEX, or no data.",
       "laborTitle": "Consolidated labor cost",
       "laborHint": "Represents {pct}% of OPEX",
       "laborEmpty": "No labor accounts with movement in the OPEX universe",
@@ -360,7 +361,7 @@
       }
     },
     "ingreso": {
-      "loadError": "Could not load the revenue monitor",
+      "loadError": "Could not load the sales monitor",
       "na": "n/a",
       "calidadTitle": "Billing Quality and Deductions",
       "calidadSubtitle": "Operating sales 4xxx · MXN",
@@ -379,13 +380,13 @@
       "vsPresupuesto": "Δ vs budget",
       "sinPresupuesto": "No budget loaded",
       "tablaTitle": "Commercial summary of the month",
-      "tablaHelp": "4xxx sales subaccounts with material movement (≥ $10,000 MXN); smaller ones are grouped under Other minor income. Click an account to audit its journal entries.",
+      "tablaHelp": "4xxx sales subaccounts with material movement (≥ $10,000 MXN); smaller ones are grouped under Other minor sales. Click an account to audit its journal entries.",
       "colConcepto": "Concept",
       "colMonto": "Month amount",
       "colPct": "% of net sales",
       "colMom": "MoM",
       "colYoy": "YoY",
-      "otrosMenores": "Other minor income",
+      "otrosMenores": "Other minor sales",
       "tablaEmpty": "No material sales movement in this period."
     },
     "cogs": {
@@ -552,7 +553,7 @@
     "yearToDateIncomplete": "Data missing for {months}; the sum only includes loaded months. Upload that trial balance in Ingest to complete it.",
     "chartByMonth": "By month",
     "chartByYear": "By year",
-    "chartViewLabel": "View revenue by month or by year",
+    "chartViewLabel": "View sales by month or by year",
     "yearCutoffNote": "Every year adds up January to {month}: the same months in all of them.",
     "partialYearsNote": "Years missing some of those months: {years}. They look lower.",
     "budgetAssumptions": {
@@ -577,16 +578,22 @@
       "resetError": "We couldn't delete your assumptions. Try again.",
       "advancedToggle": "Adjust assumptions (advanced)",
       "trendOnly": "We project with your recent sales and cost trend; we don't add extra growth or inflation on top, and we don't count new hires."
+    },
+    "context": {
+      "samePeriodLastYear": "vs same period last year",
+      "priorYear": "vs prior year",
+      "priorQuarter": "vs prior quarter",
+      "priorMonth": "vs prior month"
     }
   },
   "widgets": {
     "customize": "Customize view",
     "customizeHelp": "Choose which blocks to see on the home screen.",
     "kpis": "Main KPIs",
-    "tendencia": "Trend chart (revenue vs costs)",
+    "tendencia": "Trend chart (sales vs costs)",
     "top5": "Top 5 clients and lines",
     "cogs": "COGS breakdown",
-    "trendTitle": "Revenue vs costs",
+    "trendTitle": "Sales vs costs",
     "trendHelp": "Last 12 months combined: what you sold versus what it cost to sell."
   },
   "posicionFinanciera": {
@@ -604,7 +611,7 @@
     "titleTrial": "Trial Balance",
     "positionHint": "Closing balances for the latest period of each year. Liabilities and Equity are shown in economic sign (positive = in your favor); negative Equity is an equity deficit and A = L + E reads directly from the tree.",
     "resultsHint": "Each year adds up the same months as the selected year. A month missing in a prior year is neither counted nor filled in. Costs and expenses appear in parentheses.",
-    "ratiosHint": "Ratios at each year's close. N/D when the data is missing: no treasury, no inventory, no balances in the trial balance, or negative equity.",
+    "ratiosHint": "Ratios at each year's close. N/A when the data is missing: no treasury, no inventory, no balances in the trial balance, or negative equity.",
     "trialHint": "Movements for the selected period. Total debits and credits appear even when they do not balance.",
     "emptyTable": "No trial balance exists for this period. Upload data in Ingest.",
     "information": "Information",
@@ -639,7 +646,7 @@
       "resultadosAcumulados": "Retained earnings",
       "resultadoEjercicio": "Result for the year",
       "otrasCuentasCapital": "Other equity accounts",
-      "netRevenue": "Net revenue",
+      "netRevenue": "Net sales",
       "costs": "Costs",
       "opex": "Operating expenses",
       "financialIncome": "Financial income",
@@ -649,17 +656,17 @@
       "ratioActivity": "Activity",
       "ratioProfitability": "Profitability",
       "ratioLeverage": "Leverage",
-      "income": "Income",
+      "income": "Sales",
       "cogs": "Cost of sales"
     },
     "waterfall": {
       "eyebrow": "Waterfall",
-      "title": "From revenue to net income",
-      "help": "How costs, expenses, and taxes turn the year's revenue into net profit.",
+      "title": "From sales to net income",
+      "help": "How costs, expenses, and taxes turn the year's sales into net profit.",
       "empty": "There are no income-statement figures to build the waterfall.",
       "amount": "Amount",
       "steps": {
-        "ingresos": "Total revenue",
+        "ingresos": "Total sales",
         "costos": "Costs",
         "utilidadBruta": "Gross profit",
         "opex": "Operating expenses",
@@ -670,7 +677,7 @@
         "utilidadNeta": "Net income"
       },
       "legend": {
-        "increase": "Revenue",
+        "increase": "Sales",
         "decrease": "Costs, expenses or loss",
         "total": "Profit or positive total"
       }
@@ -809,7 +816,7 @@
       "salidasOperativas": "Operating outflows",
       "emptyTitle": "Cash flow not available yet",
       "emptyMessage": "Upload the cash flow report (or the master template) to see category detail.",
-      "totalIngresos": "Total income",
+      "totalIngresos": "Total inflows",
       "categorias": {
         "cobranza": "Collections",
         "diversos": "Other",
@@ -1099,6 +1106,24 @@
         "revisar_plazo": "Check their terms and suspend credit if they've passed them"
       },
       "fuente": "Cifra calculated days since the oldest unpaid invoice from your CONTPAQi customer auxiliary movements. They carry no credit terms, so this figure is estimated and does not say what is overdue."
+    },
+    "export": {
+      "cliente": "Customer",
+      "saldo": "Balance",
+      "diasVencidos": "Days overdue",
+      "rango": "Range",
+      "vencido": "Overdue",
+      "queHacer": "What to do",
+      "teDebe": "Owes you",
+      "diasSinCobrar": "Days unpaid (estimated)",
+      "tercero": "Party",
+      "bucket": "Bucket",
+      "razonSocial": "Company name",
+      "monto": "Amount",
+      "pctIndividual": "% Individual",
+      "pctAcumulado": "% Cumulative",
+      "plazoMedio": "Average term (days)",
+      "clasificacion": "Classification"
     }
   },
   "control": {
@@ -1181,7 +1206,7 @@
         "efficiency": "Operating efficiency",
         "cash": "Cash and debt management"
       },
-      "crecimientoVentasPct": "Revenue growth",
+      "crecimientoVentasPct": "Sales growth",
       "crecimientoVentasPctHelp": "Increasing volume moves variable cost with it.",
       "sensibilidadPreciosPct": "Selling price adjustment",
       "sensibilidadPreciosPctHelp": "Raising prices lifts your direct margin without raising costs.",
@@ -1201,7 +1226,7 @@
     },
     "cards": {
       "base": "Base",
-      "revenue": "Revenue",
+      "revenue": "Sales",
       "ebitda": "EBITDA",
       "ebitdaMarginNote": "Change shown in EBITDA margin percentage points.",
       "netIncome": "Net income",
@@ -1216,15 +1241,15 @@
       "cccMeaning": "The days your money stays out, from when you pay until you get paid.",
       "cccNote": "DSO {dso} + DIO {dio} − DPO {dpo} simulated days.",
       "runway": "Months of breathing room",
-      "runwayMeaning": "How long the business can keep going on the cash it has, without new revenue.",
+      "runwayMeaning": "How long the business can keep going on the cash it has, without new sales.",
       "runwayNote": "Months of runway = simulated cash ÷ simulated monthly operating cost (same definition as metric #28)."
     },
     "chart": {
       "compareTitle": "Base vs Simulated structure",
-      "compareHelp": "Revenue → Cost → Expense → EBITDA for the period, before and after the scenario.",
+      "compareHelp": "Sales → Cost → Expense → EBITDA for the period, before and after the scenario.",
       "tornadoTitle": "Sensitivity by driver (tornado)",
       "tornadoHelp": "ΔCash when each driver is pushed to its range extremes with the rest at zero.",
-      "income": "Revenue",
+      "income": "Sales",
       "cost": "Cost",
       "opex": "Expense",
       "ebitda": "EBITDA",
@@ -1249,7 +1274,7 @@
       "delta": "Delta",
       "generated": "Generated",
       "rows": {
-        "revenue": "Net revenue",
+        "revenue": "Net sales",
         "cogs": "Cost of sales",
         "grossProfit": "Gross profit",
         "opex": "Operating expenses",
@@ -1315,13 +1340,13 @@
       "months": "months"
     },
     "formulas": {
-      "grossMargin": "Gross profit / Revenue",
-      "ebitdaMargin": "EBITDA / Revenue",
-      "netMargin": "Net income / Revenue",
-      "nopatMargin": "NOPAT / Revenue",
-      "operatingMargin": "EBIT / Revenue",
-      "ocfMargin": "Operating cash flow (OCF) / Revenue",
-      "fcfMargin": "Free cash flow (FCF) / Revenue",
+      "grossMargin": "Gross profit / Sales",
+      "ebitdaMargin": "EBITDA / Sales",
+      "netMargin": "Net income / Sales",
+      "nopatMargin": "NOPAT / Sales",
+      "operatingMargin": "EBIT / Sales",
+      "ocfMargin": "Operating cash flow (OCF) / Sales",
+      "fcfMargin": "Free cash flow (FCF) / Sales",
       "effectiveTaxRate": "Taxes / Earnings before tax (EBT)",
       "roic": "NOPAT / Invested capital",
       "roce": "EBIT / (Total assets − |Current liabilities|)",
@@ -1330,15 +1355,15 @@
       "gmroi": "Gross profit / Average inventory",
       "ronic": "Δ NOPAT / Δ Invested capital",
       "cashRoic": "OCF / Invested capital",
-      "assetTurnover": "Revenue / Total assets",
-      "receivablesTurnover": "Revenue / Accounts receivable",
+      "assetTurnover": "Sales / Total assets",
+      "receivablesTurnover": "Sales / Accounts receivable",
       "inventoryTurnover": "Cost of sales / Inventory",
       "payablesTurnover": "Cost of sales / Accounts payable",
-      "icTurnover": "Revenue / Invested capital",
-      "nwcOfRevenue": "Net working capital / Revenue",
-      "capexOfRevenue": "CapEx / Revenue",
-      "sgaOfRevenue": "Operating expenses (SG&A) / Revenue",
-      "daOfRevenue": "Depreciation and amortization / Revenue",
+      "icTurnover": "Sales / Invested capital",
+      "nwcOfRevenue": "Net working capital / Sales",
+      "capexOfRevenue": "CapEx / Sales",
+      "sgaOfRevenue": "Operating expenses (SG&A) / Sales",
+      "daOfRevenue": "Depreciation and amortization / Sales",
       "currentRatio": "Current assets / Current liabilities",
       "quickRatio": "(Current assets − Inventory) / Current liabilities",
       "cashRatio": "Your cash (cash and bank accounts in the trial balance) ÷ current liabilities",
@@ -1354,11 +1379,11 @@
       "liabilityRatio": "|Total liabilities| / Total assets",
       "debtRatio": "Gross debt / Total assets",
       "costOfDebt": "Financial expenses / Gross debt",
-      "operatingLeverage": "Δ% EBIT / Δ% Revenue",
-      "debtToRevenue": "Gross debt / Revenue",
+      "operatingLeverage": "Δ% EBIT / Δ% Sales",
+      "debtToRevenue": "Gross debt / Sales",
       "keyScore": "Capped average of gross margin, EBITDA margin, ROE and current ratio",
-      "valueDriver": "Δ EBITDA / Δ Revenue",
-      "revenueGrowth": "(Revenue t − Revenue t−1) / |Revenue t−1|",
+      "valueDriver": "Δ EBITDA / Δ Sales",
+      "revenueGrowth": "(Sales t − Sales t−1) / |Sales t−1|",
       "ebitdaGrowth": "(EBITDA t − EBITDA t−1) / |EBITDA t−1|",
       "wacc": "Ke × (E / V) + Kd × (1 − t) × (D / V)",
       "costOfEquity": "Rf + beta × risk premium (Ke)",
@@ -1467,22 +1492,22 @@
       "help": "How much sales each $100 of invested capital generates (owners’ and lenders’ money in the business). At 2, those $100 generate $200 of sales. Higher is better: capital produces more volume."
     },
     "nwcOfRevenue": {
-      "name": "NWC to Revenue",
+      "name": "NWC to Sales",
       "question": "How much working capital does each sale require?",
       "help": "Of every $100 you sell, how much stays tied up in day-to-day operations (customers + inventory − suppliers). At 20%, you need $20. Lower is usually better: you sell without locking up as much cash."
     },
     "capexOfRevenue": {
-      "name": "CapEx to Revenue",
+      "name": "CapEx to Sales",
       "question": "How much do we reinvest in productive assets?",
       "help": "Of every $100 you sell, how much you reinvest in equipment, facilities, or systems (CapEx). At 8%, that is $8. A healthy level covers wear and growth; too high squeezes cash, too low can leave the business aging."
     },
     "sgaOfRevenue": {
-      "name": "OpEx to Revenue",
+      "name": "OpEx to Sales",
       "question": "How heavy are administrative expenses?",
       "help": "Of every $100 you sell, how much goes to admin, selling, and office costs. At 25%, that is $25. Lower is usually better, as long as you are not cutting what actually supports sales."
     },
     "daOfRevenue": {
-      "name": "D&A to Revenue",
+      "name": "D&A to Sales",
       "question": "How heavy is depreciation in sales?",
       "help": "Of every $100 you sell, how much is the accounting wear of equipment and intangibles (depreciation and amortization). At 5%, that is $5. A high % can mean heavy assets or weak sales."
     },
@@ -1567,7 +1592,7 @@
       "help": "If sales rise or fall 10%, how much operating profit moves. A high number means you gain more on the way up and suffer more on the way down. Understand it; don’t maximize it blindly."
     },
     "debtToRevenue": {
-      "name": "Debt to Revenue",
+      "name": "Debt to Sales",
       "question": "What share of sales does debt represent?",
       "help": "How much debt you have compared with what you sell in the period. At 50%, debt equals half of your sales. Lower is usually easier to service; very high means sales barely support the debt."
     },
@@ -1582,8 +1607,8 @@
       "help": "When sales grow, how much of that extra turns into more EBITDA (operating profit before interest, tax, and asset wear). If EBITDA keeps up, the growth is worth it. If not, you are growing without earning more."
     },
     "revenueGrowth": {
-      "name": "Revenue Growth",
-      "question": "How fast is revenue growing?",
+      "name": "Sales Growth",
+      "question": "How fast are sales growing?",
       "help": "How much sales rose or fell versus the comparable period. At +10%, you sell 10% more. Growth is good if you also protect margin and cash; a sustained drop calls for a look at prices, volume, or customers."
     },
     "ebitdaGrowth": {
@@ -2003,7 +2028,7 @@
         "eyebrow": "Results",
         "title": "What you really earned.",
         "body": "Your income statement, month over month and jargon-free. See what went up, what went down and what to review first.",
-        "tagA": "Income and expenses",
+        "tagA": "Sales and expenses",
         "tagB": "Margin"
       },
       "caja": {
@@ -2153,30 +2178,5 @@
     "7102": "Financial income",
     "7104": "Other financial income",
     "8101": "Financial expenses"
-  },
-  "frasesCuenta": {
-    "sueldos": "Payroll",
-    "honorarios": "Professional fees",
-    "honorariosPf": "Professional fees, individuals",
-    "honorariosPm": "Professional fees, companies",
-    "renta": "Rent",
-    "arrendamientoPm": "Rent from companies",
-    "depreciacion": "Depreciation",
-    "amortizacion": "Amortization",
-    "costoVentas": "Cost of sales",
-    "gastosGenerales": "General expenses",
-    "noDeducibles": "Nondeductible expenses",
-    "devoluciones": "Returns",
-    "intereses": "Interest",
-    "interesesPagados": "Interest paid",
-    "interesesGanados": "Interest earned",
-    "cajaChica": "Petty cash",
-    "ivaPorPagar": "VAT payable",
-    "papeleria": "Office supplies",
-    "ventas": "Sales",
-    "clientes": "Customers",
-    "proveedores": "Suppliers",
-    "bancos": "Banks",
-    "caja": "Cash"
   }
 }
