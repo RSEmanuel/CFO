@@ -51,6 +51,8 @@ type StatementTreeTableProps = {
   favoriteId?: string;
   /** Drill-down de pólizas: filas hoja con código de cuenta se vuelven clicables. */
   onAuditAccount?: (target: { codigoCuenta: string; nombreCuenta: string }) => void;
+  /** Niveles abiertos al cargar y al contraer todo (1 = solo la raíz). */
+  defaultExpandDepth?: number;
 };
 
 type VisibleRow = {
@@ -124,6 +126,7 @@ export function StatementTreeTable({
   onRefresh,
   favoriteId,
   onAuditAccount,
+  defaultExpandDepth = 1,
 }: StatementTreeTableProps) {
   const { t, locale } = useLocale();
   const resolvedEmptyMessage = emptyMessage ?? t("posicionFinanciera.emptyTable");
@@ -136,10 +139,10 @@ export function StatementTreeTable({
   const [showVertical, setShowVertical] = useState(false);
   const verticalEnabled = Boolean(verticalBase) && numberMode === "money";
   const verticalActive = verticalEnabled && showVertical;
-  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultExpandedIds(nodes)));
+  const [expanded, setExpanded] = useState<Set<string>>(() => new Set(defaultExpandedIds(nodes, defaultExpandDepth)));
 
   useEffect(() => {
-    setExpanded(new Set(defaultExpandedIds(nodes)));
+    setExpanded(new Set(defaultExpandedIds(nodes, defaultExpandDepth)));
   }, [resetKey]);
 
   const displayNodes = useMemo(() => {
@@ -168,7 +171,7 @@ export function StatementTreeTable({
 
   const toggleExpandAll = () => {
     if (allExpanded) {
-      setExpanded(new Set(defaultExpandedIds(displayNodes)));
+      setExpanded(new Set(defaultExpandedIds(displayNodes, defaultExpandDepth)));
       return;
     }
     setExpanded(new Set(expandableIds));

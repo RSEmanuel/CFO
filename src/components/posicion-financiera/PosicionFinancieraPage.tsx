@@ -9,7 +9,7 @@ import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { usePosicionFinanciera } from "@/hooks/use-posicion-financiera";
 import { cn } from "@/lib/utils";
-import { BALANZA_COLUMNS, yearColumns } from "@/services/posicionFinanciera";
+import { BALANZA_COLUMNS, groupPosicionByMayor, yearColumns } from "@/services/posicionFinanciera";
 import { useEffect, useMemo, useState } from "react";
 
 const TABS = [
@@ -42,6 +42,15 @@ export function PosicionFinancieraPage() {
   }, [data, year, period]);
 
   const columns = useMemo(() => (data ? yearColumns(data.years) : []), [data]);
+  // Cuentas agrupadas por cuenta de mayor (Caja, Bancos, Clientes…); al expandir se ven las subcuentas.
+  const posicionNodes = useMemo(
+    () =>
+      groupPosicionByMayor(data?.statements.posicion ?? [], (data?.years ?? []).map(String), (code) =>
+        t("posicionFinanciera.mayorAccount", { code }),
+        data?.mayorNames,
+      ),
+    [data, t],
+  );
   const empty = Boolean(data && !data.hasBalanza);
   const resetKey = `${tab}-${data?.year ?? ""}-${data?.period ?? ""}`;
 
@@ -93,7 +102,8 @@ export function PosicionFinancieraPage() {
           <StatementTreeTable
             title={t("posicionFinanciera.titlePosition")}
             titleHint={t("posicionFinanciera.positionHint")}
-            nodes={data?.statements.posicion ?? []}
+            nodes={posicionNodes}
+            defaultExpandDepth={2}
             columns={columns}
             numberMode="money"
             showYoY
