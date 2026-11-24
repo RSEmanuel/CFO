@@ -1129,6 +1129,31 @@
       "clasificacion": "Clasificación"
     }
   },
+  "laboratorio": {
+    "eyebrow": "Prueba visual",
+    "banner": "Así se vería tu panel con este diseño. El resto del portal sigue igual.",
+    "back": "Volver al diseño actual",
+    "groups": {
+      "month": "Tu mes",
+      "money": "Dinero",
+      "reading": "El detalle",
+      "account": "Tu cuenta"
+    },
+    "alertsTitle": "Qué hacer ahora",
+    "noAlerts": "Este mes no hay nada urgente. Revisa el siguiente cierre.",
+    "ventasLabel": "Vendiste",
+    "quedoLabel": "Te quedaron",
+    "perdioLabel": "Perdiste",
+    "reviewCash": "Revisar tu caja",
+    "reviewCollections": "Revisar cobranza",
+    "reviewResults": "Revisar resultados",
+    "chart": {
+      "subtitle": "Últimos meses de tu serie de resultados",
+      "ventas": "Ventas",
+      "empty": "Todavía no hay meses para graficar. Carga tu balanza."
+    },
+    "favoritesTitle": "Tus favoritos"
+  },
   "control": {
     "title": "Panel de Control Ejecutivo",
     "emptyTitle": "Tu Panel de Control está vacío",

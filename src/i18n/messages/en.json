@@ -1129,6 +1129,31 @@
       "clasificacion": "Classification"
     }
   },
+  "laboratorio": {
+    "eyebrow": "Visual trial",
+    "banner": "This is how your panel would look with this design. The rest of the portal stays as it is.",
+    "back": "Back to the current design",
+    "groups": {
+      "month": "Your month",
+      "money": "Money",
+      "reading": "The detail",
+      "account": "Your account"
+    },
+    "alertsTitle": "What to do now",
+    "noAlerts": "Nothing urgent this month. Check the next close.",
+    "ventasLabel": "You sold",
+    "quedoLabel": "You kept",
+    "perdioLabel": "You lost",
+    "reviewCash": "Review your cash",
+    "reviewCollections": "Review collections",
+    "reviewResults": "Review results",
+    "chart": {
+      "subtitle": "Latest months of your results series",
+      "ventas": "Sales",
+      "empty": "No months to chart yet. Upload your trial balance."
+    },
+    "favoritesTitle": "Your favorites"
+  },
   "control": {
     "title": "Executive Control Panel",
     "emptyTitle": "Your Control Panel is empty",

@@ -1,0 +1,91 @@
+/* Tema de la hoja de laboratorio (modelo Horizon UI). Solo vive bajo .lab-theme. */
+.lab-theme {
+  --lab-bg: #f4f7fe;
+  --lab-brand: #422afb;
+  --lab-navy: #1b2559;
+  --lab-nav-text: #a3aed0;
+  --lab-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+
+  --background: 222 80% 98%;
+  --foreground: 228 55% 23%;
+  --card: 0 0% 100%;
+  --card-foreground: 228 55% 23%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 228 55% 23%;
+  --primary: 245 96% 58%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 222 80% 98%;
+  --secondary-foreground: 228 55% 23%;
+  --muted: 222 80% 98%;
+  --muted-foreground: 226 33% 71%;
+  --accent: 222 80% 98%;
+  --accent-foreground: 245 96% 58%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 222 50% 93%;
+  --input: 222 50% 93%;
+  --ring: 245 96% 58%;
+  --favorable: 160 84% 30%;
+  --desfavorable: 0 72% 51%;
+  --shadow-card: var(--lab-shadow);
+  --shadow-md: var(--lab-shadow);
+
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
+
+.lab-theme .rounded-card,
+.lab-theme .rounded-xl {
+  border-radius: 20px;
+}
+
+:root[data-theme="dark"] .lab-theme {
+  --lab-bg: #0b1437;
+  --lab-brand: #7551ff;
+  --lab-navy: #ffffff;
+  --lab-nav-text: #a3aed0;
+  --lab-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08);
+  --background: 226 65% 13%;
+  --foreground: 0 0% 100%;
+  --card: 226 60% 17%;
+  --card-foreground: 0 0% 100%;
+  --popover: 226 60% 17%;
+  --popover-foreground: 0 0% 100%;
+  --primary: 254 100% 66%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 226 65% 13%;
+  --muted: 226 65% 13%;
+  --muted-foreground: 226 33% 71%;
+  --accent: 226 65% 13%;
+  --accent-foreground: 0 0% 100%;
+  --border: 226 40% 24%;
+  --input: 226 40% 24%;
+  --ring: 254 100% 66%;
+  --favorable: 160 70% 55%;
+  --desfavorable: 0 91% 71%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .lab-theme {
+    --lab-bg: #0b1437;
+    --lab-brand: #7551ff;
+    --lab-navy: #ffffff;
+    --background: 226 65% 13%;
+    --foreground: 0 0% 100%;
+    --card: 226 60% 17%;
+    --card-foreground: 0 0% 100%;
+    --popover: 226 60% 17%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 254 100% 66%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 65% 13%;
+    --muted: 226 65% 13%;
+    --muted-foreground: 226 33% 71%;
+    --accent: 226 65% 13%;
+    --accent-foreground: 0 0% 100%;
+    --border: 226 40% 24%;
+    --input: 226 40% 24%;
+    --ring: 254 100% 66%;
+    --favorable: 160 70% 55%;
+    --desfavorable: 0 91% 71%;
+  }
+}
