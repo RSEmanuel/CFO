@@ -16,6 +16,7 @@
     "email:export": "tsx scripts/export-welcome-email.ts",
     "test:forecast": "tsx --test src/services/forecast/budgetProjection.test.ts src/services/forecast/drivers.test.ts src/services/budgetAssumptionService.test.ts src/services/resultadosPresupuesto.test.ts",
     "test:ingest": "tsx --test src/services/ingest/ingest.test.ts src/services/ingest/catalogoMayor.test.ts",
+    "test:caracterizacion": "tsx --test src/services/ingest/caracterizacion.test.ts",
     "test:flujo": "tsx --test src/services/ingest/flujoEfectivo.test.ts src/services/flujoSankey.test.ts",
     "test:flujo-operativo": "tsx --test src/services/flujoOperativo.test.ts",
     "test:auxiliar": "tsx --test src/services/ingest/parseAuxiliarCuentas.test.ts",
@@ -79,7 +80,7 @@
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^3.4.19",
     "tailwindcss-animate": "^1.0.7",
-    "xlsx": "^0.18.5",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^4.4.3"
   },
   "devDependencies": {

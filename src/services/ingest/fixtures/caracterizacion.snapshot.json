@@ -1,0 +1,1663 @@
+{
+  "plantilla-master": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "plantilla_demo.xlsx",
+      "sourceSystem": "master_template",
+      "documentType": "master_workbook",
+      "headerStartRow": 1,
+      "headerRow": 1,
+      "sheetName": "balanza_pnl",
+      "headers": [
+        "id_cuenta",
+        "nombre_cuenta",
+        "categoria_maestra",
+        "saldo_inicial",
+        "debe",
+        "haber",
+        "saldo_final",
+        "monto_presupuestado",
+        "depreciacion_amortizacion",
+        "periodo",
+        "anio"
+      ],
+      "confidence": 1,
+      "persistable": true,
+      "inferredPeriodo": null,
+      "inferredAnio": null,
+      "rowCountEstimate": 3,
+      "missingCanonical": [],
+      "notes": [
+        "Plantilla de Cifra: Cifra guardará cada hoja que traiga datos."
+      ],
+      "selectedProfileId": "builtin_master_template_balanza_v1",
+      "profileCandidates": [
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 1,
+          "matched": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ],
+          "missing": []
+        },
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 0.45,
+          "matched": [
+            "header:fecha",
+            "header:tipo",
+            "token:saldo inicial"
+          ],
+          "missing": [
+            "header:cargos",
+            "header:abonos",
+            "token:auxiliares del catalogo"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 0.3,
+          "matched": [
+            "header:fecha",
+            "header:tipo"
+          ],
+          "missing": [
+            "hoja:diarios y polizas",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 0.275,
+          "matched": [
+            "header:cuenta",
+            "header:nombre"
+          ],
+          "missing": [
+            "header:cargos",
+            "header:abonos",
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "header:movimientos",
+            "header:saldos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "balanza_pnl",
+          "auxiliar_ventas",
+          "auxiliar_egresos",
+          "tesoreria_flujo"
+        ],
+        "rowsScanned": 10,
+        "columnsScanned": 11,
+        "matchedTokens": [
+          "hoja:balanza_pnl",
+          "hoja:auxiliar_ventas",
+          "hoja:auxiliar_egresos",
+          "hoja:tesoreria_flujo",
+          "header:id_cuenta",
+          "header:nombre_cuenta",
+          "header:categoria_maestra",
+          "header:debe",
+          "header:haber",
+          "token:monto_presupuestado",
+          "token:depreciacion_amortizacion"
+        ],
+        "contentPeriod": null
+      }
+    },
+    "mapeo": {
+      "workbook": {
+        "balanza": [
+          {
+            "row": 2,
+            "idCuenta": "1101",
+            "nombreCuenta": "Bancos Demo",
+            "categoriaMaestra": "Activo",
+            "saldoInicial": 100,
+            "debe": 50,
+            "haber": 50,
+            "saldoFinal": 100,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 3,
+            "idCuenta": "2101",
+            "nombreCuenta": "Proveedores Demo",
+            "categoriaMaestra": "Pasivo",
+            "saldoInicial": 100,
+            "debe": 50,
+            "haber": 50,
+            "saldoFinal": 100,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 4,
+            "idCuenta": "4101",
+            "nombreCuenta": "Ventas Demo",
+            "categoriaMaestra": "Ingreso",
+            "saldoInicial": 0,
+            "debe": 0,
+            "haber": 100,
+            "saldoFinal": -100,
+            "montoPresupuestado": 120,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "ventas": [
+          {
+            "row": 2,
+            "idCliente": "C1",
+            "nombreCliente": "Cliente Demo",
+            "folioFactura": "F-1",
+            "fechaEmision": "2026-07-02T00:00:00.000Z",
+            "fechaVencimiento": "2026-08-01T00:00:00.000Z",
+            "montoSubtotal": 100,
+            "iva": 16,
+            "montoCobrado": 116,
+            "estatusPago": "Pagado",
+            "lineaNegocio": "Demo"
+          }
+        ],
+        "egresos": [
+          {
+            "row": 2,
+            "idProveedor": "P1",
+            "nombreProveedor": "Proveedor Demo",
+            "folioDocumento": "E-1",
+            "fechaEmision": "2026-07-03T00:00:00.000Z",
+            "fechaVencimiento": "2026-07-20T00:00:00.000Z",
+            "montoSubtotal": 80,
+            "centroDeCostos": "Admin",
+            "clasificacionGasto": "Fijo",
+            "tipoInversion": "OpEx",
+            "estatusPago": "Pagado"
+          }
+        ],
+        "tesoreria": [
+          {
+            "row": 2,
+            "idBancoCaja": "1101",
+            "saldoInicialPeriodo": 100,
+            "entradasOperativas": 50,
+            "salidasOperativas": 50,
+            "salidasCapex": 0,
+            "servicioDeuda": 0,
+            "saldoFinalPeriodo": 100,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "tesoreriaDetalle": [],
+        "auxiliarMovimientos": [],
+        "auxiliarResumen": [],
+        "polizas": [],
+        "polizaMovimientos": []
+      },
+      "warnings": []
+    },
+    "cartera": null,
+    "polizas": null
+  },
+  "compac-balanza": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "archivo_sin_pistas.xlsx",
+      "sourceSystem": "compac",
+      "documentType": "balanza",
+      "headerStartRow": 4,
+      "headerRow": 5,
+      "sheetName": "Balanza de Comprobación",
+      "headers": [
+        "cuenta",
+        "nombre",
+        "saldos_iniciales_deudor",
+        "saldos_iniciales_acreedor",
+        "cargos",
+        "abonos",
+        "saldos_actuales_deudor",
+        "saldos_actuales_acreedor"
+      ],
+      "confidence": 1,
+      "persistable": true,
+      "inferredPeriodo": 7,
+      "inferredAnio": 2026,
+      "rowCountEstimate": 12,
+      "missingCanonical": [],
+      "notes": [
+        "Balanza de comprobación: Cifra guardará las cuentas y sus saldos del mes."
+      ],
+      "selectedProfileId": "builtin_compac_balanza_v1",
+      "profileCandidates": [
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 1,
+          "matched": [
+            "header:cuenta",
+            "header:nombre",
+            "header:cargos",
+            "header:abonos",
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ],
+          "missing": []
+        },
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 0.325,
+          "matched": [
+            "header:saldos"
+          ],
+          "missing": [
+            "header:movimientos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 0.325,
+          "matched": [
+            "header:cargos",
+            "header:abonos"
+          ],
+          "missing": [
+            "header:fecha",
+            "header:tipo",
+            "token:auxiliares del catalogo",
+            "token:saldo inicial"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 0.1,
+          "matched": [],
+          "missing": [
+            "hoja:diarios y polizas",
+            "header:fecha",
+            "header:tipo",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ]
+        },
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "Balanza de Comprobación"
+        ],
+        "rowsScanned": 17,
+        "columnsScanned": 8,
+        "matchedTokens": [
+          "header:cuenta",
+          "header:nombre",
+          "header:cargos",
+          "header:abonos",
+          "token:balanza de comprobacion",
+          "token:saldos iniciales",
+          "token:saldos actuales"
+        ],
+        "contentPeriod": "7/2026"
+      }
+    },
+    "mapeo": {
+      "workbook": {
+        "balanza": [
+          {
+            "row": 8,
+            "idCuenta": "1102-0001-0001-0000",
+            "nombreCuenta": "Banco Demo",
+            "categoriaMaestra": "Activo",
+            "saldoInicial": 100,
+            "debe": 80,
+            "haber": 30,
+            "saldoFinal": 150,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 9,
+            "idCuenta": "2101-0001-0001-0000",
+            "nombreCuenta": "Proveedor Demo",
+            "categoriaMaestra": "Pasivo",
+            "saldoInicial": -50,
+            "debe": 20,
+            "haber": 0,
+            "saldoFinal": -30,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 10,
+            "idCuenta": "4101-0001-0000-0000",
+            "nombreCuenta": "Ventas Demo",
+            "categoriaMaestra": "Ingreso",
+            "saldoInicial": 0,
+            "debe": 0,
+            "haber": 100,
+            "saldoFinal": -100,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 11,
+            "idCuenta": "5101-0001-0000-0000",
+            "nombreCuenta": "Costo de ventas",
+            "categoriaMaestra": "COGS",
+            "saldoInicial": 0,
+            "debe": 50,
+            "haber": 0,
+            "saldoFinal": 50,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": false,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 12,
+            "idCuenta": "6101-0001-0000-0000",
+            "nombreCuenta": "Depreciación de equipo demo",
+            "categoriaMaestra": "OpEx",
+            "saldoInicial": 0,
+            "debe": 10,
+            "haber": 0,
+            "saldoFinal": 10,
+            "montoPresupuestado": 0,
+            "depreciacionAmortizacion": true,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "ventas": [],
+        "egresos": [],
+        "tesoreria": [],
+        "tesoreriaDetalle": [],
+        "auxiliarMovimientos": [],
+        "auxiliarResumen": [],
+        "polizas": [],
+        "polizaMovimientos": [],
+        "cuentasCatalogo": [
+          {
+            "idCuenta": "1102-0000-0000-0000",
+            "nombreCuenta": "BANCOS"
+          }
+        ]
+      },
+      "warnings": [
+        {
+          "rule": "PARSEO",
+          "severity": "WARNING",
+          "message": "No hay tesorería canónica en este paquete. El tablero de flujo mostrará N/D.",
+          "sheet": "Balanza de Comprobación"
+        },
+        {
+          "rule": "PARSEO",
+          "severity": "WARNING",
+          "message": "Sin auxiliar de clientes/proveedores: cobranza y CxP quedan N/D."
+        },
+        {
+          "rule": "PARSEO",
+          "severity": "WARNING",
+          "message": "Sin presupuesto oficial (monto_presupuestado=0)."
+        }
+      ]
+    },
+    "cartera": null,
+    "polizas": null
+  },
+  "compac-flujo": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "flujo_demo.xlsx",
+      "sourceSystem": "compac",
+      "documentType": "flujo_efectivo",
+      "headerStartRow": 4,
+      "headerRow": 4,
+      "sheetName": "Flujo de Efectivo",
+      "headers": [
+        "movimientos",
+        "saldos"
+      ],
+      "confidence": 1,
+      "persistable": true,
+      "inferredPeriodo": 7,
+      "inferredAnio": 2026,
+      "rowCountEstimate": 23,
+      "missingCanonical": [],
+      "notes": [
+        "Flujo de efectivo: Cifra guardará tus bancos y sus movimientos por categoría."
+      ],
+      "selectedProfileId": "builtin_compac_flujo_efectivo_v1",
+      "profileCandidates": [
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 1,
+          "matched": [
+            "header:movimientos",
+            "header:saldos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ],
+          "missing": []
+        },
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 0.225,
+          "matched": [
+            "token:saldo inicial"
+          ],
+          "missing": [
+            "header:fecha",
+            "header:tipo",
+            "header:cargos",
+            "header:abonos",
+            "token:auxiliares del catalogo"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 0.1,
+          "matched": [],
+          "missing": [
+            "header:cuenta",
+            "header:nombre",
+            "header:cargos",
+            "header:abonos",
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ]
+        },
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:diarios y polizas",
+            "header:fecha",
+            "header:tipo",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "Flujo de Efectivo"
+        ],
+        "rowsScanned": 27,
+        "columnsScanned": 3,
+        "matchedTokens": [
+          "header:movimientos",
+          "header:saldos",
+          "token:flujo de efectivo",
+          "token:disponible"
+        ],
+        "contentPeriod": "7/2026"
+      }
+    },
+    "mapeo": {
+      "workbook": {
+        "balanza": [],
+        "ventas": [],
+        "egresos": [],
+        "tesoreria": [
+          {
+            "row": 5,
+            "idBancoCaja": "1000-0000 BANCOS DEMO",
+            "saldoInicialPeriodo": 5000,
+            "entradasOperativas": 1500,
+            "salidasOperativas": 1000,
+            "salidasCapex": 0,
+            "servicioDeuda": 0,
+            "saldoFinalPeriodo": 5500,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 18,
+            "idBancoCaja": "2000-0000 CAJA DEMO",
+            "saldoInicialPeriodo": 100,
+            "entradasOperativas": 50,
+            "salidasOperativas": 300,
+            "salidasCapex": 0,
+            "servicioDeuda": 0,
+            "saldoFinalPeriodo": -150,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "tesoreriaDetalle": [
+          {
+            "row": 8,
+            "idBancoCaja": "1000-0000 BANCOS DEMO",
+            "direccion": "ingreso",
+            "categoriaKey": "ventas-mostrador",
+            "labelOrigen": "Ingr Ventas mostrador",
+            "monto": 1200,
+            "esTraspaso": false,
+            "orden": 1,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 9,
+            "idBancoCaja": "1000-0000 BANCOS DEMO",
+            "direccion": "ingreso",
+            "categoriaKey": "traspaso-entre-cuentas",
+            "labelOrigen": "Ingr Traspaso entre cuentas",
+            "monto": 300,
+            "esTraspaso": true,
+            "orden": 2,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 13,
+            "idBancoCaja": "1000-0000 BANCOS DEMO",
+            "direccion": "egreso",
+            "categoriaKey": "compras",
+            "labelOrigen": "Egr Compras",
+            "monto": 800,
+            "esTraspaso": false,
+            "orden": 3,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 14,
+            "idBancoCaja": "1000-0000 BANCOS DEMO",
+            "direccion": "egreso",
+            "categoriaKey": "concepto-nuevo-demo",
+            "labelOrigen": "Egr Concepto nuevo demo",
+            "monto": 200,
+            "esTraspaso": false,
+            "orden": 4,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 21,
+            "idBancoCaja": "2000-0000 CAJA DEMO",
+            "direccion": "ingreso",
+            "categoriaKey": "ventas-mostrador",
+            "labelOrigen": "Ingr Ventas mostrador",
+            "monto": 50,
+            "esTraspaso": false,
+            "orden": 5,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 25,
+            "idBancoCaja": "2000-0000 CAJA DEMO",
+            "direccion": "egreso",
+            "categoriaKey": "traspaso-entre-cuentas",
+            "labelOrigen": "Egr Traspaso entre cuentas",
+            "monto": 300,
+            "esTraspaso": true,
+            "orden": 6,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "auxiliarMovimientos": [],
+        "auxiliarResumen": [],
+        "polizas": [],
+        "polizaMovimientos": []
+      },
+      "warnings": []
+    },
+    "cartera": null,
+    "polizas": null
+  },
+  "compac-auxiliar": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "auxiliar_demo.xlsx",
+      "sourceSystem": "compac",
+      "documentType": "auxiliar_cuentas",
+      "headerStartRow": 7,
+      "headerRow": 7,
+      "sheetName": "Reporte de COMPAC",
+      "headers": [
+        "fecha",
+        "tipo",
+        "numero",
+        "concepto",
+        "referencia",
+        "cargos",
+        "abonos",
+        "saldo"
+      ],
+      "confidence": 1,
+      "persistable": true,
+      "inferredPeriodo": 7,
+      "inferredAnio": 2026,
+      "rowCountEstimate": 14,
+      "missingCanonical": [],
+      "notes": [
+        "Auxiliar de cuentas: Cifra guardará los movimientos diarios y el resumen por cuenta."
+      ],
+      "selectedProfileId": "builtin_compac_auxiliar_v1",
+      "profileCandidates": [
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 1,
+          "matched": [
+            "header:fecha",
+            "header:tipo",
+            "header:cargos",
+            "header:abonos",
+            "token:auxiliares del catalogo",
+            "token:saldo inicial"
+          ],
+          "missing": []
+        },
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 0.4,
+          "matched": [
+            "header:fecha",
+            "header:tipo"
+          ],
+          "missing": [
+            "hoja:diarios y polizas",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 0.375,
+          "matched": [
+            "header:cargos",
+            "header:abonos"
+          ],
+          "missing": [
+            "header:cuenta",
+            "header:nombre",
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 0.1,
+          "matched": [],
+          "missing": [
+            "header:movimientos",
+            "header:saldos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ]
+        },
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "Reporte de COMPAC"
+        ],
+        "rowsScanned": 21,
+        "columnsScanned": 8,
+        "matchedTokens": [
+          "header:fecha",
+          "header:tipo",
+          "header:cargos",
+          "header:abonos",
+          "token:auxiliares del catalogo",
+          "token:saldo inicial"
+        ],
+        "contentPeriod": "7/2026"
+      }
+    },
+    "mapeo": {
+      "workbook": {
+        "balanza": [],
+        "ventas": [],
+        "egresos": [],
+        "tesoreria": [],
+        "tesoreriaDetalle": [],
+        "auxiliarMovimientos": [
+          {
+            "row": 10,
+            "moneda": "MXN",
+            "idCuenta": "1105-0001-0001-0000",
+            "nombreCuenta": "Cliente Demo Uno",
+            "fecha": "2026-07-02T00:00:00.000Z",
+            "tipoPoliza": "Ingresos",
+            "numeroPoliza": "1",
+            "concepto": "Cobro factura demo",
+            "referencia": "F-1",
+            "cargos": 0,
+            "abonos": 50,
+            "saldo": 150,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 11,
+            "moneda": "MXN",
+            "idCuenta": "1105-0001-0001-0000",
+            "nombreCuenta": "Cliente Demo Uno",
+            "fecha": "2026-07-15T00:00:00.000Z",
+            "tipoPoliza": "Diario",
+            "numeroPoliza": "2",
+            "concepto": "Venta demo",
+            "referencia": "F-2",
+            "cargos": 100,
+            "abonos": 0,
+            "saldo": 250,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 14,
+            "moneda": "MXN",
+            "idCuenta": "2101-0001-0001-0000",
+            "nombreCuenta": "Proveedor Demo",
+            "fecha": "2026-07-03T00:00:00.000Z",
+            "tipoPoliza": "Egresos",
+            "numeroPoliza": "3",
+            "concepto": "Pago demo",
+            "referencia": "E-1",
+            "cargos": 80,
+            "abonos": 0,
+            "saldo": 0,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 15,
+            "moneda": "MXN",
+            "idCuenta": "2101-0001-0001-0000",
+            "nombreCuenta": "Proveedor Demo",
+            "fecha": "2026-08-04T00:00:00.000Z",
+            "tipoPoliza": "Diario",
+            "numeroPoliza": "4",
+            "concepto": "Movimiento fuera de periodo demo",
+            "referencia": "",
+            "cargos": 0,
+            "abonos": 20,
+            "saldo": -20,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 18,
+            "moneda": "MXN",
+            "idCuenta": "6101-0001-0000-0000",
+            "nombreCuenta": "Gasto Demo",
+            "fecha": "2026-07-10T00:00:00.000Z",
+            "tipoPoliza": "Diario",
+            "numeroPoliza": "5",
+            "concepto": "Gasto demo",
+            "referencia": "G-1",
+            "cargos": 40,
+            "abonos": 0,
+            "saldo": 40,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "auxiliarResumen": [
+          {
+            "moneda": "MXN",
+            "idCuenta": "1105-0001-0001-0000",
+            "nombreCuenta": "Cliente Demo Uno",
+            "saldoInicial": 200,
+            "cargos": 100,
+            "abonos": 50,
+            "saldoFinal": 250,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "moneda": "MXN",
+            "idCuenta": "2101-0001-0001-0000",
+            "nombreCuenta": "Proveedor Demo",
+            "saldoInicial": -80,
+            "cargos": 80,
+            "abonos": 20,
+            "saldoFinal": -20,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "moneda": "MXN",
+            "idCuenta": "6101-0001-0000-0000",
+            "nombreCuenta": "Gasto Demo",
+            "saldoInicial": 0,
+            "cargos": 45,
+            "abonos": 0,
+            "saldoFinal": 45,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "polizas": [],
+        "polizaMovimientos": []
+      },
+      "warnings": [
+        {
+          "rule": "PARSEO",
+          "severity": "WARNING",
+          "message": "6101-0001-0000-0000 Gasto Demo: la suma de cargos parseados (40.00) difiere del Total reportado (45.00).",
+          "sheet": "Reporte de COMPAC",
+          "row": 17
+        },
+        {
+          "rule": "PERIODO",
+          "severity": "WARNING",
+          "message": "1 movimientos tienen fecha fuera del periodo 7/2026 detectado.",
+          "sheet": "Reporte de COMPAC"
+        }
+      ]
+    },
+    "cartera": {
+      "items": [
+        {
+          "accountId": "1105-0001-0001-0000",
+          "accountNumber": "1105-0001-0001-0000",
+          "entityName": "Cliente Demo Uno",
+          "type": "CLIENTE",
+          "saldoInicial": 200,
+          "facturadoOCompradoEnMes": 0,
+          "pagadoEnMes": 50,
+          "saldoPendiente": 150,
+          "movimientosCount": 1
+        },
+        {
+          "accountId": "2101-0001-0001-0000",
+          "accountNumber": "2101-0001-0001-0000",
+          "entityName": "Proveedor Demo",
+          "type": "PROVEEDOR",
+          "saldoInicial": -80,
+          "facturadoOCompradoEnMes": 20,
+          "pagadoEnMes": 80,
+          "saldoPendiente": -20,
+          "movimientosCount": 2
+        }
+      ],
+      "movimientos": [
+        {
+          "row": 9,
+          "moneda": "MXN",
+          "idCuenta": "1105-0001-0001-0000",
+          "nombreCuenta": "Cliente Demo Uno",
+          "fecha": "2026-07-02T00:00:00.000Z",
+          "tipoPoliza": "Ingresos",
+          "numeroPoliza": "1",
+          "concepto": "Cobro factura demo",
+          "referencia": "F-1",
+          "cargos": 0,
+          "abonos": 50,
+          "saldo": 150,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 13,
+          "moneda": "MXN",
+          "idCuenta": "2101-0001-0001-0000",
+          "nombreCuenta": "Proveedor Demo",
+          "fecha": "2026-07-03T00:00:00.000Z",
+          "tipoPoliza": "Egresos",
+          "numeroPoliza": "3",
+          "concepto": "Pago demo",
+          "referencia": "E-1",
+          "cargos": 80,
+          "abonos": 0,
+          "saldo": 0,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 14,
+          "moneda": "MXN",
+          "idCuenta": "2101-0001-0001-0000",
+          "nombreCuenta": "Proveedor Demo",
+          "fecha": "2026-08-04T00:00:00.000Z",
+          "tipoPoliza": "Diario",
+          "numeroPoliza": "4",
+          "concepto": "Movimiento fuera de periodo demo",
+          "referencia": "",
+          "cargos": 0,
+          "abonos": 20,
+          "saldo": -20,
+          "periodo": 7,
+          "anio": 2026
+        }
+      ],
+      "resumen": [
+        {
+          "moneda": "MXN",
+          "idCuenta": "1105-0001-0001-0000",
+          "nombreCuenta": "Cliente Demo Uno",
+          "saldoInicial": 200,
+          "cargos": 0,
+          "abonos": 50,
+          "saldoFinal": 150,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "moneda": "MXN",
+          "idCuenta": "2101-0001-0001-0000",
+          "nombreCuenta": "Proveedor Demo",
+          "saldoInicial": -80,
+          "cargos": 80,
+          "abonos": 20,
+          "saldoFinal": -20,
+          "periodo": 7,
+          "anio": 2026
+        }
+      ],
+      "summary": {
+        "moneda": "MXN",
+        "periodo": 7,
+        "anio": 2026,
+        "totalCxCPendientes": 150,
+        "totalCobradoEnMes": 50,
+        "totalCxPPendientes": -20,
+        "totalPagadoProveedoresEnMes": 80,
+        "clientesCount": 1,
+        "proveedoresCount": 1
+      },
+      "moneda": "MXN",
+      "periodo": 7,
+      "anio": 2026,
+      "warnings": [
+        {
+          "rule": "PARSEO",
+          "severity": "WARNING",
+          "message": "auxiliar_demo.xlsx: no se detectó la moneda en el encabezado; se asumió MXN.",
+          "sheet": "Reporte de COMPAC"
+        },
+        {
+          "rule": "PERIODO",
+          "severity": "WARNING",
+          "message": "1 movimientos tienen fecha fuera del periodo 7/2026 detectado.",
+          "sheet": "Reporte de COMPAC"
+        }
+      ]
+    },
+    "polizas": null
+  },
+  "compac-polizas": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "polizas_demo.xlsx",
+      "sourceSystem": "compac",
+      "documentType": "diarios_polizas",
+      "headerStartRow": 6,
+      "headerRow": 7,
+      "sheetName": "Diarios y Pólizas",
+      "headers": [
+        "fecha_no",
+        "tipo_refer",
+        "numero_cuenta",
+        "concepto_nombre",
+        "cargos",
+        "abonos"
+      ],
+      "confidence": 1,
+      "persistable": true,
+      "inferredPeriodo": 7,
+      "inferredAnio": 2026,
+      "rowCountEstimate": 17,
+      "missingCanonical": [],
+      "notes": [
+        "Pólizas: Cifra guardará las pólizas y sus movimientos."
+      ],
+      "selectedProfileId": "builtin_compac_polizas_v1",
+      "profileCandidates": [
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 1,
+          "matched": [
+            "hoja:diarios y polizas",
+            "header:fecha",
+            "header:tipo",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ],
+          "missing": []
+        },
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 0.65,
+          "matched": [
+            "header:cuenta",
+            "header:nombre",
+            "header:cargos",
+            "header:abonos"
+          ],
+          "missing": [
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 0.55,
+          "matched": [
+            "header:fecha",
+            "header:tipo",
+            "header:cargos",
+            "header:abonos"
+          ],
+          "missing": [
+            "token:auxiliares del catalogo",
+            "token:saldo inicial"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 0.1,
+          "matched": [],
+          "missing": [
+            "header:movimientos",
+            "header:saldos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ]
+        },
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "Diarios y Pólizas"
+        ],
+        "rowsScanned": 24,
+        "columnsScanned": 8,
+        "matchedTokens": [
+          "hoja:diarios y polizas",
+          "header:fecha",
+          "header:tipo",
+          "token:impreso de polizas",
+          "token:cifra de control"
+        ],
+        "contentPeriod": "7/2026"
+      }
+    },
+    "mapeo": {
+      "workbook": {
+        "balanza": [],
+        "ventas": [],
+        "egresos": [],
+        "tesoreria": [],
+        "tesoreriaDetalle": [],
+        "auxiliarMovimientos": [],
+        "auxiliarResumen": [],
+        "polizas": [
+          {
+            "row": 6,
+            "tipo": "Ingresos",
+            "numero": 1,
+            "fecha": "2026-07-01T00:00:00.000Z",
+            "concepto": "Cobranza demo",
+            "totalCargos": 116,
+            "totalAbonos": 116,
+            "cuadrada": true,
+            "movimientosCount": 2,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 12,
+            "tipo": "Diario",
+            "numero": 1,
+            "fecha": "2026-07-02T00:00:00.000Z",
+            "concepto": "Provisión demo",
+            "totalCargos": 100,
+            "totalAbonos": 90,
+            "cuadrada": false,
+            "movimientosCount": 2,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ],
+        "polizaMovimientos": [
+          {
+            "row": 7,
+            "tipoPoliza": "Ingresos",
+            "numeroPoliza": 1,
+            "numeroMovimiento": 1,
+            "codigoCuenta": "1102-0001-0001-0000",
+            "nombreCuenta": "Banco Demo",
+            "referencia": "F-1",
+            "concepto": "Cobro de factura demo",
+            "cargo": 116,
+            "abono": 0,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 9,
+            "tipoPoliza": "Ingresos",
+            "numeroPoliza": 1,
+            "numeroMovimiento": 2,
+            "codigoCuenta": "1105-0001-0001-0000",
+            "nombreCuenta": "Cliente Demo",
+            "referencia": "F-1",
+            "concepto": "",
+            "cargo": 0,
+            "abono": 116,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 13,
+            "tipoPoliza": "Diario",
+            "numeroPoliza": 1,
+            "numeroMovimiento": 1,
+            "codigoCuenta": "6101-0001-0000-0000",
+            "nombreCuenta": "Gasto Demo",
+            "referencia": "",
+            "concepto": "",
+            "cargo": 100,
+            "abono": 0,
+            "periodo": 7,
+            "anio": 2026
+          },
+          {
+            "row": 14,
+            "tipoPoliza": "Diario",
+            "numeroPoliza": 1,
+            "numeroMovimiento": 2,
+            "codigoCuenta": "2101-0001-0001-0000",
+            "nombreCuenta": "Proveedor Demo",
+            "referencia": "",
+            "concepto": "",
+            "cargo": 0,
+            "abono": 90,
+            "periodo": 7,
+            "anio": 2026
+          }
+        ]
+      },
+      "warnings": [
+        {
+          "rule": "PARTIDA_DOBLE",
+          "severity": "WARNING",
+          "message": "Póliza Diario 1 descuadrada: cargos 100.00 ≠ abonos 90.00. Se persiste marcada.",
+          "sheet": "Diarios y Pólizas",
+          "row": 12
+        }
+      ]
+    },
+    "cartera": null,
+    "polizas": {
+      "polizas": [
+        {
+          "row": 6,
+          "tipo": "Ingresos",
+          "numero": 1,
+          "fecha": "2026-07-01T00:00:00.000Z",
+          "concepto": "Cobranza demo",
+          "totalCargos": 116,
+          "totalAbonos": 116,
+          "cuadrada": true,
+          "movimientosCount": 2,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 12,
+          "tipo": "Diario",
+          "numero": 1,
+          "fecha": "2026-07-02T00:00:00.000Z",
+          "concepto": "Provisión demo",
+          "totalCargos": 100,
+          "totalAbonos": 90,
+          "cuadrada": false,
+          "movimientosCount": 2,
+          "periodo": 7,
+          "anio": 2026
+        }
+      ],
+      "movimientos": [
+        {
+          "row": 7,
+          "tipoPoliza": "Ingresos",
+          "numeroPoliza": 1,
+          "numeroMovimiento": 1,
+          "codigoCuenta": "1102-0001-0001-0000",
+          "nombreCuenta": "Banco Demo",
+          "referencia": "F-1",
+          "concepto": "Cobro de factura demo",
+          "cargo": 116,
+          "abono": 0,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 9,
+          "tipoPoliza": "Ingresos",
+          "numeroPoliza": 1,
+          "numeroMovimiento": 2,
+          "codigoCuenta": "1105-0001-0001-0000",
+          "nombreCuenta": "Cliente Demo",
+          "referencia": "F-1",
+          "concepto": "",
+          "cargo": 0,
+          "abono": 116,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 13,
+          "tipoPoliza": "Diario",
+          "numeroPoliza": 1,
+          "numeroMovimiento": 1,
+          "codigoCuenta": "6101-0001-0000-0000",
+          "nombreCuenta": "Gasto Demo",
+          "referencia": "",
+          "concepto": "",
+          "cargo": 100,
+          "abono": 0,
+          "periodo": 7,
+          "anio": 2026
+        },
+        {
+          "row": 14,
+          "tipoPoliza": "Diario",
+          "numeroPoliza": 1,
+          "numeroMovimiento": 2,
+          "codigoCuenta": "2101-0001-0001-0000",
+          "nombreCuenta": "Proveedor Demo",
+          "referencia": "",
+          "concepto": "",
+          "cargo": 0,
+          "abono": 90,
+          "periodo": 7,
+          "anio": 2026
+        }
+      ],
+      "periodo": 7,
+      "anio": 2026,
+      "descuadradas": 1,
+      "esperadasPolizas": 2,
+      "esperadosMovimientos": 4,
+      "warnings": [
+        {
+          "rule": "PARTIDA_DOBLE",
+          "severity": "WARNING",
+          "message": "Póliza Diario 1 descuadrada: cargos 100.00 ≠ abonos 90.00. Se persiste marcada.",
+          "sheet": "Diarios y Pólizas",
+          "row": 12
+        }
+      ]
+    }
+  },
+  "desconocido": {
+    "detect": {
+      "sha256": "<sha256>",
+      "filename": "notas.xlsx",
+      "sourceSystem": "unknown",
+      "documentType": "desconocido",
+      "headerStartRow": null,
+      "headerRow": null,
+      "sheetName": "Notas",
+      "headers": [],
+      "confidence": 0.2,
+      "persistable": false,
+      "inferredPeriodo": null,
+      "inferredAnio": null,
+      "rowCountEstimate": 2,
+      "missingCanonical": [
+        "id_cuenta",
+        "nombre_cuenta",
+        "categoria_maestra",
+        "debe",
+        "haber"
+      ],
+      "notes": [
+        "Cifra no reconoce este archivo. Sube la balanza de comprobación o los auxiliares del mes."
+      ],
+      "selectedProfileId": null,
+      "profileCandidates": [
+        {
+          "profileId": "builtin_master_template_balanza_v1",
+          "profileKey": "master_template/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "master_template",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:balanza_pnl",
+            "hoja:auxiliar_ventas",
+            "hoja:auxiliar_egresos",
+            "hoja:tesoreria_flujo",
+            "header:id_cuenta",
+            "header:nombre_cuenta",
+            "header:categoria_maestra",
+            "header:debe",
+            "header:haber",
+            "token:monto_presupuestado",
+            "token:depreciacion_amortizacion"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_balanza_v1",
+          "profileKey": "compac/balanza",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "balanza",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "header:cuenta",
+            "header:nombre",
+            "header:cargos",
+            "header:abonos",
+            "token:balanza de comprobacion",
+            "token:saldos iniciales",
+            "token:saldos actuales"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_flujo_efectivo_v1",
+          "profileKey": "compac/flujo-efectivo",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "flujo_efectivo",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "header:movimientos",
+            "header:saldos",
+            "token:flujo de efectivo",
+            "token:disponible"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_auxiliar_v1",
+          "profileKey": "compac/auxiliar-cuentas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "auxiliar_cuentas",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "header:fecha",
+            "header:tipo",
+            "header:cargos",
+            "header:abonos",
+            "token:auxiliares del catalogo",
+            "token:saldo inicial"
+          ]
+        },
+        {
+          "profileId": "builtin_compac_polizas_v1",
+          "profileKey": "compac/diarios-polizas",
+          "profileVersion": 1,
+          "origin": "BUILTIN",
+          "sourceSystem": "compac",
+          "documentType": "diarios_polizas",
+          "score": 0,
+          "matched": [],
+          "missing": [
+            "hoja:diarios y polizas",
+            "header:fecha",
+            "header:tipo",
+            "token:impreso de polizas",
+            "token:cifra de control"
+          ]
+        }
+      ],
+      "evidence": {
+        "sheetsScanned": [
+          "Notas"
+        ],
+        "rowsScanned": 2,
+        "columnsScanned": 2,
+        "matchedTokens": [],
+        "contentPeriod": null
+      }
+    },
+    "mapeo": null,
+    "cartera": null,
+    "polizas": null
+  }
+}
