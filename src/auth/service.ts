@@ -115,15 +115,17 @@ export async function loginWithPassword(email: string, password: string): Promis
   }
 
   const payload = await verifyAccessToken(cognitoResult.accessToken);
-  const user = await prisma.user.findFirst({
+  const found = await prisma.user.findFirst({
     where: {
       OR: [{ cognitoSub: payload.sub }, { email }],
     },
   });
 
-  if (!user || !user.isActive) {
+  if (!found || !found.isActive) {
     throw new AppError("UNAUTHORIZED", "Correo o contraseña incorrectos.", 401);
   }
+
+  const user = await adoptCognitoSub(found, email, payload.sub);
 
   return {
     accessToken: cognitoResult.accessToken,
@@ -132,6 +134,34 @@ export async function loginWithPassword(email: string, password: string): Promis
     expiresIn: cognitoResult.expiresIn,
     user: toPublicUser(user),
   };
+}
+
+/**
+ * El alta local puede guardar `dev-user:correo`. Cognito autentica, pero la sesión
+ * busca solo por el sub del token. En el primer login real se adopta ese sub.
+ */
+async function adoptCognitoSub<T extends { id: string; email: string; cognitoSub: string }>(
+  user: T,
+  email: string,
+  sub: string,
+): Promise<T> {
+  if (user.cognitoSub === sub) {
+    return user;
+  }
+  if (user.email.trim().toLowerCase() !== email.trim().toLowerCase()) {
+    return user;
+  }
+
+  const taken = await prisma.user.findUnique({ where: { cognitoSub: sub } });
+  if (taken && taken.id !== user.id) {
+    throw new AppError("CONFLICT", "Esa cuenta ya está ligada a otro usuario.", 409);
+  }
+
+  const updated = await prisma.user.update({
+    where: { id: user.id },
+    data: { cognitoSub: sub },
+  });
+  return { ...user, ...updated };
 }
 
 export type RefreshResponse = {

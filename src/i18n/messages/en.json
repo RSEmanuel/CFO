@@ -58,7 +58,8 @@
     "settings": "Settings",
     "loadControl": "Load history",
     "errorLog": "Portal errors",
-    "clients": "Clients"
+    "clients": "Clients",
+    "whatHappened": "What happened"
   },
   "auth": {
     "title": "Sign in",
@@ -2011,6 +2012,42 @@
     "deleted": "{email} was deleted.",
     "deletedWithUploads": "{email} was deleted. Their {count} file uploads are now under your name.",
     "deleteFailed": "We couldn't delete this person. Try again."
+  },
+  "activity": {
+    "title": "What happened",
+    "subtitle": "People added, removed or given a new role, and every file uploaded for {company}.",
+    "switchHint": "To see another company, switch it in the menu selector.",
+    "viewerOnly": "This section is for the team that manages the company. Ask your administrator if you have questions.",
+    "selectCompany": "Choose a company in the menu selector to see its activity.",
+    "loadFailed": "We couldn't read the activity. Reload the page to try again.",
+    "empty": "There is no activity in this company yet.",
+    "truncated": "Showing the {count} most recent entries.",
+    "kindUser": "People",
+    "kindLoad": "File",
+    "system": "Cifra",
+    "role": {
+      "ADMIN": "admin",
+      "CFO_PARTNER": "partner",
+      "CLIENT_VIEWER": "client",
+      "unknown": "no role"
+    },
+    "user": {
+      "USER_CREATED": "{actor} added {target} as {to} on {date}.",
+      "USER_DEACTIVATED": "{actor} removed access for {target} on {date}.",
+      "USER_REACTIVATED": "{actor} restored access for {target} on {date}.",
+      "ROLE_CHANGED": "{actor} changed {target} from {from} to {to} on {date}.",
+      "USER_DELETED": "{actor} deleted {target} from the company on {date}."
+    },
+    "load": {
+      "sentence": "{actor} uploaded {file} ({period}) on {date} and {result}.",
+      "noPeriod": "no period",
+      "result": {
+        "SAVED": "it was accepted",
+        "REJECTED": "it was rejected",
+        "REVIEWED_ONLY": "it was reviewed, but nobody confirmed the save",
+        "INTERRUPTED": "the save didn't finish"
+      }
+    }
   },
   "loads": {
     "selectCompany": "Pick a company in the selector above to see its uploads.",
