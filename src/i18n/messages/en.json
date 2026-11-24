@@ -1026,7 +1026,9 @@
       "plazoSubtitle": "per your trial balance: receivables ÷ monthly sales",
       "brechaSubtitle": "DSO − DPO",
       "brechaDeficit": "Trade-term deficit: you finance customers {days} days longer than your suppliers finance you",
-      "brechaSuperavit": "Trade-term surplus: your suppliers finance the operation"
+      "brechaSuperavit": "Trade-term surplus: your suppliers finance the operation",
+      "tablaCxc": "Receivables by customer",
+      "tablaCxp": "Payables by supplier"
     },
     "tabs": {
       "cartera": "Portfolio",
@@ -1230,8 +1232,8 @@
         "sinDato": "Your trial balance has no taxes payable."
       },
       "financiamiento": {
-        "proveedores": "Your suppliers finance your operation: you collect in {dso} days and pay in {dpo}.",
-        "clientes": "You finance your customers: you collect in {dso} days and pay in {dpo}."
+        "proveedores": "Your suppliers finance your operation: you collect in {dso} days and pay in {dpo} days.",
+        "clientes": "You finance your customers: you collect in {dso} days and pay in {dpo} days."
       }
     }
   },

@@ -1,10 +1,12 @@
 "use client";
 
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
-import { CobranzaCarteraKpiCard, type CobranzaCarteraKpiKey } from "@/components/cobranza/CobranzaCarteraSection";
-import { ConcentracionParetoCard } from "@/components/cobranza/ConcentracionRiesgoSection";
+import { AntiguedadCard, ClientesQueNoPaganCard, SaldosPorClienteCard } from "@/components/cobranza/AntiguedadCards";
+import { CarteraTablaCard, CobranzaCarteraKpiCard, type CobranzaCarteraKpiKey } from "@/components/cobranza/CobranzaCarteraSection";
+import { ConcentracionParetoCard, ConcentracionTablaCard } from "@/components/cobranza/ConcentracionRiesgoSection";
 import { TendenciaIngresosCostosChart } from "@/components/dashboard/TendenciaIngresosCostosChart";
 import { FlujoEfectivoView } from "@/components/flujo/FlujoEfectivoView";
+import { FlujoLibreView } from "@/components/flujo/FlujoLibreView";
 import {
   FlujoOperativoKpiCard,
   FlujoOperativoTableroCard,
@@ -51,7 +53,7 @@ import {
 import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import type { DisplayUnits } from "@/services/money";
-import { collapseToMayorAccounts, groupPosicionByMayor, yearColumns } from "@/services/posicionFinanciera";
+import { BALANZA_COLUMNS, collapseToMayorAccounts, groupPosicionByMayor, yearColumns } from "@/services/posicionFinanciera";
 import { useMemo, type ReactNode } from "react";
 
 /** Datos globales que el Panel de Control hereda de sus filtros (periodo/unidades). */
@@ -70,6 +72,31 @@ const POSICION_FAVORITE_IDS: Record<PosicionStatementKey, string> = {
   resultados: "table-posicion-resultados",
   razones: "table-posicion-razones",
 };
+
+/** Balanza de comprobación del mes del Panel de Control. */
+function BalanzaFavorite({ periodo }: { periodo: string }) {
+  const { t } = useLocale();
+  const [anio, mes] = periodo.split("-").map(Number);
+  const { data, loading, error, refetch } = usePosicionFinanciera(anio || null, mes || null);
+  if (error) {
+    return null;
+  }
+  return (
+    <StatementTreeTable
+      title={t("posicionFinanciera.titleTrial")}
+      titleHint={t("posicionFinanciera.trialHint")}
+      nodes={data?.statements.balanza ?? []}
+      columns={BALANZA_COLUMNS}
+      numberMode="money"
+      showCode
+      loading={loading}
+      empty={Boolean(data && !data.hasBalanza)}
+      resetKey={`control-balanza-${data?.year ?? ""}-${data?.period ?? ""}`}
+      onRefresh={refetch}
+      favoriteId="table-posicion-balanza"
+    />
+  );
+}
 
 /** Estado financiero auto-fetch (año de corte resuelto por la API). */
 function PosicionStatementFavorite({ statement }: { statement: PosicionStatementKey }) {
@@ -251,6 +278,20 @@ export function FavoriteWidgetRenderer({
       return <CobranzaAgingChart />;
     case "cobranzaPareto":
       return <ConcentracionParetoCard />;
+    case "cobranzaCarteraTabla":
+      return <CarteraTablaCard lado={widget.id === "table-cobranza-cartera-cxp" ? "cxp" : "cxc"} />;
+    case "cobranzaNoPagan":
+      return <ClientesQueNoPaganCard />;
+    case "cobranzaAntiguedad":
+      return <AntiguedadCard />;
+    case "cobranzaSaldos":
+      return <SaldosPorClienteCard />;
+    case "cobranzaConcentracionTabla":
+      return <ConcentracionTablaCard />;
+    case "flujoLibre":
+      return context.periodo ? <FlujoLibreView periodo={context.periodo} units={context.units} /> : null;
+    case "posicionBalanza":
+      return context.periodo ? <BalanzaFavorite periodo={context.periodo} /> : null;
     case "posicionGaugeKpi": {
       const kind = (Object.entries(POSICION_GAUGE_FAVORITE_ID) as Array<[PosicionGaugeKind, string]>).find(
         ([, id]) => id === widget.id,

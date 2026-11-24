@@ -38,11 +38,11 @@ export function CategoryTemporalKpiCard({
   return (
     <article className="relative rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
       <div className="flex items-start justify-between gap-2 pr-10">
-        <p className="font-sans text-base font-bold text-foreground">{title}</p>
+        <p className="font-sans text-base font-medium text-foreground">{title}</p>
         <FavoriteStarButton widgetId={categoryTemporalFavoriteId(category, card.key)} label={title} />
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{card.periodLabel}</p>
-      <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
+      <p className="financial-nums mt-2 text-2xl font-medium tracking-tight">
         {card.value == null ? "N/A" : KPI_FORMATTER.format(card.value)}
       </p>
       {card.deltaPct == null ? null : (
@@ -81,11 +81,11 @@ export function YearToDateKpiCard({
   return (
     <article className="relative rounded-card border border-border bg-card p-4 shadow-[var(--shadow-card)] sm:p-5">
       <div className="flex items-start justify-between gap-2 pr-10">
-        <p className="font-sans text-base font-bold text-foreground">{t("resultados.yearToDate")}</p>
+        <p className="font-sans text-base font-medium text-foreground">{t("resultados.yearToDate")}</p>
         <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoAcumulado} label={t("resultados.yearToDate")} />
       </div>
       <p className="mt-1 text-xs text-muted-foreground">{periodLabel}</p>
-      <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
+      <p className="financial-nums mt-2 text-2xl font-medium tracking-tight">
         {value == null ? "N/A" : KPI_FORMATTER.format(value)}
       </p>
       {deltaPct == null ? null : (

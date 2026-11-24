@@ -154,7 +154,7 @@ export function FavoriteCharts({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Gráficos favoritos</h3>
+      <h3 className="text-lg font-medium">Gráficos favoritos</h3>
       <div className="grid gap-4 xl:grid-cols-2">
         {known.map((id) => (
           <div key={id}>{CHART_RENDERERS[id](pack, loading)}</div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { TendenciaIngresosCostosChart } from "@/components/dashboard/TendenciaIngresosCostosChart";
+import { ConCifras } from "@/components/ui/con-cifras";
 import { useLocale } from "@/context/LocaleContext";
 import { useCajaRespiro } from "@/hooks/use-caja-respiro";
 import { useCobranza } from "@/hooks/use-cobranza";
@@ -189,7 +190,7 @@ function TarjetaPortada({ tarjeta, grande = false }: { tarjeta: Tarjeta; grande?
       <p className="text-xs font-medium text-muted-foreground">{tarjeta.label}</p>
       <p
         className={cn(
-          "cifra-num mt-2 font-semibold tracking-tight text-foreground",
+          "cifra-num mt-2 font-medium tracking-tight text-foreground",
           grande ? "text-3xl" : "text-2xl xl:text-base 2xl:text-lg",
           tarjeta.sello === "missing" && "text-muted-foreground",
         )}
@@ -198,7 +199,7 @@ function TarjetaPortada({ tarjeta, grande = false }: { tarjeta: Tarjeta; grande?
       </p>
       <p className="mt-1 text-xs text-muted-foreground">
         {tarjeta.sello === "estimated" ? <span className="font-medium">{t("control.portada.sello.estimada")} · </span> : null}
-        {tarjeta.detalle}
+        <ConCifras>{tarjeta.detalle}</ConCifras>
       </p>
     </Link>
   );
@@ -266,10 +267,14 @@ export function PortadaMes({ periodo, rows, units }: { periodo: string; rows: Mo
   return (
     <div className="space-y-6">
       <section className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-        <h2 className="font-sans text-xl font-bold tracking-tight text-foreground">
+        <h2 className="font-sans text-xl font-medium tracking-tight text-foreground">
           {t("control.portada.titulo", { mes: nombreDelMes(periodo, locale) })}
         </h2>
-        {frases.length > 0 ? <p className="mt-1 text-sm text-foreground">{frases.join(" ")}</p> : null}
+        {frases.length > 0 ? (
+          <p className="mt-1 text-sm text-muted-foreground">
+            <ConCifras>{frases.join(" ")}</ConCifras>
+          </p>
+        ) : null}
 
         <Seccion titulo={t("control.portada.seccion.comoTeFue")} />
         <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-2">

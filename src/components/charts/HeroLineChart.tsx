@@ -173,7 +173,7 @@ function IncomeTooltip({
   return (
     <div className="min-w-48 px-3 py-2 text-xs text-foreground" style={TOOLTIP_STYLE}>
       <p className="mb-1 font-medium">{periodLabel(label)}</p>
-      <p className="font-semibold text-clay">{tooltipTotalFormatter(rawTotal)}</p>
+      <p className="font-medium text-clay">{tooltipTotalFormatter(rawTotal)}</p>
       <div className="mt-2 space-y-1 border-t border-border pt-2">
         {top.map(({ key, value }) => (
           <div key={key} className="flex justify-between gap-4">
@@ -252,7 +252,7 @@ function IncomePointLabel({
       textAnchor={textAnchor}
       fill={POINT_LABEL_FILL}
       fontSize={12}
-      fontWeight={600}
+      fontWeight={500}
       stroke="var(--cifra-brand-contrast)"
       strokeWidth={3}
       paintOrder="stroke fill"

@@ -7,7 +7,7 @@ import { FavoriteStarButton } from "@/components/favorites/favorite-star-button"
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { useLocale } from "@/context/LocaleContext";
 import { presentarNombre } from "@/services/textoPresentable";
-import { useSession } from "@/context/SessionContext";
+import { useEmpresaNombre } from "@/hooks/use-empresa-nombre";
 import { useConcentracionRiesgo } from "@/hooks/use-concentracion-riesgo";
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
@@ -120,10 +120,10 @@ function KpiCard({
 }) {
   return (
     <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-      <p className="font-sans text-lg font-bold text-foreground">{label}</p>
+      <p className="font-sans text-lg font-medium text-foreground">{label}</p>
       <p className="text-xs text-muted-foreground">{help}</p>
       <div className="mt-4 flex flex-wrap items-center gap-2">
-        <p className="financial-nums text-3xl font-semibold tracking-tight text-foreground">{value}</p>
+        <p className="financial-nums text-3xl font-medium tracking-tight text-foreground">{value}</p>
         {badge ? (
           <span className={cn("rounded-full px-2.5 py-0.5 text-[11px] font-medium", badge.tone)}>
             {badge.text}
@@ -231,16 +231,10 @@ function ParetoChartCard({ chartData, moneda }: { chartData: ParetoPoint[]; mone
 
 export function ConcentracionRiesgoSection() {
   const { t } = useLocale();
-  const { tenantId, tenants, user } = useSession();
+  const empresa = useEmpresaNombre();
   const [tipo, setTipo] = useState<ConcentracionTipo>("clientes");
   const [moneda, setMoneda] = useState("MXN");
   const { data, loading, error } = useConcentracionRiesgo(tipo, moneda);
-  const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
-
-  const empresa =
-    tenants.find((tenant) => tenant.id === tenantId)?.name ??
-    (user?.tenant.id === tenantId ? user.tenant.name : undefined) ??
-    t("resultados.companyFallback");
 
   if (loading) {
     return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
@@ -267,32 +261,12 @@ export function ConcentracionRiesgoSection() {
     pctAcumulado: row.pctAcumulado,
   }));
 
-  const riesgoLabel = (key: RiesgoClasificacion) => t(`cobranza.concentracion.riesgo.${key}`);
   const hhiBadge = model.hhiNivel
     ? {
         text: t(`cobranza.concentracion.hhiNivel.${model.hhiNivel}`),
         tone: HHI_BADGE_TONE[model.hhiNivel],
       }
     : null;
-
-  const exportTabla = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
-    try {
-      const { headers, rows } = concentracionExportTable(model.rows, columnMode, riesgoLabel, t);
-      const filename = concentracionExportFilename(empresa, asOf, tipo, data.moneda, fileKind);
-      if (fileKind === "csv") {
-        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
-        return;
-      }
-      const workbook = await buildWorkbook(headers, rows, {
-        tenant: empresa,
-        reporte: `concentracion-${tipo}`,
-        generatedAt: new Date().toISOString(),
-      });
-      downloadBlob(await workbookToBlob(workbook), filename);
-    } catch {
-      toast.error(t("cobranza.exportError"));
-    }
-  };
 
   return (
     <section className="space-y-4">
@@ -358,8 +332,74 @@ export function ConcentracionRiesgoSection() {
 
       <ParetoChartCard chartData={chartData} moneda={data.moneda} />
 
-      <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+      <ConcentracionTabla data={data} tipo={tipo} empresa={empresa} />
+    </section>
+  );
+}
+
+/**
+ * Pareto de concentración de clientes para el Panel de Control. Auto-fetch
+ * con la vista por defecto (clientes, MXN); api-cache deduplica la request.
+ */
+export function ConcentracionParetoCard() {
+  const { data, loading, error } = useConcentracionRiesgo("clientes", "MXN");
+
+  if (loading) {
+    return <div className="h-72 animate-pulse rounded-card bg-secondary" />;
+  }
+  if (error || !data?.hasData) {
+    return null;
+  }
+
+  const chartData: ParetoPoint[] = data.model.rows.slice(0, PARETO_MAX_BARRAS).map((row) => ({
+    name: truncateName(presentarNombre(row.entityName)),
+    entityName: presentarNombre(row.entityName),
+    monto: row.monto,
+    pctIndividual: row.pctIndividual,
+    pctAcumulado: row.pctAcumulado,
+  }));
+
+  return <ParetoChartCard chartData={chartData} moneda={data.moneda} />;
+}
+
+/** Tabla de concentración con su exportación, auditoría de pólizas y estrella para el Panel de Control. */
+function ConcentracionTabla({
+  data,
+  tipo,
+  empresa,
+}: {
+  data: NonNullable<ReturnType<typeof useConcentracionRiesgo>["data"]>;
+  tipo: ConcentracionTipo;
+  empresa: string;
+}) {
+  const { t } = useLocale();
+  const [auditTarget, setAuditTarget] = useState<PolizasAuditTarget | null>(null);
+  const { model } = data;
+  const asOf = `${data.anio}-${String(data.periodo).padStart(2, "0")}`;
+  const riesgoLabel = (key: RiesgoClasificacion) => t(`cobranza.concentracion.riesgo.${key}`);
+  const exportTabla = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
+    try {
+      const { headers, rows } = concentracionExportTable(model.rows, columnMode, riesgoLabel, t);
+      const filename = concentracionExportFilename(empresa, asOf, tipo, data.moneda, fileKind);
+      if (fileKind === "csv") {
+        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
+        return;
+      }
+      const workbook = await buildWorkbook(headers, rows, {
+        tenant: empresa,
+        reporte: `concentracion-${tipo}`,
+        generatedAt: new Date().toISOString(),
+      });
+      downloadBlob(await workbookToBlob(workbook), filename);
+    } catch {
+      toast.error(t("cobranza.exportError"));
+    }
+  };
+
+  return (
+    <>
+      <section className="relative rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3 pr-10">
           <h2 className="font-sans text-lg font-medium text-foreground">
             {t("cobranza.concentracion.tablaTitle")}
           </h2>
@@ -369,6 +409,7 @@ export function ConcentracionRiesgoSection() {
             </p>
             <ExportMenu onDownload={exportTabla} />
           </div>
+          <FavoriteStarButton widgetId="table-cobranza-concentracion" label={t("cobranza.concentracion.tablaTitle")} />
         </div>
         <TableScroll>
           <table className="w-full text-sm">
@@ -448,31 +489,19 @@ export function ConcentracionRiesgoSection() {
       </section>
 
       <PolizasAuditSheet target={auditTarget} onClose={() => setAuditTarget(null)} />
-    </section>
+    </>
   );
 }
 
-/**
- * Pareto de concentración de clientes para el Panel de Control. Auto-fetch
- * con la vista por defecto (clientes, MXN); api-cache deduplica la request.
- */
-export function ConcentracionParetoCard() {
+/** Tabla de concentración de clientes (MXN) para el Panel de Control; api-cache deduplica la request. */
+export function ConcentracionTablaCard() {
+  const empresa = useEmpresaNombre();
   const { data, loading, error } = useConcentracionRiesgo("clientes", "MXN");
-
   if (loading) {
     return <div className="h-72 animate-pulse rounded-card bg-secondary" />;
   }
   if (error || !data?.hasData) {
     return null;
   }
-
-  const chartData: ParetoPoint[] = data.model.rows.slice(0, PARETO_MAX_BARRAS).map((row) => ({
-    name: truncateName(presentarNombre(row.entityName)),
-    entityName: presentarNombre(row.entityName),
-    monto: row.monto,
-    pctIndividual: row.pctIndividual,
-    pctAcumulado: row.pctAcumulado,
-  }));
-
-  return <ParetoChartCard chartData={chartData} moneda={data.moneda} />;
+  return <ConcentracionTabla data={data} tipo="clientes" empresa={empresa} />;
 }

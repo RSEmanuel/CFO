@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { InfoDialog } from "@/components/ui/info-dialog";
 import { Tooltip as Hint, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -57,7 +58,7 @@ function TitleRow({ title, widgetId, extra }: { title: string; widgetId: string;
   return (
     <div className="flex items-start justify-between gap-2 pr-10">
       <div className="flex min-w-0 items-center gap-1.5">
-        <p className="font-sans text-base font-bold text-foreground">{title}</p>
+        <p className="font-sans text-base font-medium text-foreground">{title}</p>
         {extra}
       </div>
       <FavoriteStarButton widgetId={widgetId} label={title} />
@@ -73,12 +74,12 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
     return (
       <article className="relative rounded-card border border-category-marginsFg/20 bg-category-margins px-4 py-3 shadow-[var(--shadow-card)]">
         <TitleRow title={title} widgetId={GASTO_CONTROL_FAVORITE_ID.absorcion} />
-        <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
+        <p className="financial-nums mt-2 text-2xl font-medium tracking-tight">
           {control.absorcionPct == null ? t("resultados.opex.na") : `${control.absorcionPct.toFixed(1)}%`}
         </p>
         {control.pesosPorPeso == null ? null : (
           <p className="mt-2 text-xs text-muted-foreground">
-            {t("resultados.opex.absorptionHint", { pesos: formatPesos(control.pesosPorPeso) })}
+            <ConCifras>{t("resultados.opex.absorptionHint", { pesos: formatPesos(control.pesosPorPeso) })}</ConCifras>
           </p>
         )}
       </article>
@@ -115,7 +116,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
         />
         {control.jaws ? (
           <>
-            <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight">
+            <p className="financial-nums mt-2 text-2xl font-medium tracking-tight">
               {formatSignedPct(control.jaws.jawsPp)}
             </p>
             <span
@@ -128,11 +129,13 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
               {t(jawsPositive ? "resultados.opex.jawsHealthy" : "resultados.opex.jawsInverted")}
             </span>
             <p className="mt-2 text-xs text-muted-foreground">
-              {t("resultados.opex.jawsNarrative", {
-                deltaIngresos: formatSignedPct(control.jaws.deltaIngresosPct),
-                deltaOpex: formatSignedPct(control.jaws.deltaOpexPct),
-                periodo: localeMonthLabel(control.jaws.periodoAnterior, t),
-              })}
+              <ConCifras>
+                {t("resultados.opex.jawsNarrative", {
+                  deltaIngresos: formatSignedPct(control.jaws.deltaIngresosPct),
+                  deltaOpex: formatSignedPct(control.jaws.deltaOpexPct),
+                  periodo: localeMonthLabel(control.jaws.periodoAnterior, t),
+                })}
+              </ConCifras>
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
               {t(jawsVentasGanan ? "resultados.opex.jawsNarrativePositive" : "resultados.opex.jawsNarrativeNegative")}
@@ -142,7 +145,7 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
           <TooltipProvider delayDuration={200}>
             <Hint>
               <TooltipTrigger asChild>
-                <p className="financial-nums mt-2 cursor-help text-2xl font-semibold tracking-tight underline decoration-dotted underline-offset-4">
+                <p className="financial-nums mt-2 cursor-help text-2xl font-medium tracking-tight underline decoration-dotted underline-offset-4">
                   {t("resultados.opex.jawsUnavailable")}
                 </p>
               </TooltipTrigger>
@@ -163,13 +166,15 @@ export function GastoControlCard({ kind, control }: { kind: GastoControlKind; co
     return (
       <article className="relative rounded-card border border-category-efficiencyFg/20 bg-category-efficiency px-4 py-3 shadow-[var(--shadow-card)]">
         <TitleRow title={title} widgetId={GASTO_CONTROL_FAVORITE_ID.laboral} />
-        <p className="financial-nums mt-2 text-2xl font-semibold tracking-tight" title={laborHintAccounts || undefined}>
+        <p className="financial-nums mt-2 text-2xl font-medium tracking-tight" title={laborHintAccounts || undefined}>
           {KPI_FORMATTER.format(control.laboral.monto)}
         </p>
         <p className="mt-2 text-xs text-muted-foreground">
-          {control.laboral.pctOpex == null
-            ? t("resultados.opex.laborEmpty")
-            : t("resultados.opex.laborHint", { pct: control.laboral.pctOpex.toFixed(1) })}
+          <ConCifras>
+            {control.laboral.pctOpex == null
+              ? t("resultados.opex.laborEmpty")
+              : t("resultados.opex.laborHint", { pct: control.laboral.pctOpex.toFixed(1) })}
+          </ConCifras>
         </p>
       </article>
     );

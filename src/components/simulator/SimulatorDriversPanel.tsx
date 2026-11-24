@@ -92,7 +92,7 @@ export function SimulatorDriversPanel({
       <div className="space-y-4">
         {DRIVER_GROUPS.map((group) => (
           <div key={group.titleKey} className="rounded-card border border-border bg-secondary/40 p-4">
-            <h3 className="mb-4 font-sans text-base font-bold tracking-tight text-foreground">{t(group.titleKey)}</h3>
+            <h3 className="mb-4 font-sans text-base font-medium tracking-tight text-foreground">{t(group.titleKey)}</h3>
             <div className="grid grid-cols-1 gap-x-8 gap-y-5 md:grid-cols-2">
               {group.keys.map((key) => {
                 const driver = driverDef(key);

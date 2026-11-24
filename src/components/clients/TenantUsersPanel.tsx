@@ -350,7 +350,7 @@ export function TenantUsersPanel({ tenantId, companyName }: { tenantId: string; 
                 <p className="text-sm text-muted-foreground">{t("users.welcomeSkipped")}</p>
               ) : (
                 <>
-                  <p className="text-sm font-semibold text-foreground">
+                  <p className="text-sm font-medium text-foreground">
                     {welcome.status === "sent"
                       ? t(welcome.resent ? "users.resent" : "users.welcomeSent", { email: welcome.email })
                       : t("users.welcomeFailed", { email: welcome.email })}

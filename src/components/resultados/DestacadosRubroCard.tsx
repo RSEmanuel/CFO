@@ -53,13 +53,13 @@ export function DestacadosRubroCard({
   return (
     <article className="relative rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
       <div className="flex items-start justify-between gap-3 pr-10">
-        <p className="font-sans text-lg font-bold text-foreground">{title}</p>
+        <p className="font-sans text-lg font-medium text-foreground">{title}</p>
         <div className="flex items-center gap-1">
           <FavoriteStarButton widgetId={`destacados:${rubro.key}`} label={title} />
           <Icon className="h-4 w-4 text-muted-foreground" aria-hidden />
         </div>
       </div>
-      <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
+      <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">
         {rubro.value == null ? "N/A" : formatAxisTick(rubro.value, units)}
       </p>
       {rubro.key === "ebitda" ? <InsightText text={t("resultados.ebitdaInsight")} /> : null}
@@ -71,7 +71,7 @@ export function DestacadosRubroCard({
           <>
             <span
               className={cn(
-                "inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                "inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium",
                 favorable === true && "bg-category-margins text-favorable",
                 favorable === false && "bg-category-solvency text-desfavorable",
                 favorable == null && "bg-muted text-muted-foreground",

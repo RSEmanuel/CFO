@@ -39,7 +39,7 @@ export function IncomeBreakdownBars({ data, valueFormatter, totalLabel, totalFor
                 <span className="min-w-0 flex-1 text-sm text-foreground">{datum.name}</span>
                 <span className="flex shrink-0 items-baseline gap-3">
                   <span className="financial-nums text-sm text-foreground">{valueFormatter(datum.value)}</span>
-                  <span className="financial-nums w-14 text-right text-sm font-bold text-foreground">
+                  <span className="financial-nums w-14 text-right text-sm font-medium text-foreground">
                     {pct.toFixed(1)}%
                   </span>
                 </span>
@@ -61,7 +61,7 @@ export function IncomeBreakdownBars({ data, valueFormatter, totalLabel, totalFor
       {total > 0 ? (
         <div className="flex items-baseline justify-between gap-3 border-t border-border/60 pt-3">
           <span className="text-sm font-medium text-muted-foreground">{totalLabel}</span>
-          <span className="financial-nums text-sm font-bold text-foreground">{formatTotal(total)}</span>
+          <span className="financial-nums text-sm font-medium text-foreground">{formatTotal(total)}</span>
         </div>
       ) : null}
     </div>

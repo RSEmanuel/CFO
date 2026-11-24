@@ -1,6 +1,7 @@
 "use client";
 
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { useLocale } from "@/context/LocaleContext";
 import { useFlujoLibre } from "@/hooks/use-flujo-libre";
@@ -152,7 +153,8 @@ export function FlujoLibreView({ periodo, units }: { periodo: string; units: Dis
     <ExpandableShell className="p-5">
       {(toggle, expanded) => (
         <>
-          <div className="mb-1 flex items-start justify-between gap-3">
+          <FavoriteStarButton widgetId="chart-flujo-libre" label={t("flujo.libre.title")} />
+          <div className="mb-1 flex items-start justify-between gap-3 pr-10">
             <h3 className="font-sans text-lg font-medium text-foreground">{t("flujo.libre.title")}</h3>
             {toggle}
           </div>

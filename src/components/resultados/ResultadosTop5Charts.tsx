@@ -85,7 +85,7 @@ function Top5Tooltip({
   return (
     <div className="min-w-[220px] px-3 py-2 text-xs" style={TOOLTIP_STYLE}>
       <p className="mb-1 font-medium text-foreground">{point.mes}</p>
-      <p className="mb-2 financial-nums text-sm font-semibold text-foreground">
+      <p className="mb-2 financial-nums text-sm font-medium text-foreground">
         {t("resultados.top5.tooltipTotal")} · {formatMxn(Number(point.totalMes))}
       </p>
       <ul className="space-y-1">
@@ -99,7 +99,7 @@ function Top5Tooltip({
               {row.label}
             </span>
             <span className="financial-nums shrink-0 text-foreground">{formatMxn(row.monto)}</span>
-            <span className="financial-nums w-12 shrink-0 text-right font-semibold tabular-nums">
+            <span className="financial-nums w-12 shrink-0 text-right font-medium tabular-nums">
               {row.pct.toFixed(1)}%
             </span>
           </li>
@@ -145,7 +145,7 @@ function TotalStackLabel(props: LabelGeom) {
       x={num(props.x) + num(props.width) / 2}
       y={num(props.y) - offset}
       textAnchor="middle"
-      className="fill-slate-700 text-xs font-semibold financial-nums"
+      className="fill-slate-700 text-xs font-medium financial-nums"
       style={{ pointerEvents: "none" }}
     >
       {text}
@@ -179,7 +179,7 @@ function SlicePctLabel({ cx, cy, midAngle, outerRadius, payload }: PieLabelGeom)
       textAnchor={x > cx ? "start" : "end"}
       dominantBaseline="central"
       fontSize={18}
-      fontWeight={700}
+      fontWeight={500}
       className="financial-nums"
     >
       {`${payload.pct.toFixed(1)}%`}
@@ -195,7 +195,7 @@ function Top5PieTooltip({ active, payload }: { active?: boolean; payload?: Array
   return (
     <div className="min-w-[180px] px-3 py-2 text-xs" style={TOOLTIP_STYLE}>
       <p className="mb-1 font-medium text-foreground">{row.label}</p>
-      <p className="financial-nums text-sm font-semibold text-foreground">
+      <p className="financial-nums text-sm font-medium text-foreground">
         {formatMxn(row.monto)} · {row.pct.toFixed(1)}%
       </p>
     </div>
@@ -293,7 +293,7 @@ function Top5Card({
             </div>
             <div className="flex items-center gap-1">
               {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
-              <p className="financial-nums text-2xl font-semibold tracking-tight">
+              <p className="financial-nums text-2xl font-medium tracking-tight">
                 {formatAxisTick(periodTotal || rankingTotal, units)}
               </p>
               {toggle}
@@ -428,7 +428,7 @@ function Top5Card({
                   </span>
                   <span
                     className={cn(
-                      "financial-nums w-14 text-right font-bold tabular-nums",
+                      "financial-nums w-14 text-right font-medium tabular-nums",
                       negative ? "text-muted-foreground" : "text-foreground",
                     )}
                   >

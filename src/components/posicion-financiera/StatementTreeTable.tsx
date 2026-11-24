@@ -391,7 +391,7 @@ export function StatementTreeTable({
                             <td className="financial-nums whitespace-nowrap px-2 py-2 text-right">
                               <span
                                 className={cn(
-                                  strong && "font-semibold",
+                                  strong && "font-medium",
                                   // Las razones no tienen semáforo propio en la tabla: verde solo sería
                                   // correcto si el valor fuera sano (regla de colores de señal).
                                   numberMode !== "ratio" && row.node.outflow ? "text-muted-foreground" : "text-foreground",

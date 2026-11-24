@@ -49,9 +49,9 @@ function CompareCard({
   const { t } = useLocale();
   return (
     <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
+      <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
       {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
-      <p className="financial-nums mt-3 text-2xl font-semibold tracking-tight text-foreground">
+      <p className="financial-nums mt-3 text-2xl font-medium tracking-tight text-foreground">
         {sim != null ? format(sim) : "N/D"}
       </p>
       <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
@@ -88,15 +88,15 @@ export function SimulatorCards({
 
   const cashBadge =
     sim.deltaCaja > 0.005 ? (
-      <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-semibold text-emerald-700">
+      <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
         {t("simulator.cards.cashReleased")}
       </span>
     ) : sim.deltaCaja < -0.005 ? (
-      <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-semibold text-red-700">
+      <span className="rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-700">
         {t("simulator.cards.cashRequired")}
       </span>
     ) : (
-      <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">
+      <span className="rounded-full bg-muted px-2.5 py-1 text-[11px] font-medium text-muted-foreground">
         {t("simulator.cards.noImpact")}
       </span>
     );
@@ -148,7 +148,7 @@ export function SimulatorCards({
 
         <article className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
           <div className="flex items-center justify-between gap-2">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <p className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
               {t("simulator.cards.cashImpact")}
             </p>
             {cashBadge}
@@ -156,7 +156,7 @@ export function SimulatorCards({
           <p className="mt-1 text-sm text-muted-foreground">{t("simulator.cards.cashImpactMeaning")}</p>
           <p
             className={cn(
-              "financial-nums mt-3 text-2xl font-semibold tracking-tight",
+              "financial-nums mt-3 text-2xl font-medium tracking-tight",
               sim.deltaCaja > 0.005 && "text-emerald-700",
               sim.deltaCaja < -0.005 && "text-red-700",
               Math.abs(sim.deltaCaja) <= 0.005 && "text-foreground",

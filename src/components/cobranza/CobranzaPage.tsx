@@ -1,47 +1,21 @@
 "use client";
 
-import { presentarNombre } from "@/services/textoPresentable";
-import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
-import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
+import {
+  AntiguedadCard,
+  ClientesQueNoPaganCard,
+  SaldosPorClienteCard,
+} from "@/components/cobranza/AntiguedadCards";
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
-import { ClientesQueNoPaganSection, type NoPaganRow } from "@/components/cobranza/ClientesQueNoPaganSection";
 import { CobranzaCarteraSection } from "@/components/cobranza/CobranzaCarteraSection";
 import { ConcentracionRiesgoSection } from "@/components/cobranza/ConcentracionRiesgoSection";
 import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
-import { HeroBarChart } from "@/components/charts/HeroBarChart";
-import { ExportMenu } from "@/components/export/ExportMenu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useSession } from "@/context/SessionContext";
 import { useLocale } from "@/context/LocaleContext";
 import { useCobranza } from "@/hooks/use-cobranza";
-import { CHART } from "@/lib/chart-theme";
 import { cn } from "@/lib/utils";
-import type { AntiguedadBucketKey } from "@/services/antiguedad";
-import { clienteParaRevisar } from "@/services/carteraSinCobrar";
-import { clienteParaSuspender } from "@/services/clientesQueNoPagan";
-import {
-  antiguedadExportFilename,
-  antiguedadExportTable,
-  cobranzaExportFilename,
-  listaClientesExportFilename,
-  listaClientesExportTable,
-  cobranzaExportTable,
-} from "@/services/cobranzaExport";
-import type { CobranzaPayload } from "@/services/cobranzaService";
-import { formatAxisTick, formatMxn } from "@/services/money";
-import {
-  buildCsv,
-  buildWorkbook,
-  downloadBlob,
-  type ColumnMode,
-  type FileKind,
-  workbookToBlob,
-} from "@/services/tableExport";
-import { useRef, useState } from "react";
-import { toast } from "sonner";
-import { TableScroll } from "@/components/ui/table-scroll";
+import { formatAxisTick } from "@/services/money";
+import { useState } from "react";
 
-type AntiguedadLado = "cxc" | "cxp";
 type CobranzaTab = "cartera" | "antiguedad" | "concentracion";
 
 const COBRANZA_TABS: Array<{ value: CobranzaTab; labelKey: string }> = [
@@ -52,100 +26,17 @@ const COBRANZA_TABS: Array<{ value: CobranzaTab; labelKey: string }> = [
 
 export function CobranzaPage() {
   const { t } = useLocale();
-  const { tenantId, tenants, user } = useSession();
   const { data, loading, error } = useCobranza();
-  const antiguedadRef = useRef<HTMLDivElement>(null);
-  const [lado, setLado] = useState<AntiguedadLado>("cxc");
   const [tab, setTab] = useState<CobranzaTab>("cartera");
-  const empresa =
-    tenants.find((tenant) => tenant.id === tenantId)?.name ??
-    (user?.tenant.id === tenantId ? user.tenant.name : undefined) ??
-    t("resultados.companyFallback");
   if (loading) return <div className="h-96 animate-pulse rounded-card bg-secondary" />;
   const model = data?.model ?? null;
   const asOf = data?.asOf ?? null;
-  const antiguedad = lado === "cxc" ? data?.antiguedadCxc ?? null : data?.antiguedadCxp ?? null;
-  const bucketLabel = (key: AntiguedadBucketKey) => t(`cobranza.agingBuckets.${key}`);
-
-  const exportClientes = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
-    if (!model || !asOf) {
-      return;
-    }
-    try {
-      const { headers, rows } = cobranzaExportTable(model.clientes, columnMode, bucketLabel, t);
-      const filename = cobranzaExportFilename(empresa, asOf, fileKind);
-      if (fileKind === "csv") {
-        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
-        return;
-      }
-      const workbook = await buildWorkbook(headers, rows, {
-        tenant: empresa,
-        reporte: "cobranza",
-        generatedAt: new Date().toISOString(),
-      });
-      downloadBlob(await workbookToBlob(workbook), filename);
-    } catch {
-      toast.error(t("cobranza.exportError"));
-    }
-  };
-
-  const lista = listaDeClientes(data);
-  const exportLista = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
-    if (!lista || !asOf) {
-      return;
-    }
-    const variant = lista.variant;
-    try {
-      const { headers, rows } = listaClientesExportTable(
-        lista.rows,
-        variant,
-        columnMode,
-        (accion) => t(`cobranza.${variant === "vencido" ? "noPagan" : "sinCobrar"}.acciones.${accion}`),
-        t,
-      );
-      const filename = listaClientesExportFilename(empresa, asOf, variant, fileKind);
-      if (fileKind === "csv") {
-        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
-        return;
-      }
-      const workbook = await buildWorkbook(headers, rows, {
-        tenant: empresa,
-        reporte: variant === "vencido" ? "clientes-que-no-pagan" : "clientes-sin-cobrar",
-        generatedAt: new Date().toISOString(),
-      });
-      downloadBlob(await workbookToBlob(workbook), filename);
-    } catch {
-      toast.error(t("cobranza.exportError"));
-    }
-  };
-
-  const exportAntiguedad = async ({ fileKind, columnMode }: { fileKind: FileKind; columnMode: ColumnMode }) => {
-    if (!antiguedad || !asOf) {
-      return;
-    }
-    try {
-      const { headers, rows } = antiguedadExportTable(antiguedad.terceros, columnMode, bucketLabel, t);
-      const filename = antiguedadExportFilename(empresa, asOf, lado, fileKind);
-      if (fileKind === "csv") {
-        downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
-        return;
-      }
-      const workbook = await buildWorkbook(headers, rows, {
-        tenant: empresa,
-        reporte: `antiguedad-${lado}`,
-        generatedAt: new Date().toISOString(),
-      });
-      downloadBlob(await workbookToBlob(workbook), filename);
-    } catch {
-      toast.error(t("cobranza.exportError"));
-    }
-  };
 
   return (
     <div className="mx-auto w-full max-w-[1680px] bg-background">
       <Tabs value={tab} onValueChange={(value) => setTab(value as CobranzaTab)}>
         <div>
-          <p className="mb-2 text-2xl font-bold tracking-tight text-clay">{t("nav.collections")}</p>
+          <p className="mb-2 text-2xl font-medium tracking-tight text-clay">{t("nav.collections")}</p>
           <TabsList className="flex h-auto flex-nowrap justify-start gap-2 overflow-x-auto border-0 bg-transparent p-0 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
             {COBRANZA_TABS.map((item) => (
               <TabsTrigger
@@ -173,30 +64,30 @@ export function CobranzaPage() {
       {!error && data && !data.hasData ? (
         <DataEmptyState title={t("cobranza.emptyTitle")} message={t("cobranza.emptyMessage")} />
       ) : null}
-      {lista ? <ClientesQueNoPaganSection {...lista} onExport={exportLista} /> : null}
+      <ClientesQueNoPaganCard />
       {model && asOf ? (
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.pendingInvoices")}</p>
+          <p className="font-sans text-lg font-medium text-foreground">{t("cobranza.pendingInvoices")}</p>
           <p className="text-xs text-muted-foreground">{t("cobranza.outstanding")}</p>
-          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
+          <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">
             {formatAxisTick(model.cxcAbierta, "m")}
           </p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.averageDays")}</p>
+          <p className="font-sans text-lg font-medium text-foreground">{t("cobranza.averageDays")}</p>
           <p className="text-xs text-muted-foreground">{t("cobranza.averageDaysHelp")}</p>
-          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">{model.dso == null ? t("common.na") : t("cobranza.days", { value: model.dso })}</p>
+          <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">{model.dso == null ? t("common.na") : t("cobranza.days", { value: model.dso })}</p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.over60")}</p>
-          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
+          <p className="font-sans text-lg font-medium text-foreground">{t("cobranza.over60")}</p>
+          <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">
             {model.pctMayor60.toFixed(1)}%
           </p>
         </article>
         <article className="rounded-card border border-border bg-card p-6 shadow-[var(--shadow-card)]">
-          <p className="font-sans text-lg font-bold text-foreground">{t("cobranza.topClient")}</p>
-          <p className="mt-4 font-sans text-2xl font-semibold tracking-tight text-foreground">
+          <p className="font-sans text-lg font-medium text-foreground">{t("cobranza.topClient")}</p>
+          <p className="mt-4 font-sans text-2xl font-medium tracking-tight text-foreground">
             {model.topCliente.nombre} · {model.topCliente.pct.toFixed(0)}%
           </p>
         </article>
@@ -205,118 +96,9 @@ export function CobranzaPage() {
 
       {model && asOf ? <CobranzaAgingChart /> : null}
 
-      {antiguedad && asOf ? (
-        <ExpandableShell className="p-5">
-          {(toggle, expanded) => (
-          <>
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div>
-              <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.agingSchedule")}</h2>
-              <p className="text-xs text-muted-foreground">{t("cobranza.agingScheduleHelp")}</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="flex rounded-control border border-border bg-secondary p-0.5">
-                {(["cxc", "cxp"] as const).map((option) => (
-                  <button
-                    key={option}
-                    type="button"
-                    onClick={() => setLado(option)}
-                    className={cn(
-                      "rounded-control px-3 py-1 text-xs font-medium text-muted-foreground",
-                      lado === option && "bg-card text-clay shadow-sm",
-                    )}
-                  >
-                    {option === "cxc" ? t("cobranza.receivable") : t("cobranza.payable")}
-                  </button>
-                ))}
-              </div>
-              <ChartDownloadButton
-                targetRef={antiguedadRef}
-                empresa={empresa}
-                modulo="cobranza"
-                titulo={t("cobranza.agingSchedule")}
-                periodo={asOf}
-              />
-              {toggle}
-            </div>
-          </div>
-          {/* Ampliada, la tabla sigue debajo: alto fijo grande en vez de flex-1 para que no aplaste la gráfica. */}
-          <div ref={antiguedadRef} className={cn("mt-4 w-full min-w-0", expanded ? "h-[60vh] shrink-0" : "h-[260px]")}>
-            <HeroBarChart
-              data={antiguedad.buckets.map((bucket) => ({
-                name: bucketLabel(bucket.key),
-                saldo: bucket.saldo,
-              }))}
-              xKey="name"
-              yTickFormatter={(value) => formatAxisTick(value, "m")}
-              tooltipFormatter={(value, name) => [formatMxn(Number(value)), name]}
-              legendFormatter={() => t("cobranza.balance")}
-              series={[{ dataKey: "saldo", name: t("cobranza.balance"), fill: CHART.sand }]}
-            />
-          </div>
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="text-sm text-muted-foreground">
-              {t("cobranza.agingTotal")}: <span className="financial-nums font-semibold text-foreground">{formatMxn(antiguedad.total)}</span>
-            </p>
-            <ExportMenu onDownload={exportAntiguedad} />
-          </div>
-          <TableScroll className="mt-2">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
-                  <th className="pb-2 font-medium">{lado === "cxc" ? t("cobranza.client") : t("cobranza.vendor")}</th>
-                  <th className="pb-2 text-right font-medium">{t("cobranza.balance")}</th>
-                  <th className="pb-2 text-right font-medium">{t("cobranza.daysPastDue")}</th>
-                  <th className="pb-2 text-right font-medium">{t("cobranza.bucket")}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {antiguedad.terceros.map((row) => (
-                  <tr key={row.tercero} className="border-b border-beige-deep last:border-0">
-                    <td className="py-3 font-sans text-base text-foreground">{row.tercero}</td>
-                    <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
-                    <td className="financial-nums py-3 text-right text-foreground">{Math.max(0, row.diasVencidos)}</td>
-                    <td className="py-3 text-right text-muted-foreground">{bucketLabel(row.bucket)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </TableScroll>
-          </>
-          )}
-        </ExpandableShell>
-      ) : null}
+      <AntiguedadCard />
 
-      {model ? (
-      <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="font-sans text-lg font-medium text-foreground">{t("cobranza.balancesByClient")}</h2>
-          <ExportMenu onDownload={exportClientes} />
-        </div>
-        <TableScroll>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-beige-deep text-left text-[11.5px] uppercase tracking-[0.1em] text-muted-foreground">
-                <th className="pb-2 font-medium">{t("cobranza.client")}</th>
-                <th className="pb-2 text-right font-medium">{t("cobranza.balance")}</th>
-                <th className="pb-2 text-right font-medium">{t("cobranza.daysPastDue")}</th>
-                <th className="pb-2 text-right font-medium">{t("cobranza.bucket")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {model.clientes.map((row) => (
-                <tr key={row.cliente} className="border-b border-beige-deep last:border-0">
-                  <td className="py-3 font-sans text-base text-foreground">{presentarNombre(row.cliente)}</td>
-                  <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
-                  <td className="financial-nums py-3 text-right text-foreground">{row.dias}</td>
-                  <td className="py-3 text-right text-muted-foreground">{bucketLabel(row.bucket)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </TableScroll>
-      </section>
-      ) : null}
+      <SaldosPorClienteCard />
       </div>
         </TabsContent>
 
@@ -326,55 +108,4 @@ export function CobranzaPage() {
       </Tabs>
     </div>
   );
-}
-
-type ListaClientes = {
-  variant: "vencido" | "sinCobrar";
-  total: number;
-  rows: NoPaganRow[];
-  topCount: number;
-  topPct: number;
-  alerta: NoPaganRow | null;
-};
-
-/** Con auxiliar de ventas manda la fecha de vencimiento; sin él, los días desde la factura. */
-function listaDeClientes(data: CobranzaPayload | null): ListaClientes | null {
-  if (data?.clientesQueNoPagan) {
-    const model = data.clientesQueNoPagan;
-    const paraRow = (row: { cliente: string; vencido: number; diasVencidos: number; accion: string }): NoPaganRow => ({
-      cliente: row.cliente,
-      monto: row.vencido,
-      dias: row.diasVencidos,
-      accion: row.accion,
-    });
-    const alerta = clienteParaSuspender(model);
-    return {
-      variant: "vencido",
-      total: model.totalVencido,
-      rows: model.clientes.map(paraRow),
-      topCount: model.topCount,
-      topPct: model.topPct,
-      alerta: alerta ? paraRow(alerta) : null,
-    };
-  }
-  if (data?.clientesSinCobrar) {
-    const model = data.clientesSinCobrar;
-    const paraRow = (row: { cliente: string; saldo: number; diasSinCobrar: number; alMenos: boolean; accion: string }): NoPaganRow => ({
-      cliente: row.cliente,
-      monto: row.saldo,
-      dias: row.diasSinCobrar,
-      accion: row.accion,
-      alMenos: row.alMenos,
-    });
-    const alerta = clienteParaRevisar(model);
-    return {
-      variant: "sinCobrar",
-      total: model.totalSaldo,
-      rows: model.clientes.map(paraRow),
-      topCount: model.topCount,
-      topPct: model.topPct,
-      alerta: alerta ? paraRow(alerta) : null,
-    };
-  }
-  return null;
 }

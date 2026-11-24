@@ -31,7 +31,7 @@ type FilterSelectProps = {
 function FilterSelect({ label, value, onValueChange, options, disabled }: FilterSelectProps) {
   return (
     <label className={cn("min-w-[150px] flex-1", disabled && "cursor-not-allowed opacity-60")}>
-      <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {label}
       </span>
       <Select value={value} onValueChange={onValueChange} disabled={disabled}>

@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { Button } from "@/components/ui/button";
 import { useLocale } from "@/context/LocaleContext";
 import { useSession } from "@/context/SessionContext";
@@ -99,7 +100,9 @@ export function BudgetAssumptionsSummary({
           <p className="text-sm font-medium text-foreground">
             {manual ? t("resultados.budgetAssumptions.manualTitle") : t("resultados.budgetAssumptions.autoTitle")}
           </p>
-          <p className="mt-1 text-sm text-foreground">{budgetAssumptionsSentence(drivers, source, driversApplied, t, locale)}</p>
+          <p className="mt-1 text-sm text-foreground">
+            <ConCifras>{budgetAssumptionsSentence(drivers, source, driversApplied, t, locale)}</ConCifras>
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">
             {manual && updatedAt
               ? t("resultados.budgetAssumptions.manualSaved", {

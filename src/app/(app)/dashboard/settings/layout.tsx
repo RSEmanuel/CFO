@@ -17,7 +17,7 @@ export default function SettingsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.settings")}</p>
+        <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.settings")}</p>
       </div>
       {children}
     </div>

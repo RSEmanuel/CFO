@@ -58,7 +58,7 @@ export default function ClienteDetallePage() {
         {back}
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="min-w-0">
-            <p className="text-2xl font-bold tracking-tight text-clay">{client.name}</p>
+            <p className="text-2xl font-medium tracking-tight text-clay">{client.name}</p>
             <p className="cifra-num mt-1 text-sm text-muted-foreground">{client.rfc}</p>
           </div>
           <Button type="button" className="gap-2" onClick={openNumbers}>

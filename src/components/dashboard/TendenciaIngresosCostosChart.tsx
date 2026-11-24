@@ -260,7 +260,7 @@ function TrendPointLabel({
       textAnchor={textAnchor}
       fill={color}
       fontSize={11}
-      fontWeight={600}
+      fontWeight={500}
       stroke="var(--cifra-brand-contrast)"
       strokeWidth={3}
       paintOrder="stroke fill"

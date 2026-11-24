@@ -116,7 +116,7 @@ function OpexXTick({
         <tspan x={0} dy={12} fill={CHART.mute} fontSize={11}>
           {month}
         </tspan>
-        <tspan x={0} dy={14} fill={CHART.clay} fontSize={10} fontWeight={600}>
+        <tspan x={0} dy={14} fill={CHART.clay} fontSize={10} fontWeight={500}>
           {formattedTotal}
         </tspan>
       </text>
@@ -161,7 +161,7 @@ function OpexTooltip({
   return (
     <div className="min-w-52 px-3 py-2 text-xs text-foreground" style={TOOLTIP_STYLE}>
       <p className="mb-1 font-medium">{label}</p>
-      <p className="font-semibold text-clay">
+      <p className="font-medium text-clay">
         {totalLabel}: {formatMxn(total)}
       </p>
       <div className="mt-2 space-y-1 border-t border-border pt-2">
@@ -283,7 +283,7 @@ export function GastoOpexView({ periodo, units, comparable, budgetPayload, rows,
                   {toggle}
                 </div>
               </div>
-              <p className="financial-nums text-4xl font-semibold tracking-tight">
+              <p className="financial-nums text-4xl font-medium tracking-tight">
                 {formatAxisTick(data.totalOpex, units)}
               </p>
               {Object.prototype.hasOwnProperty.call(data.totalesPorMes, comparablePeriod) ? (

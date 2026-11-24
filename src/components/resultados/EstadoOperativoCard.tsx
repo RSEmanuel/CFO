@@ -232,8 +232,8 @@ function EstadoRow({
     <tr
       className={cn(
         "border-t border-border/40",
-        isTotal && "border-t-2 border-t-foreground/40 font-semibold",
-        isResult && "bg-[var(--cifra-good-soft)]/50 font-semibold",
+        isTotal && "border-t-2 border-t-foreground/40 font-medium",
+        isResult && "bg-[var(--cifra-good-soft)]/50 font-medium",
         isBottomLine && "bg-[var(--cifra-good-soft)]/70",
         onAudit && "cursor-pointer transition-colors hover:bg-secondary/60",
       )}

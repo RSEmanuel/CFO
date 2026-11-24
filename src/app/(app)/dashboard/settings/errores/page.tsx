@@ -47,7 +47,7 @@ function buildQuery(filters: Filters, page: number): string {
 function FilterField({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="flex min-w-[150px] flex-1 flex-col gap-1.5">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{label}</span>
+      <span className="text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{label}</span>
       {children}
     </label>
   );
@@ -145,7 +145,7 @@ export default function ErroresPage() {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.errorLog")}</p>
+        <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.errorLog")}</p>
       </div>
 
       {view ? (
@@ -160,7 +160,7 @@ export default function ErroresPage() {
             <Card key={labelKey}>
               <CardContent className="space-y-1 p-4">
                 <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground">{t(labelKey)}</p>
-                <p className="cifra-num text-2xl font-semibold text-foreground">{num(value)}</p>
+                <p className="cifra-num text-2xl font-medium text-foreground">{num(value)}</p>
               </CardContent>
             </Card>
           ))}

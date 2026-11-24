@@ -57,7 +57,7 @@ export default function ClientesPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.clients")}</p>
+          <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.clients")}</p>
           <p className="mt-1 text-sm text-muted-foreground">{t("clients.help")}</p>
         </div>
         <Button asChild variant="outline" size="sm" className="gap-2">

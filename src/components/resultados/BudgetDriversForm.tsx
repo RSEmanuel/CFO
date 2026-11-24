@@ -92,7 +92,7 @@ export function BudgetDriversForm({
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {DRIVER_FIELDS.map((field) => (
           <label key={field.key} className="block">
-            <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+            <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
               {t(field.labelKey)}
             </span>
             <input

@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { BudgetForecastChart } from "@/components/charts/BudgetForecastChart";
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
@@ -163,7 +164,7 @@ export function ResultadosPresupuestoView({
 
             <div className="mt-5 flex flex-wrap items-end gap-5 border-y border-beige-deep py-4">
               <div>
-                <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
                   {t("resultados.horizon")}
                 </span>
                 <div className="inline-flex h-10 rounded-control border border-input p-0.5">
@@ -186,7 +187,7 @@ export function ResultadosPresupuestoView({
                 </div>
               </div>
               <div>
-                <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
                   {t("resultados.scenario")}
                 </span>
                 <div className="inline-flex h-10 rounded-control border border-input p-0.5">
@@ -213,7 +214,7 @@ export function ResultadosPresupuestoView({
                 </div>
               </div>
               <label className="min-w-[220px] flex-1">
-                <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
                   {t("resultados.incomeAdjustment", {
                     sign: incomeAdjustmentPct > 0 ? "+" : "",
                     value: incomeAdjustmentPct,
@@ -386,9 +387,13 @@ export function ResultadosPresupuestoView({
 
             <p className="mt-5 flex gap-2 text-[13px] text-muted-foreground">
               <span className="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-clay" />
-              {t(model.insight.messageKey, model.insight.values?.driver
-                ? { ...model.insight.values, driver: t(`resultados.${model.insight.values.driver === "ingreso" ? "income" : model.insight.values.driver === "costo" ? "cost" : "expense"}`) }
-                : model.insight.values)}
+              <span>
+                <ConCifras>
+                  {t(model.insight.messageKey, model.insight.values?.driver
+                    ? { ...model.insight.values, driver: t(`resultados.${model.insight.values.driver === "ingreso" ? "income" : model.insight.values.driver === "costo" ? "cost" : "expense"}`) }
+                    : model.insight.values)}
+                </ConCifras>
+              </span>
             </p>
 
             <div className="mt-5 border-t border-beige-deep pt-4">
