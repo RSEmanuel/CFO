@@ -1183,7 +1183,56 @@
       },
       "alertas": {
         "perdida": "This month you lost {monto}. Review your biggest costs and expenses and cut what doesn't drive sales.",
-        "gastoSube": "Your costs and expenses rose {pct}% ({monto}) versus last month. Review what drove the increase."
+        "gastoSube": "Your costs and expenses rose {pct}% ({monto}) versus last month. Review what drove the increase.",
+        "deudaAlta": "Your debt equals {anios} years of what your operation generates. Renegotiate term and rate before taking on more credit.",
+        "deudaSinOperacion": "Your operation didn't generate enough in the last 12 months to pay your {monto} debt. Talk to your bank about extending the term before the next due date."
+      },
+      "seccion": {
+        "comoTeFue": "How you did",
+        "tuDinero": "Your money",
+        "queHacer": "What to do"
+      },
+      "ventas": {
+        "label": "Sales for the month",
+        "vsMes": "{pct} vs prior month",
+        "vsAnio": "{pct} vs same month last year",
+        "sinComparar": "No prior months to compare.",
+        "sinDato": "Upload this month's trial balance to see them."
+      },
+      "margen": {
+        "gana": "Out of every $100 you sold, you kept ${monto}.",
+        "pierde": "You lost ${monto} for every $100 you sold."
+      },
+      "cajaRespiro": "Enough for {meses} months of operation.",
+      "cxc": {
+        "label": "Customers owe you",
+        "dias": "They take {dias} days to pay you, on average.",
+        "sinDias": "Customer balance in your trial balance at month end.",
+        "sinDato": "Your trial balance has no customer accounts."
+      },
+      "cxp": {
+        "label": "You owe suppliers",
+        "dias": "You pay them in {dias} days, on average.",
+        "sinDias": "Supplier balance in your trial balance at month end.",
+        "sinDato": "Your trial balance has no supplier accounts."
+      },
+      "deuda": {
+        "label": "Financial debt",
+        "anios": "With what your operation generates, you'd pay it off in {anios} years.",
+        "cajaCubre": "Your cash is enough to pay it all.",
+        "sinOperacion": "Your operation didn't generate enough in the last 12 months to pay it.",
+        "sinDato": "Not enough months of results to measure it.",
+        "sinDeuda": "Your trial balance has no financial debt."
+      },
+      "impuestos": {
+        "label": "Taxes payable",
+        "detalle": "VAT, income tax, withholdings and contributions to remit.",
+        "ivaPorCobrar": "Includes {monto} of VAT you pay once you collect.",
+        "sinDato": "Your trial balance has no taxes payable."
+      },
+      "financiamiento": {
+        "proveedores": "Your suppliers finance your operation: you collect in {dso} days and pay in {dpo}.",
+        "clientes": "You finance your customers: you collect in {dso} days and pay in {dpo}."
       }
     }
   },
