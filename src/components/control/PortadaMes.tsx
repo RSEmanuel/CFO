@@ -1,7 +1,6 @@
 "use client";
 
 import { TendenciaIngresosCostosChart } from "@/components/dashboard/TendenciaIngresosCostosChart";
-import { presentarNombre } from "@/services/textoPresentable";
 import { useLocale } from "@/context/LocaleContext";
 import { useCajaRespiro } from "@/hooks/use-caja-respiro";
 import { useCobranza } from "@/hooks/use-cobranza";
@@ -10,7 +9,7 @@ import { usePanelSaldos } from "@/hooks/use-panel-saldos";
 import { cn } from "@/lib/utils";
 import type { MonthlyFinancials } from "@/services/financialDataTransformer";
 import { formatMxn, type DisplayUnits } from "@/services/money";
-import { buildPortadaMes, type PortadaAlerta, type PortadaMes as Portada, type PortadaSello } from "@/services/portadaMes";
+import { buildPortadaMes, type PortadaMes as Portada, type PortadaSello } from "@/services/portadaMes";
 import Link from "next/link";
 import { useMemo } from "react";
 
@@ -43,25 +42,6 @@ function deLaSerie(rows: MonthlyFinancials[], periodo: string) {
     ? { monto: ventana.reduce((acc, row) => acc + row.ebitda, 0), meses: ventana.length }
     : null;
   return { ventasAnioAnterior, ebitda12m };
-}
-
-function alertaTexto(alerta: PortadaAlerta, t: T): string {
-  switch (alerta.kind) {
-    case "lowRunway":
-      return t("flujo.alertsMessages.lowRunway", { caja: formatMxn(alerta.caja), meses: alerta.meses.toFixed(1) });
-    case "clienteSuspender":
-      return t("cobranza.noPagan.alerta", { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias });
-    case "clienteRevisar":
-      return t("cobranza.sinCobrar.alerta", { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias });
-    case "perdida":
-      return t("control.portada.alertas.perdida", { monto: formatMxn(alerta.monto) });
-    case "gastoSube":
-      return t("control.portada.alertas.gastoSube", { pct: alerta.pct.toFixed(1), monto: formatMxn(alerta.monto) });
-    case "deudaAlta":
-      return t("control.portada.alertas.deudaAlta", { anios: alerta.anios.toFixed(1) });
-    case "deudaSinOperacion":
-      return t("control.portada.alertas.deudaSinOperacion", { monto: formatMxn(alerta.monto) });
-  }
 }
 
 type Tarjeta = {
@@ -230,8 +210,8 @@ function Seccion({ titulo }: { titulo: string }) {
 
 /**
  * Portada del Panel de Control: cómo te fue (ventas y utilidad), tu dinero
- * (caja, lo que te deben, lo que debes a proveedores, deuda e impuestos), qué
- * hacer (máximo 3 alertas) y la tendencia de 12 meses. Cada cifra con su sello
+ * (caja, lo que te deben, lo que debes a proveedores, deuda e impuestos) y la
+ * tendencia de 12 meses. Sin lista de alertas por decisión del dueño (2026-11-24). Cada cifra con su sello
  * (confirmada o estimada) y el clic a su módulo. La lógica vive en services/portadaMes.
  */
 export function PortadaMes({ periodo, rows, units }: { periodo: string; rows: MonthlyFinancials[]; units: DisplayUnits }) {
@@ -304,23 +284,6 @@ export function PortadaMes({ periodo, rows, units }: { periodo: string; rows: Mo
             <TarjetaPortada key={tarjeta.key} tarjeta={tarjeta} />
           ))}
         </div>
-
-        {portada.alertas.length > 0 ? (
-          <>
-            <Seccion titulo={t("control.portada.seccion.queHacer")} />
-            <ul className="mt-2 space-y-2">
-              {portada.alertas.map((alerta, index) => (
-                <li
-                  key={`${alerta.kind}-${index}`}
-                  className="flex items-start gap-2 rounded-control border border-border bg-background px-3 py-2.5 text-sm text-foreground"
-                >
-                  <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-desfavorable" aria-hidden />
-                  {alertaTexto(alerta, t)}
-                </li>
-              ))}
-            </ul>
-          </>
-        ) : null}
       </section>
 
       {rows.length > 0 ? <TendenciaIngresosCostosChart rows={rows} units={units} endPeriod={periodo} /> : null}
