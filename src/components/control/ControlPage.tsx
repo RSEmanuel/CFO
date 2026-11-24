@@ -161,7 +161,7 @@ export function ControlPage() {
         }}
       />
 
-      <PortadaMes periodo={effectivePeriod || filters.periodo} />
+      <PortadaMes periodo={effectivePeriod || filters.periodo} rows={rows} units={filters.units} />
 
       <DashboardDataProvider>
         <div className="space-y-8">

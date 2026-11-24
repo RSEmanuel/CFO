@@ -121,3 +121,62 @@ describe("portada: tu mes en 5 números", () => {
     );
   });
 });
+
+// Cifras de ejemplo, redondas a propósito.
+const saldos = (over: Partial<import("./panelSaldos").PanelSaldos> = {}): import("./panelSaldos").PanelSaldos => ({
+  tenantId: "t",
+  periodo: "2026-07",
+  hasBalanza: true,
+  cxc: 3000,
+  cxp: 2000,
+  dso: 40,
+  dpo: 60,
+  deuda: 5000,
+  deudaNeta: 4500,
+  impuestos: { total: 800, ivaPorCobrar: 300 },
+  ...over,
+});
+
+describe("portada: cómo te fue y tu dinero", () => {
+  it("ventas contra mes anterior y año pasado, y margen de la utilidad", () => {
+    const portada = buildPortadaMes({ ...base, ventasAnioAnterior: 800 });
+    assert.equal(portada.ventasAnterior, 900);
+    assert.equal(portada.ventasAnioAnterior, 800);
+    assert.equal(portada.margenPct, 20);
+  });
+
+  it("toma los saldos del cierre tal cual y mide la deuda en años de EBITDA", () => {
+    const portada = buildPortadaMes({ ...base, saldos: saldos(), ebitda12m: { monto: 1500, meses: 12 } });
+    assert.equal(portada.cxc, 3000);
+    assert.equal(portada.dpo, 60);
+    assert.deepEqual(portada.impuestos, { total: 800, ivaPorCobrar: 300 });
+    assert.deepEqual(portada.deudaPago, { estado: "anios", anios: 3 });
+    assert.ok(!portada.alertas.some((alerta) => alerta.kind === "deudaAlta"));
+  });
+
+  it("con menos de 12 meses anualiza el EBITDA; más de 3 años de deuda es alerta", () => {
+    const portada = buildPortadaMes({ ...base, saldos: saldos(), ebitda12m: { monto: 500, meses: 6 } });
+    assert.deepEqual(portada.deudaPago, { estado: "anios", anios: 4.5 });
+    assert.ok(portada.alertas.some((alerta) => alerta.kind === "deudaAlta"));
+  });
+
+  it("si la caja cubre la deuda o la operación no genera, lo dice en vez de inventar años", () => {
+    assert.deepEqual(
+      buildPortadaMes({ ...base, saldos: saldos({ deudaNeta: -100 }), ebitda12m: { monto: 1500, meses: 12 } }).deudaPago,
+      { estado: "cajaCubre" },
+    );
+    const sinOperacion = buildPortadaMes({ ...base, saldos: saldos(), ebitda12m: { monto: -200, meses: 12 } });
+    assert.deepEqual(sinOperacion.deudaPago, { estado: "sinOperacion" });
+    assert.ok(sinOperacion.alertas.some((alerta) => alerta.kind === "deudaSinOperacion" && alerta.monto === 5000));
+    assert.deepEqual(buildPortadaMes({ ...base, saldos: saldos({ deuda: null, deudaNeta: null }) }).deudaPago, {
+      estado: "sinDato",
+    });
+  });
+
+  it("sin balanza del mes los saldos son null, nunca 0", () => {
+    const portada = buildPortadaMes({ ...base, saldos: saldos({ hasBalanza: false }) });
+    assert.equal(portada.cxc, null);
+    assert.equal(portada.deuda, null);
+    assert.equal(portada.impuestos, null);
+  });
+});

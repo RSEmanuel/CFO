@@ -49,6 +49,31 @@ function sumRoleBalance(
   return findRoleLeaves(rows, rule).reduce((acc, fila) => acc + money(fila[field]), 0);
 }
 
+/**
+ * Saldo al cierre de clientes (CxC) y proveedores (CxP) con los mismos roles y
+ * hojas que `cccFromBalanza`. CxC con su signo (deudor +); CxP en magnitud,
+ * porque la balanza persiste los pasivos en negativo.
+ */
+export function saldosComercialesCierre(
+  rows: BalanzaPnL[],
+  roles?: AccountRoles | null,
+): { cxc: number | null; cxp: number | null } {
+  const saldo = (categoria: BalanzaPnL["categoriaMaestra"], key: "clientes" | "proveedores"): number | null => {
+    const rule = ruleFor(roles ?? null, key);
+    if (!rule) return null;
+    const filas = inCategoria(rows, categoria);
+    // Primero por prefijo (como «tu caja»): así «IVA retenido por clientes» no cuenta como cliente.
+    // Solo si el catálogo no trae esos prefijos se usan los nombres del rol.
+    const porPrefijo = findRoleLeaves(filas, { ...rule, nameTokens: [] });
+    const hojas = porPrefijo.length > 0 ? porPrefijo : findRoleLeaves(filas, rule);
+    if (hojas.length === 0) return null;
+    return round2(hojas.reduce((acc, fila) => acc + money(fila.saldoFinal), 0));
+  };
+  const cxc = saldo("Activo", "clientes");
+  const cxp = saldo("Pasivo", "proveedores");
+  return { cxc, cxp: cxp == null ? null : round2(Math.abs(cxp)) };
+}
+
 /** Flujo del periodo sobre las hojas del rol: credit = haber − debe; debit = debe − haber. */
 function sumRoleFlow(rows: BalanzaPnL[], rule: AccountRoleRule | undefined, direction: "credit" | "debit"): number {
   if (!rule) {

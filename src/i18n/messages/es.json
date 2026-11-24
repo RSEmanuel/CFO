@@ -1183,7 +1183,56 @@
       },
       "alertas": {
         "perdida": "Este mes perdiste {monto}. Revisa tus costos y gastos más grandes y recorta lo que no te deje venta.",
-        "gastoSube": "Tus costos y gastos subieron {pct}% ({monto}) contra el mes anterior. Revisa en qué se fue el aumento."
+        "gastoSube": "Tus costos y gastos subieron {pct}% ({monto}) contra el mes anterior. Revisa en qué se fue el aumento.",
+        "deudaAlta": "Tu deuda equivale a {anios} años de lo que genera tu operación. Renegocia plazo y tasa antes de pedir más crédito.",
+        "deudaSinOperacion": "Tu operación de los últimos 12 meses no generó para pagar tu deuda de {monto}. Habla con tu banco para ampliar el plazo antes del próximo vencimiento."
+      },
+      "seccion": {
+        "comoTeFue": "Cómo te fue",
+        "tuDinero": "Tu dinero",
+        "queHacer": "Qué hacer"
+      },
+      "ventas": {
+        "label": "Ventas del mes",
+        "vsMes": "{pct} vs mes anterior",
+        "vsAnio": "{pct} vs mismo mes del año pasado",
+        "sinComparar": "Sin meses anteriores para comparar.",
+        "sinDato": "Carga la balanza de este mes para verlas."
+      },
+      "margen": {
+        "gana": "De cada $100 que vendiste te quedaron ${monto}.",
+        "pierde": "Perdiste ${monto} por cada $100 que vendiste."
+      },
+      "cajaRespiro": "Te alcanza para {meses} meses de operación.",
+      "cxc": {
+        "label": "Te deben tus clientes",
+        "dias": "Tardan {dias} días en pagarte, en promedio.",
+        "sinDias": "Saldo de clientes en tu balanza al cierre.",
+        "sinDato": "Tu balanza no trae cuentas de clientes."
+      },
+      "cxp": {
+        "label": "Debes a proveedores",
+        "dias": "Les pagas en {dias} días, en promedio.",
+        "sinDias": "Saldo de proveedores en tu balanza al cierre.",
+        "sinDato": "Tu balanza no trae cuentas de proveedores."
+      },
+      "deuda": {
+        "label": "Deuda financiera",
+        "anios": "Con lo que genera tu operación, la pagarías en {anios} años.",
+        "cajaCubre": "Tu caja alcanza para pagarla completa.",
+        "sinOperacion": "Tu operación de los últimos 12 meses no generó para pagarla.",
+        "sinDato": "Faltan meses de resultados para medirla.",
+        "sinDeuda": "Tu balanza no trae deuda financiera."
+      },
+      "impuestos": {
+        "label": "Impuestos por pagar",
+        "detalle": "IVA, ISR, retenciones y cuotas por enterar.",
+        "ivaPorCobrar": "Incluye {monto} de IVA que pagas hasta que cobres.",
+        "sinDato": "Tu balanza no trae impuestos por pagar."
+      },
+      "financiamiento": {
+        "proveedores": "Tus proveedores financian tu operación: cobras en {dso} días y pagas en {dpo}.",
+        "clientes": "Tú financias a tus clientes: cobras en {dso} días y pagas en {dpo}."
       }
     }
   },
