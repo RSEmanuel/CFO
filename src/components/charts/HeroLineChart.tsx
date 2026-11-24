@@ -279,7 +279,7 @@ export function HeroLineChart({
       <LineChart
         key={chartKey}
         data={data}
-        margin={{ top: 52, right: 30, left: 10, bottom: 20 }}
+        margin={{ top: 24, right: 24, left: 4, bottom: 8 }}
       >
         <CartesianGrid vertical={false} stroke={CHART_AXIS.stroke} strokeDasharray="3 3" />
         <XAxis

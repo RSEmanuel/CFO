@@ -130,62 +130,112 @@ export function CategorySeriesCard({
         : t("resultados.monthly");
   const categoryLabel = t(category === "Ingreso" ? "resultados.income" : "resultados.cost");
   const favoriteId = category === "Ingreso" ? RESULTADOS_FAVORITE.serieIngreso : RESULTADOS_FAVORITE.serieCosto;
+  const headlineValue = headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units);
+  const comparableText =
+    comparableLabel && comparableTotal != null
+      ? `${comparable === "mom" ? "MoM" : "YoY"} ${comparableLabel}: ${formatAxisTick(comparableTotal, units)}`
+      : null;
+
+  const titleBlock = (
+    <div className="flex items-center gap-2">
+      <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
+        <LineChartIcon className="h-4 w-4" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 className="font-sans text-xl font-medium text-foreground">{categoryLabel}</h2>
+        <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
+          {tempoLabel} | {units.toUpperCase()} | MXN
+        </p>
+      </div>
+      <FavoriteStarButton widgetId={favoriteId} label={categoryLabel} />
+    </div>
+  );
+
+  const viewToggle = canToggleYear ? (
+    <div
+      role="group"
+      aria-label={t("resultados.chartViewLabel")}
+      className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5"
+    >
+      {(["month", "year"] as const).map((view) => (
+        <button
+          key={view}
+          type="button"
+          onClick={() => setChartView(view)}
+          aria-pressed={chartView === view}
+          className={cn(
+            "h-9 rounded-control px-3 text-sm font-medium transition-colors",
+            chartView === view
+              ? "bg-secondary text-clay shadow-sm"
+              : "text-muted-foreground hover:bg-muted hover:text-foreground",
+          )}
+        >
+          {t(view === "month" ? "resultados.chartByMonth" : "resultados.chartByYear")}
+        </button>
+      ))}
+    </div>
+  ) : null;
+
+  const yearsNote =
+    showYearly && partialYearsNote ? (
+      <p className="mt-2 text-xs leading-snug text-muted-foreground">{partialYearsNote}</p>
+    ) : null;
+
+  // Ingreso: encabezado en un renglón y la gráfica a todo el ancho de la tarjeta.
+  if (category === "Ingreso") {
+    return (
+      <ExpandableShell className="flex flex-col gap-4 p-6">
+        {(toggle, expanded) => (
+          <>
+            <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 pr-10">
+              <div className="flex flex-wrap items-center gap-x-10 gap-y-3">
+                {titleBlock}
+                <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className="font-sans text-lg text-muted-foreground">{headlineLabel}</span>
+                  <span className="financial-nums text-4xl font-semibold tracking-tight">{headlineValue}</span>
+                  {comparableText ? <span className="text-xs text-muted-foreground">{comparableText}</span> : null}
+                </div>
+              </div>
+              <div className="ml-auto flex items-center gap-1">
+                {viewToggle}
+                {toggle}
+              </div>
+            </div>
+            <div
+              className={cn(
+                expanded ? "min-h-0 flex-1" : "h-[400px] lg:h-[460px]",
+                "w-full min-w-0 overflow-visible",
+              )}
+            >
+              <IncomeTotalChart
+                data={showYearly && yearlyChartData ? yearlyChartData : chartData}
+                series={seriesKeys}
+                units={units}
+                selectedLabel={showYearly ? (yearlySelectedLabel ?? headlineLabel) : headlineLabel}
+              />
+            </div>
+            {yearsNote}
+          </>
+        )}
+      </ExpandableShell>
+    );
+  }
 
   return (
     <ExpandableShell className="flex flex-col gap-6 p-6 lg:flex-row">
       {(toggle, expanded) => (
         <>
           <div className="flex w-full flex-col lg:w-[30%]">
-            <div className="mb-4 flex items-center gap-2 pr-10 lg:pr-0">
-              <span className="flex h-9 w-9 items-center justify-center rounded-control bg-secondary text-clay">
-                <LineChartIcon className="h-4 w-4" />
-              </span>
-              <div className="min-w-0 flex-1">
-                <h2 className="font-sans text-xl font-medium text-foreground">{categoryLabel}</h2>
-                <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                  {tempoLabel} | {units.toUpperCase()} | MXN
-                </p>
-              </div>
-              <FavoriteStarButton widgetId={favoriteId} label={categoryLabel} />
-            </div>
+            <div className="mb-4 pr-10 lg:pr-0">{titleBlock}</div>
 
             <p className="font-sans text-lg text-muted-foreground">{headlineLabel}</p>
-            <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">
-              {headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units)}
-            </p>
-            {comparableLabel && comparableTotal != null ? (
-              <p className="mt-2 text-xs text-muted-foreground">
-                {comparable === "mom" ? "MoM" : "YoY"} {comparableLabel}: {formatAxisTick(comparableTotal, units)}
-              </p>
-            ) : null}
+            <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">{headlineValue}</p>
+            {comparableText ? <p className="mt-2 text-xs text-muted-foreground">{comparableText}</p> : null}
           </div>
 
           <div className={cn("flex w-full min-w-0 flex-col lg:w-[70%]", expanded && "min-h-0 flex-1")}>
             <div className="flex items-center justify-end gap-1 lg:pr-10">
-              {canToggleYear ? (
-                <div
-                  role="group"
-                  aria-label={t("resultados.chartViewLabel")}
-                  className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5"
-                >
-                  {(["month", "year"] as const).map((view) => (
-                    <button
-                      key={view}
-                      type="button"
-                      onClick={() => setChartView(view)}
-                      aria-pressed={chartView === view}
-                      className={cn(
-                        "h-9 rounded-control px-3 text-sm font-medium transition-colors",
-                        chartView === view
-                          ? "bg-secondary text-clay shadow-sm"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground",
-                      )}
-                    >
-                      {t(view === "month" ? "resultados.chartByMonth" : "resultados.chartByYear")}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
+              {viewToggle}
               {toggle}
             </div>
             <div
@@ -194,20 +244,9 @@ export function CategorySeriesCard({
                 "w-full min-w-0 overflow-visible",
               )}
             >
-              {category === "Ingreso" ? (
-                <IncomeTotalChart
-                  data={showYearly && yearlyChartData ? yearlyChartData : chartData}
-                  series={seriesKeys}
-                  units={units}
-                  selectedLabel={showYearly ? (yearlySelectedLabel ?? headlineLabel) : headlineLabel}
-                />
-              ) : (
-                <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
-              )}
+              <StackedCategoryChart data={chartData} series={seriesKeys} units={units} />
             </div>
-            {showYearly && partialYearsNote ? (
-              <p className="mt-2 text-xs leading-snug text-muted-foreground">{partialYearsNote}</p>
-            ) : null}
+            {yearsNote}
           </div>
         </>
       )}
