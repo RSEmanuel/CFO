@@ -43,7 +43,8 @@
     "and": "y",
     "retry": "Reintentar",
     "clientLabel": "Cliente",
-    "yourCompanyIs": "Tu empresa: {name}"
+    "yourCompanyIs": "Tu empresa: {name}",
+    "close": "Cerrar"
   },
   "nav": {
     "results": "Resultados",
@@ -577,6 +578,12 @@
       "resetError": "No pudimos borrar tus supuestos. Intenta de nuevo.",
       "advancedToggle": "Ajustar supuestos (avanzado)",
       "trendOnly": "Proyectamos con tu tendencia reciente de ventas y costos; no sumamos un crecimiento extra ni inflación encima, y no contamos nuevas contrataciones."
+    },
+    "context": {
+      "samePeriodLastYear": "vs mismo periodo del año anterior",
+      "priorYear": "vs año anterior",
+      "priorQuarter": "vs trimestre anterior",
+      "priorMonth": "vs mes anterior"
     }
   },
   "widgets": {
@@ -1099,6 +1106,24 @@
         "revisar_plazo": "Revisa su plazo y suspende su crédito si ya lo rebasó"
       },
       "fuente": "Cifra calculó los días desde la factura más antigua sin cobrar, con tus movimientos auxiliares de clientes de CONTPAQi. No traen plazo de crédito, así que esta cifra es estimada y no dice qué está vencido."
+    },
+    "export": {
+      "cliente": "Cliente",
+      "saldo": "Saldo",
+      "diasVencidos": "Días vencidos",
+      "rango": "Rango",
+      "vencido": "Vencido",
+      "queHacer": "Qué hacer",
+      "teDebe": "Te debe",
+      "diasSinCobrar": "Días sin cobrar (estimado)",
+      "tercero": "Tercero",
+      "bucket": "Bucket",
+      "razonSocial": "Razón Social",
+      "monto": "Monto",
+      "pctIndividual": "% Individual",
+      "pctAcumulado": "% Acumulado",
+      "plazoMedio": "Plazo Medio (días)",
+      "clasificacion": "Clasificación"
     }
   },
   "control": {
@@ -2153,30 +2178,5 @@
     "7102": "Productos financieros",
     "7104": "Otros productos financieros",
     "8101": "Gastos financieros"
-  },
-  "frasesCuenta": {
-    "sueldos": "Sueldos y salarios",
-    "honorarios": "Honorarios",
-    "honorariosPf": "Honorarios a personas físicas",
-    "honorariosPm": "Honorarios a personas morales",
-    "renta": "Renta",
-    "arrendamientoPm": "Arrendamiento a personas morales",
-    "depreciacion": "Depreciación",
-    "amortizacion": "Amortización",
-    "costoVentas": "Costo de ventas",
-    "gastosGenerales": "Gastos generales",
-    "noDeducibles": "Gastos no deducibles",
-    "devoluciones": "Devoluciones",
-    "intereses": "Intereses",
-    "interesesPagados": "Intereses pagados",
-    "interesesGanados": "Intereses ganados",
-    "cajaChica": "Caja chica",
-    "ivaPorPagar": "IVA por pagar",
-    "papeleria": "Papelería y artículos de oficina",
-    "ventas": "Ventas",
-    "clientes": "Clientes",
-    "proveedores": "Proveedores",
-    "bancos": "Bancos",
-    "caja": "Caja"
   }
 }

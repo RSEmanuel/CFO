@@ -17,11 +17,11 @@ describe("i18n catalogs", () => {
     assert.equal(createT("en")("settings.languageTitle"), "Portal language");
   });
 
-  it("translates the income total chart without translating account names", () => {
-    const accountName = "Servicios marítimos 4102";
+  it("en inglés el ingreso se llama sales, no revenue", () => {
     assert.equal(createT("es")("resultados.incomeTotal"), "Ingreso total");
-    assert.equal(createT("en")("resultados.incomeTotal"), "Total revenue");
-    assert.equal(accountName, "Servicios marítimos 4102");
+    assert.equal(createT("en")("resultados.incomeTotal"), "Total sales");
+    const conRevenue = collectKeys(MESSAGES.en).filter((key) => /revenue/i.test(createT("en")(key)));
+    assert.deepEqual(conRevenue, []);
   });
 
   it("no muestra instrucciones de desarrollo ni códigos internos a los clientes", () => {

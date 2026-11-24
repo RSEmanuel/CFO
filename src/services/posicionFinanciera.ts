@@ -63,10 +63,10 @@ export function formatStatementMoney(value: number | null, outflow = false): str
   return wrap ? `(${formatted})` : formatted;
 }
 
-export function formatStatementRatio(value: number | null, unit: StatementValueFormat): string {
+export function formatStatementRatio(value: number | null, unit: StatementValueFormat, na = "N/D"): string {
   if (value == null || !Number.isFinite(value)) {
-    // Mismo "N/D" que promete la ayuda de Razones y que usan los indicadores.
-    return "N/D";
+    // Mismo "N/D" (en inglés "N/A", `common.na`) que promete la ayuda de Razones y que usan los indicadores.
+    return na;
   }
   if (unit === "pct") {
     return `${value.toFixed(1)}%`;

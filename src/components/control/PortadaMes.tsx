@@ -1,5 +1,6 @@
 "use client";
 
+import { presentarNombre } from "@/services/textoPresentable";
 import { useLocale } from "@/context/LocaleContext";
 import { useCajaRespiro } from "@/hooks/use-caja-respiro";
 import { useCobranza } from "@/hooks/use-cobranza";
@@ -27,9 +28,9 @@ function alertaTexto(alerta: PortadaAlerta, t: T): string {
     case "lowRunway":
       return t("flujo.alertsMessages.lowRunway", { caja: formatMxn(alerta.caja), meses: alerta.meses.toFixed(1) });
     case "clienteSuspender":
-      return t("cobranza.noPagan.alerta", { cliente: alerta.cliente, monto: formatMxn(alerta.monto), dias: alerta.dias });
+      return t("cobranza.noPagan.alerta", { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias });
     case "clienteRevisar":
-      return t("cobranza.sinCobrar.alerta", { cliente: alerta.cliente, monto: formatMxn(alerta.monto), dias: alerta.dias });
+      return t("cobranza.sinCobrar.alerta", { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias });
     case "perdida":
       return t("control.portada.alertas.perdida", { monto: formatMxn(alerta.monto) });
     case "gastoSube":

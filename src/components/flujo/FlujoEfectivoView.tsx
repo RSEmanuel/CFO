@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { useFlujoEfectivo } from "@/hooks/use-flujo-efectivo";
 import { CHART, WATERFALL_TONE, waterfallFigureColor } from "@/lib/chart-theme";
 import { etiquetaFlujoCategoria } from "@/i18n/flujoCategoria";
+import type { Locale } from "@/i18n/config";
 import type { TranslateFn } from "@/i18n/translate";
 import type { FlujoEfectivoPeriodo, FlujoLinea } from "@/services/flujoEfectivo";
 import { sankeyChartHeight } from "@/components/flujo/sankeyLayout";
@@ -23,9 +24,9 @@ type FlujoEfectivoViewProps = {
   units: DisplayUnits;
 };
 
-function lineaLabel(linea: FlujoLinea, t: TranslateFn): string {
+function lineaLabel(linea: FlujoLinea, t: TranslateFn, locale: Locale): string {
   if (linea.labelKey) return t(linea.labelKey);
-  return etiquetaFlujoCategoria(linea.categoriaKey, linea.label, t);
+  return etiquetaFlujoCategoria(linea.categoriaKey, linea.label, t, locale);
 }
 
 function FlujoEfectivoWaterfallFallback({
@@ -102,7 +103,7 @@ function FlujoEfectivoWaterfallFallback({
 }
 
 export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { data, loading, error } = useFlujoEfectivo(periodo);
   const [excluirTraspasos, setExcluirTraspasos] = useState(true);
 
@@ -115,14 +116,14 @@ export function FlujoEfectivoView({ periodo, units }: FlujoEfectivoViewProps) {
     return {
       ingresos: filter(data.data.ingresos).map((linea) => ({
         ...linea,
-        label: lineaLabel(linea, t),
+        label: lineaLabel(linea, t, locale),
       })),
       egresos: filter(data.data.egresos).map((linea) => ({
         ...linea,
-        label: lineaLabel(linea, t),
+        label: lineaLabel(linea, t, locale),
       })),
     };
-  }, [data, excluirTraspasos, t]);
+  }, [data, excluirTraspasos, t, locale]);
 
   if (loading) {
     return (

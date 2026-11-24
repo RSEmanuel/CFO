@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { useNarrowScreen } from "@/hooks/use-narrow-screen";
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 
 export type HeroLineDatum = Record<string, string | number | null>;
 
@@ -27,6 +28,8 @@ type HeroLineChartProps = {
   exactValueFormatter: (value: number) => string;
   tooltipTotalFormatter: (value: number) => string;
   valueLabelFormatter: (value: number) => string;
+  /** Cómo se muestra cada cuenta del desglose en el tooltip (p. ej. traducida). */
+  breakdownLabel?: (key: string) => string;
   chartKey?: string;
 };
 
@@ -142,6 +145,8 @@ function IncomeTooltip({
   othersLabel,
   exactValueFormatter,
   tooltipTotalFormatter,
+  breakdownLabel = (key) => key,
+  periodLabel = (value) => String(value ?? ""),
 }: {
   active?: boolean;
   payload?: Array<{ payload?: HeroLineDatum }>;
@@ -151,6 +156,8 @@ function IncomeTooltip({
   othersLabel: string;
   exactValueFormatter: (value: number) => string;
   tooltipTotalFormatter: (value: number) => string;
+  breakdownLabel?: (key: string) => string;
+  periodLabel?: (value: unknown) => string;
 }) {
   const datum = payload?.[0]?.payload;
   const rawTotal = datum?.[totalKey];
@@ -165,12 +172,12 @@ function IncomeTooltip({
 
   return (
     <div className="min-w-48 px-3 py-2 text-xs text-foreground" style={TOOLTIP_STYLE}>
-      <p className="mb-1 font-medium">{label}</p>
+      <p className="mb-1 font-medium">{periodLabel(label)}</p>
       <p className="font-semibold text-clay">{tooltipTotalFormatter(rawTotal)}</p>
       <div className="mt-2 space-y-1 border-t border-border pt-2">
         {top.map(({ key, value }) => (
           <div key={key} className="flex justify-between gap-4">
-            <span className="text-muted-foreground">{key}</span>
+            <span className="text-muted-foreground">{breakdownLabel(key)}</span>
             <span className="financial-nums">{exactValueFormatter(value)}</span>
           </div>
         ))}
@@ -268,11 +275,13 @@ export function HeroLineChart({
   exactValueFormatter,
   tooltipTotalFormatter,
   valueLabelFormatter,
+  breakdownLabel,
   chartKey,
 }: HeroLineChartProps) {
   const seriesValues = seriesNumbers(data, totalKey);
   const labelOffsets = pointLabelOffsets(seriesValues);
   const narrow = useNarrowScreen();
+  const periodLabel = useEtiquetaPeriodo();
 
   return (
     <ResponsiveContainer width="100%" height="100%">
@@ -286,6 +295,7 @@ export function HeroLineChart({
           dataKey={xKey}
           interval="preserveStartEnd"
           minTickGap={narrow ? 16 : 5}
+          tickFormatter={periodLabel}
           tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
           axisLine={{ stroke: CHART_AXIS.stroke }}
           tickLine={false}
@@ -307,6 +317,8 @@ export function HeroLineChart({
               othersLabel={othersLabel}
               exactValueFormatter={exactValueFormatter}
               tooltipTotalFormatter={tooltipTotalFormatter}
+              breakdownLabel={breakdownLabel}
+              periodLabel={periodLabel}
             />
           }
         />

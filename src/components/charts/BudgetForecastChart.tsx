@@ -2,6 +2,7 @@
 
 import { CHART, CHART_AXIS } from "@/lib/chart-theme";
 import { useLocale } from "@/context/LocaleContext";
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 import type { PresupuestoChartPoint } from "@/services/resultadosPresupuesto";
 import {
   Area,
@@ -35,6 +36,7 @@ export function BudgetForecastChart({
   valueFormatter,
 }: BudgetForecastChartProps) {
   const { t } = useLocale();
+  const periodLabel = useEtiquetaPeriodo();
   const forecastStart = data.find((point) => point.kind === "projection")?.label;
 
   return (
@@ -50,6 +52,7 @@ export function BudgetForecastChart({
         />
         <XAxis
           dataKey="label"
+          tickFormatter={periodLabel}
           tick={{ fill: CHART_AXIS.tick, fontSize: 10 }}
           axisLine={{ stroke: CHART_AXIS.stroke }}
           tickLine={false}
@@ -64,6 +67,7 @@ export function BudgetForecastChart({
         />
         <Tooltip
           contentStyle={TOOLTIP_STYLE}
+          labelFormatter={periodLabel}
           formatter={(value, name) => {
             const labels: Record<string, string> = {
               real: t("resultados.actual"),

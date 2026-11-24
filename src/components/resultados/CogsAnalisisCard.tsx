@@ -6,7 +6,8 @@ import { useLocale } from "@/context/LocaleContext";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useCogsDesglose } from "@/hooks/use-cogs-desglose";
 import { CHART, COGS_STACK } from "@/lib/chart-theme";
-import { formatAccountName } from "@/lib/formatAccountName";
+import { nombreCuentaVisible } from "@/i18n/nombreVisible";
+import type { Locale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 import type { CogsAnalysisRow, CogsColumnCell, CogsLineRef, CogsStackedMix } from "@/services/cogsDesglose";
 import { formatMxn } from "@/services/money";
@@ -35,11 +36,11 @@ const COGS_LINE_PALETTE = [
   "var(--cifra-surface-2)",
 ] as const;
 
-function lineLabel(line: CogsLineRef, t: (key: string) => string): string {
+function lineLabel(line: CogsLineRef, t: (key: string) => string, locale: Locale): string {
   if (line.kind === "rubro" && line.rubroKey) {
     return t(`resultados.cogs.rubros.${line.rubroKey}`);
   }
-  return formatAccountName(line.nombre);
+  return nombreCuentaVisible(line.nombre, undefined, locale, t);
 }
 
 function formatPct(value: number | null): string {
@@ -98,7 +99,7 @@ function deltaTone(value: number | null, invertDelta: boolean): string {
 }
 
 export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const { data, loading, error } = useCogsDesglose(periodo);
   const [mode, setMode] = useState<DisplayMode>("ambos");
 
@@ -208,7 +209,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
                         return [`${formatPct(mix.pctUtilidad)} · ${formatMxn(mix.utilidad)}`, t("resultados.cogs.chartUtilidad")];
                       }
                       const segment = mix.segmentos.find((candidate) => candidate.id === dataKey);
-                      const label = segment ? lineLabel(segment, t) : dataKey;
+                      const label = segment ? lineLabel(segment, t, locale) : dataKey;
                       return [`${formatPct(segment?.pct ?? null)} · ${formatMxn(segment?.monto ?? 0)}`, label];
                     }}
                   />
@@ -217,7 +218,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
                     <Bar
                       key={segment.id}
                       dataKey={segment.id}
-                      name={lineLabel(segment, t)}
+                      name={lineLabel(segment, t, locale)}
                       stackId="mix"
                       fill={COGS_LINE_PALETTE[index % COGS_LINE_PALETTE.length]}
                       isAnimationActive={false}
@@ -255,7 +256,7 @@ export function CogsAnalisisCard({ periodo }: CogsAnalisisCardProps) {
                         key={row.key}
                         row={row}
                         mode={mode}
-                        label={row.line ? lineLabel(row.line, t) : t(`resultados.cogs.rows.${row.key}`)}
+                        label={row.line ? lineLabel(row.line, t, locale) : t(`resultados.cogs.rows.${row.key}`)}
                         variation={variation}
                         tone={deltaTone(toneValue, row.invertDelta)}
                       />

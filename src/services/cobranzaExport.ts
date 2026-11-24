@@ -3,10 +3,43 @@ import { type CobranzaClienteRow } from "@/services/cobranzaTransformer";
 import type { ConcentracionRow, RiesgoClasificacion } from "@/services/concentracionRiesgo";
 import { slugAscii, type ColumnMode, type TableRow } from "@/services/tableExport";
 
+type Translate = (key: string) => string;
+
+/** Encabezados del modo lectura; con `t` salen del idioma activo (`cobranza.export.*`). */
+const ENCABEZADO_ES: Record<string, string> = {
+  cliente: "Cliente",
+  saldo: "Saldo",
+  diasVencidos: "Días vencidos",
+  rango: "Rango",
+  vencido: "Vencido",
+  queHacer: "Qué hacer",
+  teDebe: "Te debe",
+  diasSinCobrar: "Días sin cobrar (estimado)",
+  tercero: "Tercero",
+  bucket: "Bucket",
+  razonSocial: "Razón Social",
+  monto: "Monto",
+  pctIndividual: "% Individual",
+  pctAcumulado: "% Acumulado",
+  plazoMedio: "Plazo Medio (días)",
+  clasificacion: "Clasificación",
+};
+
+function encabezados(t: Translate | undefined, keys: string[]): string[] {
+  return keys.map((key) => {
+    const fallback = ENCABEZADO_ES[key] ?? key;
+    if (!t) return fallback;
+    const fullKey = `cobranza.export.${key}`;
+    const value = t(fullKey);
+    return value && value !== fullKey ? value : fallback;
+  });
+}
+
 export function cobranzaExportTable(
   clientes: CobranzaClienteRow[],
   columnMode: ColumnMode,
   bucketLabel: (key: AntiguedadBucketKey) => string,
+  t?: Translate,
 ): { headers: string[]; rows: TableRow[] } {
   if (columnMode === "sistemas") {
     return {
@@ -16,7 +49,7 @@ export function cobranzaExportTable(
   }
 
   return {
-    headers: ["Cliente", "Saldo", "Días vencidos", "Rango"],
+    headers: encabezados(t, ["cliente", "saldo", "diasVencidos", "rango"]),
     rows: clientes.map((row) => [row.cliente, row.saldo, row.dias, bucketLabel(row.bucket)]),
   };
 }
@@ -35,6 +68,7 @@ export function listaClientesExportTable(
   variant: "vencido" | "sinCobrar",
   columnMode: ColumnMode,
   accionLabel: (accion: string) => string,
+  t?: Translate,
 ): { headers: string[]; rows: TableRow[] } {
   const vencido = variant === "vencido";
   if (columnMode === "sistemas") {
@@ -46,8 +80,8 @@ export function listaClientesExportTable(
 
   return {
     headers: vencido
-      ? ["Cliente", "Vencido", "Días vencidos", "Qué hacer"]
-      : ["Cliente", "Te debe", "Días sin cobrar (estimado)", "Qué hacer"],
+      ? encabezados(t, ["cliente", "vencido", "diasVencidos", "queHacer"])
+      : encabezados(t, ["cliente", "teDebe", "diasSinCobrar", "queHacer"]),
     rows: rows.map((row) => [
       row.cliente,
       row.monto,
@@ -75,6 +109,7 @@ export function antiguedadExportTable(
   terceros: AntiguedadTerceroRow[],
   columnMode: ColumnMode,
   bucketLabel: (key: AntiguedadBucketKey) => string,
+  t?: Translate,
 ): { headers: string[]; rows: TableRow[] } {
   if (columnMode === "sistemas") {
     return {
@@ -84,7 +119,7 @@ export function antiguedadExportTable(
   }
 
   return {
-    headers: ["Tercero", "Saldo", "Días vencidos", "Bucket"],
+    headers: encabezados(t, ["tercero", "saldo", "diasVencidos", "bucket"]),
     rows: terceros.map((row) => [row.tercero, row.saldo, row.diasVencidos, bucketLabel(row.bucket)]),
   };
 }
@@ -102,6 +137,7 @@ export function concentracionExportTable(
   rows: ConcentracionRow[],
   columnMode: ColumnMode,
   riesgoLabel: (key: RiesgoClasificacion) => string,
+  t?: Translate,
 ): { headers: string[]; rows: TableRow[] } {
   if (columnMode === "sistemas") {
     return {
@@ -129,7 +165,7 @@ export function concentracionExportTable(
   }
 
   return {
-    headers: ["Razón Social", "Monto", "% Individual", "% Acumulado", "Plazo Medio (días)", "Clasificación"],
+    headers: encabezados(t, ["razonSocial", "monto", "pctIndividual", "pctAcumulado", "plazoMedio", "clasificacion"]),
     rows: rows.map((row) => [
       row.entityName,
       row.monto,

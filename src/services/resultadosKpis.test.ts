@@ -38,8 +38,8 @@ describe("etiquetas de periodo de los KPI de resultados", () => {
   it("traduce los meses al inglés", () => {
     const labels = temporalPeriodLabels("2026-07", en, "en");
     assert.equal(labels.mesActual, "July 2026");
-    assert.equal(labels.promedio3M, "May–july 2026");
-    assert.equal(labels.trimAnterior, "April–june 2026");
+    assert.equal(labels.promedio3M, "May–July 2026");
+    assert.equal(labels.trimAnterior, "April–June 2026");
   });
 
   it("pone el mes seleccionado primero, sin variación y sin presupuesto", () => {

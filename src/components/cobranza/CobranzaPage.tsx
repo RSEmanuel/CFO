@@ -1,5 +1,6 @@
 "use client";
 
+import { presentarNombre } from "@/services/textoPresentable";
 import { ChartDownloadButton } from "@/components/charts/ChartDownloadButton";
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { CobranzaAgingChart } from "@/components/cobranza/CobranzaAgingChart";
@@ -71,7 +72,7 @@ export function CobranzaPage() {
       return;
     }
     try {
-      const { headers, rows } = cobranzaExportTable(model.clientes, columnMode, bucketLabel);
+      const { headers, rows } = cobranzaExportTable(model.clientes, columnMode, bucketLabel, t);
       const filename = cobranzaExportFilename(empresa, asOf, fileKind);
       if (fileKind === "csv") {
         downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
@@ -95,8 +96,12 @@ export function CobranzaPage() {
     }
     const variant = lista.variant;
     try {
-      const { headers, rows } = listaClientesExportTable(lista.rows, variant, columnMode, (accion) =>
-        t(`cobranza.${variant === "vencido" ? "noPagan" : "sinCobrar"}.acciones.${accion}`),
+      const { headers, rows } = listaClientesExportTable(
+        lista.rows,
+        variant,
+        columnMode,
+        (accion) => t(`cobranza.${variant === "vencido" ? "noPagan" : "sinCobrar"}.acciones.${accion}`),
+        t,
       );
       const filename = listaClientesExportFilename(empresa, asOf, variant, fileKind);
       if (fileKind === "csv") {
@@ -119,7 +124,7 @@ export function CobranzaPage() {
       return;
     }
     try {
-      const { headers, rows } = antiguedadExportTable(antiguedad.terceros, columnMode, bucketLabel);
+      const { headers, rows } = antiguedadExportTable(antiguedad.terceros, columnMode, bucketLabel, t);
       const filename = antiguedadExportFilename(empresa, asOf, lado, fileKind);
       if (fileKind === "csv") {
         downloadBlob(new Blob([buildCsv(headers, rows)], { type: "text/csv;charset=utf-8;" }), filename);
@@ -301,7 +306,7 @@ export function CobranzaPage() {
             <tbody>
               {model.clientes.map((row) => (
                 <tr key={row.cliente} className="border-b border-beige-deep last:border-0">
-                  <td className="py-3 font-sans text-base text-foreground">{row.cliente}</td>
+                  <td className="py-3 font-sans text-base text-foreground">{presentarNombre(row.cliente)}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{formatMxn(row.saldo)}</td>
                   <td className="financial-nums py-3 text-right text-foreground">{row.dias}</td>
                   <td className="py-3 text-right text-muted-foreground">{bucketLabel(row.bucket)}</td>

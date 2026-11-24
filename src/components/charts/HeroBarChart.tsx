@@ -1,5 +1,6 @@
 "use client";
 
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 import { CHART, CHART_AXIS, CHART_SERIES } from "@/lib/chart-theme";
 import {
   Bar,
@@ -81,12 +82,14 @@ export function HeroBarChart({
   valueLabelFormatter,
 }: HeroBarChartProps) {
   const lastStackedIndex = series.reduce((last, item, index) => (item.stackId ? index : last), -1);
+  const periodLabel = useEtiquetaPeriodo();
 
   return (
     <ResponsiveContainer width="100%" height="100%">
       <BarChart key={chartKey} data={data} margin={{ top: showValueLabels ? 28 : 8, right: 8, left: 8, bottom: 0 }}>
         <XAxis
           dataKey={xKey}
+          tickFormatter={periodLabel}
           tick={{ fill: CHART_AXIS.tick, fontSize: 11 }}
           axisLine={{ stroke: CHART_AXIS.stroke }}
           tickLine={false}
@@ -101,6 +104,7 @@ export function HeroBarChart({
         <Tooltip
           cursor={{ fill: "rgb(196 93 62 / 0.06)" }}
           contentStyle={TOOLTIP_STYLE}
+          labelFormatter={periodLabel}
           formatter={
             tooltipFormatter
               ? (value, name) => tooltipFormatter(value as number | string, String(name))

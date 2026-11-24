@@ -12,6 +12,8 @@ import { IngresoMonitor } from "@/components/resultados/IngresoMonitor";
 import { ResultadosTop5Charts } from "@/components/resultados/ResultadosTop5Charts";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
 import { useLocale } from "@/context/LocaleContext";
+import { useNombreCuenta } from "@/hooks/use-nombre-cuenta";
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 import { monthLabelKey } from "@/i18n/format";
 import { formatAxisTick, formatMxn } from "@/services/money";
 import { buildIncomeBreakdown, buildStackedSeries } from "@/services/financialDataTransformer";
@@ -39,6 +41,7 @@ function StackedCategoryChart({
   series: string[];
   units: "k" | "m" | "b";
 }) {
+  const nombreCuenta = useNombreCuenta();
   return (
     <HeroBarChart
       data={data}
@@ -47,7 +50,7 @@ function StackedCategoryChart({
       tooltipFormatter={(value, name) => [formatMxn(Number(value)), name]}
       series={series.map((key, index) => ({
         dataKey: key,
-        name: key,
+        name: nombreCuenta(key),
         fill: HERO_CHART_COLORS[index % HERO_CHART_COLORS.length],
         stackId: "category",
       }))}
@@ -69,6 +72,7 @@ function IncomeTotalChart({
   selectedLabel: string;
 }) {
   const { t } = useLocale();
+  const nombreCuenta = useNombreCuenta();
   return (
     <HeroLineChart
       data={data}
@@ -84,6 +88,7 @@ function IncomeTotalChart({
         t("resultados.incomeTotalTooltip", { value: formatMxn(value) })
       }
       valueLabelFormatter={(value) => formatAxisTick(value, units)}
+      breakdownLabel={(key) => nombreCuenta(key)}
     />
   );
 }
@@ -119,6 +124,7 @@ export function CategorySeriesCard({
   partialYearsNote?: string | null;
 }) {
   const { t } = useLocale();
+  const periodLabel = useEtiquetaPeriodo();
   const [chartView, setChartView] = useState<"month" | "year">("month");
   const canToggleYear = category === "Ingreso" && temporalidad === "month" && Boolean(yearlyChartData?.length);
   const showYearly = canToggleYear && chartView === "year";
@@ -133,7 +139,7 @@ export function CategorySeriesCard({
   const headlineValue = headlineTotal == null ? t("common.na") : formatAxisTick(headlineTotal, units);
   const comparableText =
     comparableLabel && comparableTotal != null
-      ? `${comparable === "mom" ? "MoM" : "YoY"} ${comparableLabel}: ${formatAxisTick(comparableTotal, units)}`
+      ? `${comparable === "mom" ? "MoM" : "YoY"} ${periodLabel(comparableLabel)}: ${formatAxisTick(comparableTotal, units)}`
       : null;
 
   const titleBlock = (
@@ -191,7 +197,7 @@ export function CategorySeriesCard({
               <div className="flex flex-wrap items-center gap-x-10 gap-y-3">
                 {titleBlock}
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                  <span className="font-sans text-lg text-muted-foreground">{headlineLabel}</span>
+                  <span className="font-sans text-lg text-muted-foreground">{periodLabel(headlineLabel)}</span>
                   <span className="financial-nums text-4xl font-semibold tracking-tight">{headlineValue}</span>
                   {comparableText ? <span className="text-xs text-muted-foreground">{comparableText}</span> : null}
                 </div>
@@ -228,7 +234,7 @@ export function CategorySeriesCard({
           <div className="flex w-full flex-col lg:w-[30%]">
             <div className="mb-4 pr-10 lg:pr-0">{titleBlock}</div>
 
-            <p className="font-sans text-lg text-muted-foreground">{headlineLabel}</p>
+            <p className="font-sans text-lg text-muted-foreground">{periodLabel(headlineLabel)}</p>
             <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">{headlineValue}</p>
             {comparableText ? <p className="mt-2 text-xs text-muted-foreground">{comparableText}</p> : null}
           </div>
@@ -270,6 +276,8 @@ export function IncomeBreakdownCard({
   headlineLabel: string;
 }) {
   const { t } = useLocale();
+  const nombreCuenta = useNombreCuenta();
+  const periodLabel = useEtiquetaPeriodo();
   const incomeBreakdown = useMemo(
     () =>
       buildIncomeBreakdown(rows, {
@@ -281,9 +289,9 @@ export function IncomeBreakdownCard({
         analysis: "amount",
       }).map((slice) => ({
         ...slice,
-        name: slice.isOther ? t("resultados.incomeBreakdownOther") : slice.name,
+        name: slice.isOther ? t("resultados.incomeBreakdownOther") : nombreCuenta(slice.name),
       })),
-    [rows, temporalidad, periodo, comparable, units, t],
+    [rows, temporalidad, periodo, comparable, units, t, nombreCuenta],
   );
   if (incomeBreakdown.length === 0) return null;
 
@@ -298,7 +306,7 @@ export function IncomeBreakdownCard({
             <div className="min-w-0 flex-1">
               <h2 className="font-sans text-xl font-medium text-foreground">{t("resultados.incomeBreakdown")}</h2>
               <p className="text-[11.5px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
-                {headlineLabel} | {t("resultados.pctOfRevenue")}
+                {periodLabel(headlineLabel)} | {t("resultados.pctOfRevenue")}
               </p>
             </div>
             <FavoriteStarButton widgetId={RESULTADOS_FAVORITE.ingresoDesglose} label={t("resultados.incomeBreakdown")} />

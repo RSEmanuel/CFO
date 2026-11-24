@@ -88,7 +88,7 @@ function RatioBullet({
   const scaleMax = ratioGaugeScaleMax(id, value);
   const bands = ratioGaugeBands(id, scaleMax);
   const zone = value == null ? null : ratioGaugeZone(id, value);
-  const formatted = formatStatementRatio(value, GAUGE_FORMAT[id]);
+  const formatted = formatStatementRatio(value, GAUGE_FORMAT[id], t("common.na"));
   const marker = value == null ? 0 : Math.min(Math.max(value, 0), scaleMax);
   // El relleno recorre las mismas bandas del fondo: cada tramo llega hasta el valor o hasta el fin de su banda.
   const segments = bands.map((band) => Math.max(0, Math.min(band.to, marker) - band.from));

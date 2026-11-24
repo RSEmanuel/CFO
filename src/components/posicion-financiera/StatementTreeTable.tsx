@@ -92,11 +92,11 @@ function csvEscape(value: string): string {
   return value;
 }
 
-function formatCell(node: StatementNode, key: string, numberMode: NumberMode): string {
+function formatCell(node: StatementNode, key: string, numberMode: NumberMode, na?: string): string {
   const value = node.values[key];
   if (numberMode === "ratio") {
     // Los grupos de razones (Liquidez, Actividad…) son solo encabezados.
-    return node.kind === "group" ? "" : formatStatementRatio(value, node.format ?? "x");
+    return node.kind === "group" ? "" : formatStatementRatio(value, node.format ?? "x", na);
   }
   return formatStatementMoney(value, node.outflow === true);
 }
@@ -193,7 +193,7 @@ export function StatementTreeTable({
         ...(showCode ? [row.node.code ?? ""] : []),
         `${indent}${nodeLabel(row.node)}`,
         ...columns.flatMap((column) => {
-          const value = formatCell(row.node, column.key, numberMode);
+          const value = formatCell(row.node, column.key, numberMode, t("common.na"));
           return verticalActive
             ? [value, formatVerticalPct(verticalPct(row.node.values[column.key], verticalBase?.[column.key]))]
             : [value];
@@ -397,7 +397,7 @@ export function StatementTreeTable({
                                   numberMode !== "ratio" && row.node.outflow ? "text-muted-foreground" : "text-foreground",
                                 )}
                               >
-                                {formatCell(row.node, column.key, numberMode)}
+                                {formatCell(row.node, column.key, numberMode, t("common.na"))}
                               </span>
                               {delta != null ? (
                                 <span className={cn("ml-2 text-[11px]", deltaClass(row.node.polarity, delta))}>

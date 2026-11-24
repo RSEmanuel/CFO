@@ -25,6 +25,7 @@ import {
   YAxis,
 } from "recharts";
 import { useNarrowScreen } from "@/hooks/use-narrow-screen";
+import { useEtiquetaPeriodo } from "@/hooks/use-etiqueta-periodo";
 
 type TendenciaIngresosCostosChartProps = {
   rows: MonthlyFinancials[];
@@ -278,14 +279,15 @@ export function TendenciaIngresosCostosChart({
 }: TendenciaIngresosCostosChartProps) {
   const { t } = useLocale();
   const narrow = useNarrowScreen();
+  const etiquetaPeriodo = useEtiquetaPeriodo();
   const data = useMemo(
     () =>
       trailingMonthlyRows(rows, endPeriod, TREND_WINDOW_MONTHS).map((row) => ({
-        label: periodLabel(row.periodo),
+        label: etiquetaPeriodo(periodLabel(row.periodo)),
         ingreso: row.ingreso_total,
         costo: row.costo_total,
       })),
-    [rows, endPeriod],
+    [rows, endPeriod, etiquetaPeriodo],
   );
   const incomeVisible = useMemo(() => incomeLabelMask(seriesNumbers(data, "ingreso")), [data]);
   const costVisible = useMemo(
