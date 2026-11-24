@@ -51,7 +51,7 @@ import {
 import { buildUtilidadRubro, comparableShift, shiftPeriodo } from "@/services/utilidadRubro";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import type { DisplayUnits } from "@/services/money";
-import { collapseToMayorAccounts, yearColumns } from "@/services/posicionFinanciera";
+import { collapseToMayorAccounts, groupPosicionByMayor, yearColumns } from "@/services/posicionFinanciera";
 import { useMemo, type ReactNode } from "react";
 
 /** Datos globales que el Panel de Control hereda de sus filtros (periodo/unidades). */
@@ -87,7 +87,10 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
 
   const nodes =
     statement === "posicion"
-      ? data?.statements.posicion ?? []
+      ? groupPosicionByMayor(data?.statements.posicion ?? [], (data?.years ?? []).map(String), (code) =>
+          t("posicionFinanciera.mayorAccount", { code }),
+          data?.mayorNames,
+        )
       : statement === "resultados"
         ? collapseToMayorAccounts(data?.statements.resultados ?? [], (data?.years ?? []).map(String), (code) =>
             t("posicionFinanciera.mayorAccount", { code }),
@@ -115,6 +118,7 @@ function PosicionStatementFavorite({ statement }: { statement: PosicionStatement
       nodes={nodes}
       columns={columns}
       numberMode={statement === "razones" ? "ratio" : "money"}
+      defaultExpandDepth={statement === "posicion" ? 2 : 1}
       showYoY
       showEmptyToggle={statement !== "razones"}
       verticalBase={statement === "resultados" ? revenueBase : undefined}

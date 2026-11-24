@@ -177,8 +177,14 @@ export function collectExpandableIds(nodes: StatementNode[]): string[] {
   return ids;
 }
 
-export function defaultExpandedIds(nodes: StatementNode[]): string[] {
-  return nodes.filter((node) => node.children && node.children.length > 0).map((node) => node.id);
+/** Filas abiertas al cargar: `depth` niveles desde la raíz (1 = solo Activo, Pasivo y Capital). */
+export function defaultExpandedIds(nodes: StatementNode[], depth = 1): string[] {
+  if (depth <= 0) {
+    return [];
+  }
+  return nodes.flatMap((node) =>
+    node.children && node.children.length > 0 ? [node.id, ...defaultExpandedIds(node.children, depth - 1)] : [],
+  );
 }
 
 function digits(idCuenta: string): string {
@@ -834,6 +840,79 @@ export function collapseToMayorAccounts(
       });
     return { ...node, children };
   });
+}
+
+/** Secciones del Estado de posición cuyas cuentas se agrupan por cuenta de mayor. */
+const POSICION_SECTION_IDS = new Set([
+  "epf:activo-cp",
+  "epf:activo-lp",
+  "epf:pasivo-cp",
+  "epf:pasivo-lp",
+  "epf:capital-social",
+  "epf:capital-reservas",
+  "epf:capital-resultados-acumulados",
+  "epf:capital-resultado-ejercicio",
+  "epf:capital-otras",
+]);
+
+/**
+ * Agrupa las cuentas de cada sección del Estado de posición (activo y pasivo a
+ * corto y largo plazo, y cada rubro del capital) bajo su cuenta de mayor: Caja,
+ * Bancos, Clientes, Proveedores… Cada grupo suma sus subcuentas y se expande
+ * para verlas; los totales de sección y la identidad A = P + C no cambian.
+ * Una mayor con una sola cuenta queda como esa cuenta, y una sección con una
+ * sola mayor con saldo no agrega otro nivel. El nombre del grupo sale igual que en
+ * `collapseToMayorAccounts`; nunca se toma el de una subcuenta.
+ */
+export function groupPosicionByMayor(
+  nodes: StatementNode[],
+  yearKeys: string[],
+  fallbackLabel: (segment: string) => string,
+  knownNames: Record<string, string> = {},
+): StatementNode[] {
+  const labels = new Map([...Object.entries(knownNames), ...mayorLabels(nodes)]);
+  const visit = (node: StatementNode): StatementNode => {
+    if (!node.children?.length) {
+      return node;
+    }
+    if (!POSICION_SECTION_IDS.has(node.id)) {
+      return { ...node, children: node.children.map(visit) };
+    }
+    const bySegment = new Map<string, StatementNode[]>();
+    for (const child of node.children) {
+      const segment = child.code ? mayorSegment(child.code) : child.id;
+      const list = bySegment.get(segment) ?? [];
+      list.push(child);
+      bySegment.set(segment, list);
+    }
+    // Una mayor con todas sus cuentas en cero no cuenta: si solo queda una con saldo, no hay a qué agrupar.
+    const withBalance = [...bySegment.values()].filter(
+      (members) => !members.every((member) => isEffectivelyZero(member.values, yearKeys)),
+    );
+    if (withBalance.length <= 1) {
+      return node;
+    }
+    const children = [...bySegment.entries()]
+      .sort(([a], [b]) => a.localeCompare(b, "es"))
+      .map(([segment, members]): StatementNode => {
+        const [only] = members;
+        if (members.length === 1 && only) {
+          return only;
+        }
+        return {
+          id: `${node.id}:mayor:${segment}`,
+          label: labels.get(segment) ?? fallbackLabel(segment),
+          kind: "group",
+          code: segment,
+          outflow: node.outflow,
+          children: members,
+          values: sumChildValues(members, yearKeys),
+          polarity: node.polarity,
+        };
+      });
+    return { ...node, children };
+  };
+  return nodes.map(visit);
 }
 
 function metricNode(metric: CatalogMetric, yearKeys: string[], values: Record<string, number | null>): StatementNode {
