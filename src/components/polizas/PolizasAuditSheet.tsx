@@ -122,7 +122,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                   {data ? (
                     <p className="mt-1 text-sm text-muted-foreground">
                       {t("polizas.audit.saldoNeto")}:{" "}
-                      <span className="financial-nums font-semibold text-foreground">
+                      <span className="financial-nums font-medium text-foreground">
                         {formatMxn(data.resumen.saldoNeto)}
                       </span>
                       <span className="mx-2 text-border">·</span>
@@ -157,7 +157,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                     <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                       {t("polizas.audit.cargos")}
                     </p>
-                    <p className="financial-nums mt-1 text-lg font-semibold text-foreground">
+                    <p className="financial-nums mt-1 text-lg font-medium text-foreground">
                       {formatMxn(data.resumen.totalCargos)}
                     </p>
                   </div>
@@ -165,7 +165,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                     <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                       {t("polizas.audit.abonos")}
                     </p>
-                    <p className="financial-nums mt-1 text-lg font-semibold text-foreground">
+                    <p className="financial-nums mt-1 text-lg font-medium text-foreground">
                       {formatMxn(data.resumen.totalAbonos)}
                     </p>
                   </div>
@@ -173,7 +173,7 @@ export function PolizasAuditSheet({ target, onClose }: PolizasAuditSheetProps) {
                     <p className="text-[11px] font-medium uppercase tracking-[0.1em] text-muted-foreground">
                       {t("polizas.audit.saldoNeto")}
                     </p>
-                    <p className="financial-nums mt-1 text-lg font-semibold text-foreground">
+                    <p className="financial-nums mt-1 text-lg font-medium text-foreground">
                       {formatMxn(data.resumen.saldoNeto)}
                     </p>
                   </div>

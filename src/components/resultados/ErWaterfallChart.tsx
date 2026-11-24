@@ -116,7 +116,7 @@ function WaterfallValueLabel({ x, y, width, index, rows }: LabelGeom & { rows: C
       textAnchor="middle"
       fill={waterfallFigureColor(row.value, CHART_VARS.text)}
       fontSize={11}
-      fontWeight={600}
+      fontWeight={500}
       className="financial-nums"
     >
       {row.value < 0 ? `-${formatCompactAxis(-row.value)}` : formatCompactAxis(row.value)}

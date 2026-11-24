@@ -107,13 +107,13 @@ function RatioBullet({
       {/* pr-9 deja libre la esquina de la estrella. */}
       <div className="flex items-start justify-between gap-3 pr-9">
         <div className="min-w-0">
-          <h3 className="font-sans text-base font-bold tracking-tight text-foreground">{title}</h3>
+          <h3 className="font-sans text-base font-medium tracking-tight text-foreground">{title}</h3>
           {/* Alto fijo de tres renglones: la gráfica empieza a la misma altura en todas las tarjetas. */}
           <div className="min-h-[4.5rem]">
             <InsightText text={t(`posicionFinanciera.gauges.insights.${id}`)} />
           </div>
         </div>
-        <p className="financial-nums text-lg font-semibold tabular-nums text-foreground">{formatted}</p>
+        <p className="financial-nums text-lg font-medium tabular-nums text-foreground">{formatted}</p>
       </div>
       {value == null ? (
         <p className="mt-auto flex h-[80px] items-center text-sm text-muted-foreground">{t("posicionFinanciera.gauges.na")}</p>

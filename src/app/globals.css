@@ -87,6 +87,13 @@
   body {
     @apply bg-background font-sans text-foreground antialiased tracking-[-0.01em];
   }
+
+  /* Solo cargamos pesos 400 y 500: el énfasis usa 500 real, nunca negrita sintetizada. */
+  b,
+  strong,
+  th {
+    font-weight: 500;
+  }
 }
 
 @keyframes cifra-blink-lid {

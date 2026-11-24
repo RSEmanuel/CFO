@@ -198,7 +198,7 @@ export function CategorySeriesCard({
                 {titleBlock}
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="font-sans text-lg text-muted-foreground">{periodLabel(headlineLabel)}</span>
-                  <span className="financial-nums text-4xl font-semibold tracking-tight">{headlineValue}</span>
+                  <span className="financial-nums text-4xl font-medium tracking-tight">{headlineValue}</span>
                   {comparableText ? <span className="text-xs text-muted-foreground">{comparableText}</span> : null}
                 </div>
               </div>
@@ -235,7 +235,7 @@ export function CategorySeriesCard({
             <div className="mb-4 pr-10 lg:pr-0">{titleBlock}</div>
 
             <p className="font-sans text-lg text-muted-foreground">{periodLabel(headlineLabel)}</p>
-            <p className="financial-nums mt-1 text-4xl font-semibold tracking-tight">{headlineValue}</p>
+            <p className="financial-nums mt-1 text-4xl font-medium tracking-tight">{headlineValue}</p>
             {comparableText ? <p className="mt-2 text-xs text-muted-foreground">{comparableText}</p> : null}
           </div>
 

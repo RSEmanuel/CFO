@@ -49,7 +49,7 @@ export default function ControlCargasPage() {
 
   const header = (
     <div>
-      <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.loadControl")}</p>
+      <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.loadControl")}</p>
     </div>
   );
 
@@ -113,7 +113,7 @@ export default function ControlCargasPage() {
             <Card key={labelKey}>
               <CardContent className="space-y-1 p-4">
                 <p className="text-xs uppercase tracking-[0.1em] text-muted-foreground">{t(labelKey)}</p>
-                <p className="cifra-num text-2xl font-semibold text-foreground">{num(value)}</p>
+                <p className="cifra-num text-2xl font-medium text-foreground">{num(value)}</p>
               </CardContent>
             </Card>
           ))}

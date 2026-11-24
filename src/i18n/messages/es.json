@@ -1026,7 +1026,9 @@
       "plazoSubtitle": "según tu balanza: saldo de clientes ÷ ventas del mes",
       "brechaSubtitle": "DSO − DPO",
       "brechaDeficit": "Déficit de plazo comercial: financias a clientes {days} días más de lo que tus proveedores te financian",
-      "brechaSuperavit": "Superávit de plazo comercial: tus proveedores financian tu operación"
+      "brechaSuperavit": "Superávit de plazo comercial: tus proveedores financian tu operación",
+      "tablaCxc": "Cartera por cliente",
+      "tablaCxp": "Saldos por proveedor"
     },
     "tabs": {
       "cartera": "Cartera",
@@ -1230,8 +1232,8 @@
         "sinDato": "Tu balanza no trae impuestos por pagar."
       },
       "financiamiento": {
-        "proveedores": "Tus proveedores financian tu operación: cobras en {dso} días y pagas en {dpo}.",
-        "clientes": "Tú financias a tus clientes: cobras en {dso} días y pagas en {dpo}."
+        "proveedores": "Tus proveedores financian tu operación: cobras en {dso} días y pagas en {dpo} días.",
+        "clientes": "Tú financias a tus clientes: cobras en {dso} días y pagas en {dpo} días."
       }
     }
   },

@@ -130,7 +130,7 @@ function ActividadCard({ family, periodo, units }: { family: FlujoActividadFamil
                 <DeltaRow label={t("flujo.vsPreviousMonth")} delta={family.vsMesAnterior} units={units} />
                 <DeltaRow label={t("flujo.vsPreviousYear")} delta={family.vsMesAnioAnterior} units={units} />
               </dl>
-              <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">{t("flujo.components")}</p>
+              <p className="mt-4 text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">{t("flujo.components")}</p>
               <ul className="mt-2 space-y-1.5">
                 {family.componentes.map((item) => (
                   <li key={item.label} className="flex items-center justify-between gap-3 text-sm">

@@ -32,7 +32,7 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
     >
       <div className="flex items-center justify-end gap-3 pr-10">
         <div className="flex items-center gap-1">
-          <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-semibold", category.badgeClass)}>
+          <span className={cn("rounded-full px-2.5 py-1 text-[11px] font-medium", category.badgeClass)}>
             {t(`metrics.categories.${metric.category}`)}
           </span>
           <FavoriteStar kind="metric" id={metric.key} label={t(`metrics.${metric.key}.name`)} />
@@ -45,7 +45,7 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
       </h3>
 
       <div className="mt-auto pt-5">
-        <p className="financial-nums text-3xl font-semibold tracking-tight text-foreground">
+        <p className="financial-nums text-3xl font-medium tracking-tight text-foreground">
           {formatCatalogMetric(metric, t)}
         </p>
 
@@ -70,7 +70,7 @@ export function CatalogMetricCard({ metric, comparable }: CatalogMetricCardProps
           ) : (
             <span
               className={cn(
-                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
+                "inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium",
                 improved === true && "bg-card/80 text-favorable",
                 improved === false && "bg-card/80 text-desfavorable",
                 improved == null && "bg-card/70 text-muted-foreground",

@@ -1,7 +1,9 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { presentarNombre } from "@/services/textoPresentable";
 import { ExportMenu } from "@/components/export/ExportMenu";
+import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { TableScroll } from "@/components/ui/table-scroll";
 import { useLocale } from "@/context/LocaleContext";
 import { formatMxn } from "@/services/money";
@@ -43,16 +45,19 @@ export function ClientesQueNoPaganSection({ variant, total, rows, topCount, topP
   const vacio = rows.length === 0;
 
   return (
-    <section className="rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
-      <div className="flex flex-wrap items-start justify-between gap-3">
+    <section className="relative rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+      <FavoriteStarButton widgetId="table-cobranza-no-pagan" label={t(`${prefix}.title`)} />
+      <div className="flex flex-wrap items-start justify-between gap-3 pr-10">
         <div className="min-w-0">
           <h2 className="font-sans text-lg font-medium text-foreground">{t(`${prefix}.title`)}</h2>
-          <p className="mt-1 text-sm text-foreground">
-            {vacio
-              ? t(`${prefix}.vacio`)
-              : topCount === 1
-                ? t(`${prefix}.resumenUno`, { monto: formatMxn(total) })
-                : t(`${prefix}.resumen`, { monto: formatMxn(total), pct: Math.round(topPct), n: topCount })}
+          <p className="mt-1 text-sm text-muted-foreground">
+            <ConCifras>
+              {vacio
+                ? t(`${prefix}.vacio`)
+                : topCount === 1
+                  ? t(`${prefix}.resumenUno`, { monto: formatMxn(total) })
+                  : t(`${prefix}.resumen`, { monto: formatMxn(total), pct: Math.round(topPct), n: topCount })}
+            </ConCifras>
           </p>
         </div>
         {vacio ? null : <ExportMenu onDownload={onExport} />}
@@ -61,7 +66,11 @@ export function ClientesQueNoPaganSection({ variant, total, rows, topCount, topP
       {alerta ? (
         <p className="mt-4 flex items-start gap-2 rounded-control border border-border bg-background px-3 py-2.5 text-sm text-foreground">
           <span className="mt-1.5 inline-block h-2 w-2 shrink-0 rounded-full bg-desfavorable" aria-hidden />
-          {t(`${prefix}.alerta`, { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias })}
+          <span>
+            <ConCifras>
+              {t(`${prefix}.alerta`, { cliente: presentarNombre(alerta.cliente), monto: formatMxn(alerta.monto), dias: alerta.dias })}
+            </ConCifras>
+          </span>
         </p>
       ) : null}
 

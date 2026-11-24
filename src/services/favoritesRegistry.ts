@@ -211,6 +211,7 @@ export const FAVORITABLE_WIDGETS: FavoritableWidget[] = [
   { id: "kpi-flujo-caja", titleKey: "flujo.operativo.endingCash", category: "FLUJO", type: "KPI", componentKey: "flujoOperativoKpi", storage: "widget" },
   { id: "chart-sankey", titleKey: "flujo.efectivo.mapaTitle", category: "FLUJO", type: "CHART", componentKey: "flujoSankey", storage: "widget", wide: true },
   { id: "chart-tablero-diario", titleKey: "flujo.operativo.tab", category: "FLUJO", type: "CHART", componentKey: "flujoTableroDiario", storage: "widget", wide: true },
+  { id: "chart-flujo-libre", titleKey: "flujo.libre.title", category: "FLUJO", type: "CHART", componentKey: "flujoLibre", storage: "widget", wide: true },
 
   // ── Cobranza y Cartera (/dashboard/cobranza) ─────────────────────────────
   { id: "kpi-cobranza-total-cartera", titleKey: "cobranza.cartera.totalPendienteCxc", category: "COBRANZA", type: "KPI", componentKey: "cobranzaCarteraKpi", storage: "widget" },
@@ -221,12 +222,19 @@ export const FAVORITABLE_WIDGETS: FavoritableWidget[] = [
   { id: "kpi-cobranza-brecha", titleKey: "cobranza.cartera.brechaTitle", category: "COBRANZA", type: "KPI", componentKey: "cobranzaPlazoKpi", storage: "widget" },
   { id: "chart-cobranza-aging", titleKey: "cobranza.aging", category: "COBRANZA", type: "CHART", componentKey: "cobranzaAging", storage: "widget" },
   { id: "chart-cobranza-pareto", titleKey: "cobranza.concentracion.chartTitle", category: "COBRANZA", type: "CHART", componentKey: "cobranzaPareto", storage: "widget" },
+  { id: "table-cobranza-cartera-cxc", titleKey: "cobranza.cartera.tablaCxc", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaCarteraTabla", storage: "widget" },
+  { id: "table-cobranza-cartera-cxp", titleKey: "cobranza.cartera.tablaCxp", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaCarteraTabla", storage: "widget" },
+  { id: "table-cobranza-no-pagan", titleKey: "cobranza.noPagan.title", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaNoPagan", storage: "widget" },
+  { id: "table-cobranza-antiguedad", titleKey: "cobranza.agingSchedule", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaAntiguedad", storage: "widget" },
+  { id: "table-cobranza-saldos", titleKey: "cobranza.balancesByClient", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaSaldos", storage: "widget" },
+  { id: "table-cobranza-concentracion", titleKey: "cobranza.concentracion.tablaTitle", category: "COBRANZA", type: "TABLE", componentKey: "cobranzaConcentracionTabla", storage: "widget" },
 
   // ── Posición Financiera (/dashboard/posicion-financiera) ─────────────────
   ...POSICION_GAUGE_WIDGETS,
   { id: "table-posicion-balance", titleKey: "posicionFinanciera.titlePosition", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },
   { id: "table-posicion-resultados", titleKey: "posicionFinanciera.titleResults", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },
   { id: "table-posicion-razones", titleKey: "posicionFinanciera.titleRatios", category: "POSICION", type: "TABLE", componentKey: "posicionStatement", storage: "widget" },
+  { id: "table-posicion-balanza", titleKey: "posicionFinanciera.titleTrial", category: "POSICION", type: "TABLE", componentKey: "posicionBalanza", storage: "widget" },
 ];
 
 const WIDGETS_BY_ID = new Map(FAVORITABLE_WIDGETS.map((widget) => [widget.id, widget]));

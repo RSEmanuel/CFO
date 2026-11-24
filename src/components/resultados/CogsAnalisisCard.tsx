@@ -295,15 +295,15 @@ function AnalisisRow({
         "border-t border-border/40",
         isTotalCosto && "border-t-2 border-t-foreground/40",
         isResult && "bg-[var(--cifra-good-soft)]/70",
-        isHeader && "font-semibold",
+        isHeader && "font-medium",
       )}
     >
       <td
         className={cn(
           "py-2 pr-3 text-foreground",
           isSub && "pl-6 text-muted-foreground",
-          isHeader && "font-semibold",
-          isResult && "font-semibold underline decoration-double decoration-[var(--cifra-good)] underline-offset-4",
+          isHeader && "font-medium",
+          isResult && "font-medium underline decoration-double decoration-[var(--cifra-good)] underline-offset-4",
         )}
       >
         {isResult ? (

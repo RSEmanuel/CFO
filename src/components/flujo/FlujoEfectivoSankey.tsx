@@ -125,7 +125,7 @@ export function FlujoEfectivoSankey({
                     width: TOTAL_LABEL_WIDTH,
                     overflow: "break",
                     fontSize: frame.totalFontSize,
-                    fontWeight: 600,
+                    fontWeight: 500,
                     lineHeight: 24,
                   }
                 : {

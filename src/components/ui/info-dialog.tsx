@@ -43,7 +43,7 @@ export function InfoDialog({
           >
             <X className="h-4 w-4" />
           </DialogPrimitive.Close>
-          <DialogPrimitive.Title className="pr-8 font-sans text-xl font-bold text-foreground">
+          <DialogPrimitive.Title className="pr-8 font-sans text-xl font-medium text-foreground">
             {title}
           </DialogPrimitive.Title>
           <DialogPrimitive.Description className="mt-4 text-base leading-relaxed text-foreground">

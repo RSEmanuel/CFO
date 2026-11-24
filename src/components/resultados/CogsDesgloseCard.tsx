@@ -80,7 +80,7 @@ export function CogsDesgloseCard({ periodo, units }: CogsDesgloseCardProps) {
             </div>
             <div className="flex items-center gap-1">
               <FavoriteStarButton widgetId="chart-cogs-desglose" label={t("resultados.cogs.title")} />
-              <p className="financial-nums text-2xl font-semibold tracking-tight">
+              <p className="financial-nums text-2xl font-medium tracking-tight">
                 {formatAxisTick(data.totalCosto, units)}
               </p>
               {toggle}

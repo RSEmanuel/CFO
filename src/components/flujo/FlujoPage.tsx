@@ -34,7 +34,7 @@ export function FlujoPage() {
 
   return (
     <div className="mx-auto w-full max-w-[1680px] bg-background">
-      <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.cashflow")}</p>
+      <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.cashflow")}</p>
 
       <div className="mt-4">
         <ResultadosFilterBar

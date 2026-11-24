@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { PolizasAuditSheet, type PolizasAuditTarget } from "@/components/polizas/PolizasAuditSheet";
 import { RESULTADOS_FAVORITE } from "@/services/favoritesRegistry";
@@ -215,10 +216,12 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
             <div className="h-full rounded-full bg-clay" style={{ width: `${pacing.avancePct}%` }} />
           </div>
 
-          <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight">
+          <p className="financial-nums mt-4 text-3xl font-medium tracking-tight">
             {pacing.cierreEstimado == null ? t("resultados.ingreso.na") : formatCompactAxis(pacing.cierreEstimado)}
           </p>
-          <p className="mt-1 text-sm text-muted-foreground">{pacingTexto}</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            <ConCifras>{pacingTexto}</ConCifras>
+          </p>
 
           <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-border/60 pt-3 text-sm">
             <span className="text-muted-foreground">
@@ -267,7 +270,7 @@ export function IngresoMonitor({ periodo, part }: IngresoMonitorProps) {
           <TableScroll className="mt-4">
             <table className="w-full min-w-[640px] text-sm">
               <thead>
-                <tr className="text-left text-[11.5px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
+                <tr className="text-left text-[11.5px] font-medium uppercase tracking-[0.08em] text-muted-foreground">
                   <th className="pb-2 pr-3 font-medium">{t("resultados.ingreso.colConcepto")}</th>
                   <th className="pb-2 pr-3 text-right font-medium">{t("resultados.ingreso.colMonto")}</th>
                   <th className="pb-2 pr-3 text-right font-medium">{t("resultados.ingreso.colPct")}</th>

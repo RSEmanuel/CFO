@@ -73,7 +73,7 @@ export function MobileNav() {
           </Button>
         </SheetContent>
       </Sheet>
-      <span className="text-sm font-semibold text-clay">{t("common.appName")}</span>
+      <span className="text-sm font-medium text-clay">{t("common.appName")}</span>
     </div>
   );
 }

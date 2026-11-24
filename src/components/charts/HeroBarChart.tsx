@@ -153,7 +153,7 @@ export function HeroBarChart({
                   fill={CHART_AXIS.tick}
                   fontSize={12}
                   className="financial-nums"
-                  style={{ fontWeight: 700, fontFamily: "var(--cifra-font-mono)", fontVariantNumeric: "tabular-nums" }}
+                  style={{ fontWeight: 500, fontFamily: "var(--cifra-font-mono)", fontVariantNumeric: "tabular-nums" }}
                   valueAccessor={(entry) => {
                     const payload = (entry.payload ?? {}) as HeroBarDatum;
                     // Una sola cifra por pila: la lleva la serie más alta con valor en esa barra.

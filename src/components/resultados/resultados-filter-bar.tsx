@@ -42,7 +42,7 @@ function FilterSelect({ label, value, onValueChange, options }: FilterSelectProp
   const { t } = useLocale();
   return (
     <label className="min-w-[140px] flex-1">
-      <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {label}
       </span>
       <Select value={value || undefined} onValueChange={onValueChange}>
@@ -74,7 +74,7 @@ function ToggleGroup<T extends string>({
 }) {
   return (
     <div className="min-w-[140px]">
-      <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+      <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
         {label}
       </span>
       <div className="inline-flex h-10 items-center rounded-control border border-input bg-card p-0.5">

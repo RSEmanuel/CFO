@@ -111,7 +111,7 @@ export function MetricsCatalog() {
     <div className="metrics-page space-y-5">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-2xl font-bold tracking-tight text-clay">{t("nav.metrics")}</p>
+          <p className="text-2xl font-medium tracking-tight text-clay">{t("nav.metrics")}</p>
         </div>
         {data ? (
           <span className="w-fit rounded-full border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground">

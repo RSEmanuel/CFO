@@ -30,7 +30,7 @@ export function PosicionFinancieraFilterBar({
   return (
     <div className="flex flex-wrap gap-4">
       <label className="min-w-[140px]">
-        <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+        <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
           {t("filters.year")}
         </span>
         <Select
@@ -51,7 +51,7 @@ export function PosicionFinancieraFilterBar({
       </label>
       {showPeriod ? (
         <label className="min-w-[140px]">
-          <span className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+          <span className="mb-1.5 block text-[10px] font-medium uppercase tracking-[0.12em] text-muted-foreground">
             {t("filters.period")}
           </span>
           <Select

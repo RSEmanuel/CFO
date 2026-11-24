@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { DataEmptyState, DataErrorState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
 import { Input } from "@/components/ui/input";
@@ -71,10 +72,10 @@ function KpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2 pr-10">
-        <p className="font-sans text-lg font-bold text-foreground">{label}</p>
+        <p className="font-sans text-lg font-medium text-foreground">{label}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={label} /> : null}
       </div>
-      <p className="financial-nums mt-4 text-3xl font-semibold tracking-tight text-foreground">
+      <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">
         {value}
       </p>
     </article>
@@ -104,11 +105,11 @@ function PlazoKpiCard({
       )}
     >
       <div className="flex items-start justify-between gap-2 pr-10">
-        <p className="font-sans text-lg font-bold text-foreground">{title}</p>
+        <p className="font-sans text-lg font-medium text-foreground">{title}</p>
         {favoriteId ? <FavoriteStarButton widgetId={favoriteId} label={title} /> : null}
       </div>
       <p className="mt-1 text-xs uppercase tracking-[0.08em] text-muted-foreground">{subtitle}</p>
-      <p className="financial-nums mt-4 text-3xl font-bold tracking-tight text-foreground">{value}</p>
+      <p className="financial-nums mt-4 text-3xl font-medium tracking-tight text-foreground">{value}</p>
     </article>
   );
 }
@@ -152,10 +153,10 @@ function PlazosComercialesRow({ plazos }: { plazos: PlazosComerciales }) {
       </div>
       {kind === "deficit" ? (
         <p
-          className="rounded-xl border border-category-efficiencyFg/25 bg-category-efficiency px-3 py-2 text-sm font-medium text-category-efficiencyInk"
+          className="rounded-xl border border-category-efficiencyFg/25 bg-category-efficiency px-3 py-2 text-sm text-category-efficiencyInk"
           role="status"
         >
-          {t("cobranza.cartera.brechaDeficit", { days: formatPlazoDias(plazos.brecha, na) })}
+          <ConCifras heredarColor>{t("cobranza.cartera.brechaDeficit", { days: formatPlazoDias(plazos.brecha, na) })}</ConCifras>
         </p>
       ) : null}
       {kind === "superavit" ? (
@@ -256,7 +257,7 @@ function CarteraMovimientosDetalle({ cuenta, moneda }: { cuenta: string; moneda:
               {t("cobranza.cartera.filaSaldoFinal")}
             </td>
             <td className="pt-1.5" colSpan={2} />
-            <td className="financial-nums pt-1.5 text-right font-semibold">
+            <td className="financial-nums pt-1.5 text-right font-medium">
               {formatMoney(data.saldoFinal, moneda)}
             </td>
           </tr>
@@ -271,11 +272,15 @@ function CarteraTable({
   moneda,
   facturadoLabel,
   pagadoLabel,
+  title,
+  favoriteId,
 }: {
   items: CarteraItemPayload[];
   moneda: string;
   facturadoLabel: string;
   pagadoLabel: string;
+  title: string;
+  favoriteId: string;
 }) {
   const { t } = useLocale();
   const [search, setSearch] = useState("");
@@ -337,7 +342,9 @@ function CarteraTable({
   ];
 
   return (
-    <div className="mt-4 rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+    <div className="relative mt-4 rounded-card border border-border bg-card p-5 shadow-[var(--shadow-card)]">
+      <FavoriteStarButton widgetId={favoriteId} label={title} />
+      <h2 className="mb-3 pr-10 font-sans text-lg font-medium text-foreground">{title}</h2>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="relative w-full max-w-sm">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -432,7 +439,7 @@ function CarteraTable({
                     <td className="financial-nums py-3 text-right text-foreground">
                       {formatMoney(row.pagadoEnMes, moneda)}
                     </td>
-                    <td className="financial-nums py-3 text-right font-semibold text-foreground">
+                    <td className="financial-nums py-3 text-right font-medium text-foreground">
                       {formatMoney(row.saldoPendiente, moneda)}
                     </td>
                   </tr>
@@ -534,6 +541,8 @@ export function CobranzaCarteraSection() {
             moneda={data.moneda}
             facturadoLabel={t("cobranza.cartera.colFacturado")}
             pagadoLabel={t("cobranza.cartera.colCobrado")}
+            title={t("cobranza.cartera.tablaCxc")}
+            favoriteId="table-cobranza-cartera-cxc"
           />
         </TabsContent>
 
@@ -560,6 +569,8 @@ export function CobranzaCarteraSection() {
             moneda={data.moneda}
             facturadoLabel={t("cobranza.cartera.colComprado")}
             pagadoLabel={t("cobranza.cartera.colPagado")}
+            title={t("cobranza.cartera.tablaCxp")}
+            favoriteId="table-cobranza-cartera-cxp"
           />
         </TabsContent>
       </Tabs>
@@ -620,6 +631,37 @@ export function CobranzaCarteraKpiCard({ kpi }: { kpi: CobranzaCarteraKpiKey }) 
       value={formatMoney(config.value, data.moneda)}
       tone="margins"
       favoriteId={`kpi-cobranza-${kpi}`}
+    />
+  );
+}
+
+/** Tabla de cartera (clientes o proveedores, MXN) para el Panel de Control; api-cache deduplica la request. */
+export function CarteraTablaCard({ lado }: { lado: "cxc" | "cxp" }) {
+  const { t } = useLocale();
+  const { data, loading, error } = useCobranzaCartera("MXN");
+  if (loading) {
+    return <div className="h-72 animate-pulse rounded-card bg-secondary" />;
+  }
+  if (error || !data?.hasData) {
+    return null;
+  }
+  return lado === "cxc" ? (
+    <CarteraTable
+      items={data.clientes.items}
+      moneda={data.moneda}
+      facturadoLabel={t("cobranza.cartera.colFacturado")}
+      pagadoLabel={t("cobranza.cartera.colCobrado")}
+      title={t("cobranza.cartera.tablaCxc")}
+      favoriteId="table-cobranza-cartera-cxc"
+    />
+  ) : (
+    <CarteraTable
+      items={data.proveedores.items}
+      moneda={data.moneda}
+      facturadoLabel={t("cobranza.cartera.colComprado")}
+      pagadoLabel={t("cobranza.cartera.colPagado")}
+      title={t("cobranza.cartera.tablaCxp")}
+      favoriteId="table-cobranza-cartera-cxp"
     />
   );
 }

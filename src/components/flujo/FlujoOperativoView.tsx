@@ -1,5 +1,6 @@
 "use client";
 
+import { ConCifras } from "@/components/ui/con-cifras";
 import { ExpandableShell } from "@/components/charts/ExpandableChartCard";
 import { DataEmptyState } from "@/components/data-empty-state";
 import { FavoriteStarButton } from "@/components/favorites/favorite-star-button";
@@ -120,7 +121,7 @@ function OperativoTooltip({ active, payload }: { active?: boolean; payload?: Arr
             {formatMxn(punto.neto)}
           </span>
         </div>
-        <div className="flex items-center justify-between gap-4 border-t border-border pt-1.5 font-semibold">
+        <div className="flex items-center justify-between gap-4 border-t border-border pt-1.5 font-medium">
           <span>{t("flujo.operativo.finalBalance")}</span>
           <span className="financial-nums font-medium text-foreground">
             {formatMxn(punto.saldoAcumulado)}
@@ -148,7 +149,7 @@ function SaldoStat({ label, value, detail }: { label: string; value: string; det
   return (
     <div className="min-w-0">
       <p className="text-xs font-medium text-muted-foreground">{label}</p>
-      <p className="cifra-num mt-0.5 text-xl font-semibold tracking-tight text-foreground">{value}</p>
+      <p className="cifra-num mt-0.5 text-xl font-medium tracking-tight text-foreground">{value}</p>
       {detail ? <p className="text-xs text-muted-foreground">{detail}</p> : null}
     </div>
   );
@@ -220,15 +221,17 @@ export function FlujoOperativoTablero({
 
           {minimo ? (
             <p className="mt-3 text-sm text-foreground">
-              {enNegativo
-                ? t("flujo.operativo.saldoDiario.insightNegative", {
-                    dia: diaMinimo,
-                    monto: formatMxn(-minimo.saldoAcumulado),
-                  })
-                : t("flujo.operativo.saldoDiario.insightLowest", {
-                    dia: diaMinimo,
-                    monto: formatMxn(minimo.saldoAcumulado),
-                  })}
+              <ConCifras>
+                {enNegativo
+                  ? t("flujo.operativo.saldoDiario.insightNegative", {
+                      dia: diaMinimo,
+                      monto: formatMxn(-minimo.saldoAcumulado),
+                    })
+                  : t("flujo.operativo.saldoDiario.insightLowest", {
+                      dia: diaMinimo,
+                      monto: formatMxn(minimo.saldoAcumulado),
+                    })}
+              </ConCifras>
             </p>
           ) : null}
 
@@ -290,7 +293,7 @@ export function FlujoOperativoTablero({
 
           {data.totales.traspasos > 0 ? (
             <p className="mt-3 text-xs text-muted-foreground">
-              {t("flujo.operativo.traspasosNote", { amount: formatMxn(data.totales.traspasos) })}
+              <ConCifras>{t("flujo.operativo.traspasosNote", { amount: formatMxn(data.totales.traspasos) })}</ConCifras>
             </p>
           ) : null}
         </>
