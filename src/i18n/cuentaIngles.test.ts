@@ -48,4 +48,19 @@ describe("traducción de cuentas al inglés", () => {
     assert.equal(traducirCuentaAlIngles("Prestamo BBVA 007416900000003313"), "Loan BBVA 007416900000003313");
     assert.equal(traducirCuentaAlIngles("Arrendamiento de Oficina C.S.G"), "Office lease C.S.G");
   });
+  it("traduce las cuentas de la empresa de ejemplo, con su etiqueta (sample)", () => {
+    const casos: Record<string, string> = {
+      "Ventas línea ferretería (ejemplo)": "Hardware line sales (sample)",
+      "Ventas línea construcción ligera (ejemplo)": "Light construction line sales (sample)",
+      "Costo de ventas (ejemplo)": "Cost of sales (sample)",
+      "Sueldos de ventas (ejemplo)": "Sales salaries (sample)",
+      "Renta de bodega (ejemplo)": "Warehouse rent (sample)",
+      "Caja chica de ejemplo": "Petty cash (sample)",
+      "Préstamo bancario de ejemplo": "Bank loan (sample)",
+      "Banco Ejemplo, cuenta principal": "Sample Bank, main account",
+      "Inventario de mercancía (ejemplo)": "Merchandise inventory (sample)",
+      "Luz, agua y teléfono (ejemplo)": "Electricity, water and telephone (sample)",
+    };
+    for (const [es, en] of Object.entries(casos)) assert.equal(traducirCuentaAlIngles(es), en, es);
+  });
 });
