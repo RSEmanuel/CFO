@@ -5,6 +5,7 @@ import { CatalogMetricCard } from "@/components/metrics/catalog-metric-card";
 import { renderModuleFavoriteMetric } from "@/components/metrics/module-metric-favorites";
 import type { ResultadosFilters } from "@/components/resultados/resultados-filter-bar";
 import { useDashboardData } from "@/context/DashboardDataContext";
+import { useLocale } from "@/context/LocaleContext";
 import { useFavorites } from "@/context/FavoritesContext";
 import { useMetricsCatalog } from "@/hooks/use-metrics-catalog";
 import { isRegisteredFavoriteId } from "@/services/favoritesRegistry";
@@ -24,6 +25,7 @@ type CatalogFavoritesSectionProps = {
 export function CatalogFavoritesSection({ filters }: CatalogFavoritesSectionProps) {
   const { favoriteMetricIds, favoriteChartIds } = useFavorites();
   const dashboard = useDashboardData();
+  const { t } = useLocale();
   const comparable = filters.comparable === "mom" ? "mom" : "yoy";
   const { data: catalog } = useMetricsCatalog(comparable);
 
@@ -55,7 +57,7 @@ export function CatalogFavoritesSection({ filters }: CatalogFavoritesSectionProp
             return metric ? <CatalogMetricCard key={id} metric={metric} comparable={comparable} /> : null;
           })}
           {moduleIds.map((id) => (
-            <div key={id}>{renderModuleFavoriteMetric(id, dashboard.pack, dashboard.loading)}</div>
+            <div key={id}>{renderModuleFavoriteMetric(id, dashboard.pack, dashboard.loading, t)}</div>
           ))}
         </div>
       ) : null}

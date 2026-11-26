@@ -181,7 +181,7 @@ export function MetricsCatalog() {
                     if (catalog) {
                       return <CatalogMetricCard key={id} metric={catalog} comparable={filters.comparable} />;
                     }
-                    return <div key={id}>{renderModuleFavoriteMetric(id, dashboard.pack, dashboard.loading)}</div>;
+                    return <div key={id}>{renderModuleFavoriteMetric(id, dashboard.pack, dashboard.loading, t)}</div>;
                   })}
                 </div>
               </div>

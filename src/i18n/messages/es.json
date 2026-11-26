@@ -2265,5 +2265,32 @@
     "7102": "Productos financieros",
     "7104": "Otros productos financieros",
     "8101": "Gastos financieros"
+  },
+  "favoritosModulo": {
+    "freeCashFlow": "Free Cash Flow",
+    "mesesRespiro": "Meses de respiro",
+    "margenEbitda": "Margen EBITDA",
+    "ccc": "Ciclo de conversión (CCC)",
+    "realVsPresupuesto": "Real vs presupuesto (ingresos)",
+    "top5": "Concentración Top 5",
+    "top10": "Concentración Top 10",
+    "liquidezCorriente": "Liquidez corriente",
+    "pruebaAcida": "Prueba ácida",
+    "endeudamiento": "Endeudamiento",
+    "coberturaIntereses": "Cobertura de intereses",
+    "saldoFinal": "Saldo final en bancos (tesorería)",
+    "entradasOperativas": "Entradas operativas",
+    "salidasOperativas": "Salidas operativas",
+    "capex": "CapEx",
+    "servicioDeuda": "Servicio de deuda",
+    "costosFijos": "Costos fijos",
+    "costosVariables": "Costos variables",
+    "egresosTotales": "Egresos totales",
+    "nwc": "NWC",
+    "dso": "Días promedio de cobro (DSO)",
+    "dsoInsight": "Cuántos días tardas, en promedio, en cobrar a tus clientes.",
+    "dio": "DIO",
+    "dpo": "DPO",
+    "ccc2": "CCC"
   }
 }

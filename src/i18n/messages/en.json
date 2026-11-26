@@ -2265,5 +2265,32 @@
     "7102": "Financial income",
     "7104": "Other financial income",
     "8101": "Financial expenses"
+  },
+  "favoritosModulo": {
+    "freeCashFlow": "Free cash flow",
+    "mesesRespiro": "Months of runway",
+    "margenEbitda": "EBITDA margin",
+    "ccc": "Cash conversion cycle (CCC)",
+    "realVsPresupuesto": "Actual vs budget (sales)",
+    "top5": "Top 5 concentration",
+    "top10": "Top 10 concentration",
+    "liquidezCorriente": "Current ratio",
+    "pruebaAcida": "Quick ratio",
+    "endeudamiento": "Debt ratio",
+    "coberturaIntereses": "Interest coverage",
+    "saldoFinal": "Ending bank balance (treasury)",
+    "entradasOperativas": "Operating cash in",
+    "salidasOperativas": "Operating cash out",
+    "capex": "CapEx",
+    "servicioDeuda": "Debt service",
+    "costosFijos": "Fixed costs",
+    "costosVariables": "Variable costs",
+    "egresosTotales": "Total expenses",
+    "nwc": "NWC",
+    "dso": "Average days to collect (DSO)",
+    "dsoInsight": "How many days it takes you, on average, to collect from your customers.",
+    "dio": "DIO",
+    "dpo": "DPO",
+    "ccc2": "CCC"
   }
 }
